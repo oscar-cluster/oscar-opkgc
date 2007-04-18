@@ -14,7 +14,6 @@ import os
 import re
 import shutil
 import exceptions
-import tarfile
 from OpkgcXml import *
 from OpkgcConfig import *
 from OpkgDescription import *
@@ -135,16 +134,19 @@ class CompilerRpm(Compiler):
         desc = OpkgDescriptionRpm(self.xml_tool.getXmlDoc(), self.dist)
 
         pkgName = Tools.normalizeWithDash(self.getPackageName())
-        self.pkgDir = os.path.join(self.getDestDir(), "opkg-%s" % pkgName)
+        self.pkgDir = os.path.join(self.getMacro('%_sourcedir'), "opkg-%s" % pkgName)
 
         if (os.path.exists(self.pkgDir)):
             Tools.rmDir(self.pkgDir)
         os.makedirs(self.pkgDir)
-        
-        self.specfile = os.path.join(self.getDestDir(),
-                                     "opkg-%s.spec" % pkgName)
-        if (os.path.exists(self.specfile)):
-            os.remove(self.specfile)
+
+        specdir = self.getMacro('%_specdir')
+        self.specfile = os.path.join(specdir, "opkg-%s.spec" % pkgName)
+        if (not os.path.exists(specdir)):
+            os.makedirs(specdir)
+        else:
+            if (os.path.exists(self.specfile)):
+                os.remove(self.specfile)
 
         # Produce spec file
         self.cheetahCompile(
@@ -152,14 +154,9 @@ class CompilerRpm(Compiler):
             os.path.join(Config().get(self.configSection, "templatedir"), "opkg.spec.tmpl"),
             self.specfile)
 
-        # Produce a tarball from package dir
-        tarpath = "%s.tar.gz" % self.pkgDir
-        if (os.path.exists(tarpath)):
-            os.remove(tarpath)
-
-        tar = tarfile.open(tarpath, "w:gz")
-        tar.add(self.pkgDir)
-        tar.close()
+    def getMacro(self, name):
+        line = os.popen("rpm --eval %s" % name).readline()
+        return line.strip()
 
     def build(self):
         cmd = Config().get(self.configSection, "buildcmd")
@@ -174,10 +171,17 @@ class CompilerDebian(Compiler):
     configSection = "DEBIAN"
     supportedDist = ['debian']
     pkgDir = ''
-    scriptsOrigDest = {'api-pre-install':       'opkg-api-%s.preinst',
-                       'server-post-install':   'opkg-server-%s.postinst',
+    scriptsOrigDest = {'api-pre-install'      : 'opkg-api-%s.preinst',
+                       'api-post-install'     : 'opkg-api-%s.postinst',
+                       'api-pre-uninstall'    : 'opkg-api-%s.prerm',
+                       'api-post-uninstall'   : 'opkg-api-%s.postrm',
+                       'server-pre-install'   : 'opkg-server-%s.preinst',
+                       'server-post-install'  : 'opkg-server-%s.postinst',
+                       'server-pre-uninstall' : 'opkg-server-%s.prerm',
                        'server-post-uninstall': 'opkg-server-%s.postrm',
-                       'client-post-install':   'opkg-client-%s.postinst',
+                       'client-pre-install'   : 'opkg-client-%s.preinst',
+                       'client-post-install'  : 'opkg-client-%s.postinst',
+                       'client-pre-uninstall' : 'opkg-client-%s.prerm',
                        'client-post-uninstall': 'opkg-client-%s.postrm'}
 
     def compile (self):

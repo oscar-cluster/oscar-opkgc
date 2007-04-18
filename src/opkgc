@@ -33,13 +33,13 @@ compilers = ['CompilerRpm', 'CompilerDebian']
 def usage():
     """ Print command usage
     """
-    print "Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [--build]"
+    print "Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [--source]"
     print "               [-o|--output=dir] [-i|--input=dir] --dist=targetDist"
     print ""
     print "\t--supported-dist : list supported distributions for --dist option"
     print "\t--dist           : target distibution, default to current distribution"
     print ""
-    print "\t--build  : build packages"
+    print "\t--source : does not build package, only generate sources"
     print "\t--input  : opkg directory, default current dir"
     print "\t--output : build packages in specified dir"
 
@@ -51,15 +51,11 @@ def distList():
         for target in eval(compiler).SupportedDist():
             print target
 
-def getCurrentDist():
-    """
-    """
-
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hubi:o:d:",
-                                   ["help", "supported-dist", "build", "input=", "output=", "dist="])
+                                   "husi:o:d:",
+                                   ["help", "supported-dist", "source", "input=", "output=", "dist="])
     except getopt.GetoptError:
         # Print help information
         usage()
@@ -69,7 +65,7 @@ def main():
     Config()
 
     # Default values
-    build = False
+    build = True
     inputdir = "."
     output = "."
     validate = True
@@ -82,13 +78,13 @@ def main():
         if o in ("-u", "--supported-dist"):
             distList()
             sys.exit()
-        if o in ("-b", "--build"):
-            build = True
+        if o in ("-s", "--source"):
+            build = False
         if o in ("-i", "--input"):
             inputdir = a
         if o in ("-o", "--output"):
             output = a
-        if o in ("-o", "--dist"):
+        if o in ("-d", "--dist"):
             dist = a
 
     # Build list of available target distributions and
