@@ -1,0 +1,68 @@
+### Makefile.in for opkgc src
+###
+### Copyright 2007 INRIA-IRISA
+###     Jean Parpaillon <jean.parpaillon@irisa.fr>
+###
+DISTFILES =  $(EXTRA_DIST) setup.py.in Makefile.in opkgc opkg-convert Opkgc
+DISTCLEAN_FILES = $(EXTRA_DISTCLEAN_FILES) Makefile setup.py
+
+CLEAN_FILES = $(EXTRA_CLEAN_FILES)
+
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
+pkgdatadir=@datadir@/@PACKAGE@
+srcdir=@srcdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+datadir=@datadir@
+datarootdir=@datarootdir@
+docdir=@docdir@
+htmldir=@htmldir@
+pdfdir=@docdir@
+mkdir_p = @mkdir_p@
+install_sh_SCRIPT = @install_sh@ -c
+INSTALL = @install_sh@
+INSTALL_DATA = @INSTALL_DATA@
+
+ifeq ($(DESTDIR),)
+destdircmd=
+else
+destdircmd=--root=$(DESTDIR)
+endif
+
+all:
+	python setup.py build
+
+distdir: $(DISTFILES)
+	for distfile in $(DISTFILES); do \
+	  distfile_dir=`dirname $$distfile`; \
+	  if test "$$distfile_dir" = "$(srcdir)"; then \
+	    rsync -av --exclude '.svn' --exclude '*~' $$distfile $(distdir); \
+	  else \
+	    test -d $(distdir)/$$distfile_dir || $(mkdir_p) $(distdir)/$$distfile_dir; \
+	    rsync -av --exclude '.svn' --exclude '*~' $$distfile $(distdir)/$$distfile_dir; \
+	  fi; \
+	done
+
+install: all
+	python setup.py install -f --prefix=$(prefix) $(destdircmd) | \
+	  egrep '^copying' | sed -e 's/.*\(\/[a-zA-Z0-9_-.]*\)\s*->\s*\(.*\)/\2\1/' > install.list
+	$(install_sh_SCRIPT) opkg-convert $(DESTDIR)$(bindir)
+
+uninstall:
+	if test -e install.list; then \
+	  for f in `cat install.list`; do \
+	    rm -f $$f; \
+	    if echo $$f | egrep '\.py$$' > /dev/null; then \
+	      rm -f `dirname $$f`/`basename $$f .py`.pyc; \
+	    fi; \
+	  done; \
+	fi
+	rm -f $(DESTDIR)$(bindir)/opkg-convert 
+
+clean:
+	python setup.py clean
+	rm -rf $(CLEAN_FILES) *~ 
+
+distclean: clean
+	rm -rf $(DISTCLEAN_FILES)

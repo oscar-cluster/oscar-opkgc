@@ -1,0 +1,412 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<refentry id='opkg.5'>
+  <refmeta>
+    <refentrytitle>opkg</refentrytitle>
+    <manvolnum>5</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>opkg</refname>
+    <refpurpose>Format for OSCAR packages (opkg)</refpurpose>
+  </refnamediv>
+
+  <refsect1>
+    <title>Introduction</title>
+    <para>
+      This manual describes the structure of an OSCAR package.
+    </para>
+    <para>
+      OSCAR packages (<emphasis>opkg</emphasis>) describes software
+      in a multi-distribution way and with cluster-wide
+      characteristics.
+    </para>
+    <para>
+      The compiler for <emphasis>opkg</emphasis> is
+      <command>opkgc</command>. It produces a set of three native (RPM
+      or Deb) packages:
+      <orderedlist>
+	<listitem><para><command>opkg-&lt;package&gt;</command></para></listitem>
+	<listitem><para><command>opkg-&lt;package&gt;-server</command></para></listitem>
+	<listitem><para><command>opkg-&lt;package&gt;-client</command></para></listitem>
+      </orderedlist>
+    </para>
+    <para>
+      We call OSCAR package source (<emphasis>opkg source</emphasis>)
+      a directory containing needed files to build an OSCAR package
+      (<emphasis>opkg</emphasis>). The following is the list of files
+      composing an <emphasis>opkg source</emphasis>. <xref
+      linkend="files" /> contains a detailed description of each
+      files.
+
+      <table>
+	<title>OSCAR Package Source</title>
+	<tgroup  cols="2">
+	  <tbody>
+	    <row>
+	      <entry><filename>config.xml</filename></entry>
+	      <entry>required</entry>
+	    </row>
+	    <row>
+	      <entry><filename>configurator.html/</filename></entry>
+	      <entry>optional</entry>
+	    </row>
+	    <row>
+	      <entry><filename>scripts/</filename></entry>
+	      <entry>optional</entry>
+	    </row>
+	    <row>
+	      <entry><filename>doc/</filename></entry>
+	      <entry>optional</entry>
+	    </row>
+	    <row>
+	      <entry><filename>testing/</filename></entry>
+	      <entry>optional</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </para>
+  </refsect1>
+
+  <refsect1 id="files" >
+    <title>OSCAR Package Source Files</title>
+
+    <refsect2>
+      <title><filename>config.xml</filename> File</title>
+      <para>
+	The file <filename>config.xml</filename> contains the
+	description of the package (authors, dependancies,
+	changelog, informal description, etc.).
+      </para>
+      <para>
+	It is described in a formal way by a XML schema located in
+	<filename>/usr/share/doc/opkg/opkg.xsd</filename> if you
+	installed the <command>opkgc</command>. The schema is also
+	available online at <ulink
+	url="http://svn.oscar.openclustergroup.org/trac/oscar/browser/pkgsrc/tools/opkgc/doc/opkg.xsd"
+	>http://svn.oscar.openclustergroup.org/trac/oscar/browser/pkgsrc/tools/opkgc/doc/opkg.xsd</ulink>
+      </para>
+    </refsect2>
+
+    <refsect2>
+      <title><filename>configurator.html</filename></title>
+
+      <para>
+	The file <filename>configurator.html</filename> is an HTML
+	file containing a form. Input fields are used to obtain user
+	input.
+      </para>
+
+      <para>
+	See <xref linkend="configuration" /> for more information.
+      </para>
+    </refsect2>
+
+    <refsect2>
+      <title><filename>scripts</filename> Directory</title>
+
+      <para>
+	This directory contains executable scripts executed before
+	or after package installation or removal, or during other
+	stage of the deployment of an OSCAR cluster.
+
+	<table id="scriptstable" >
+	  <title>opkg scripts</title>
+	  <tgroup cols="3">
+	    <thead>
+	      <row>
+		<entry>File name</entry>
+		<entry>Package</entry>
+		<entry>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry><filename>api-pre-install</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>native pre-install script</entry>
+	      </row>
+	      <row>
+		<entry><filename>api-post-install</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>native post-install script</entry>
+	      </row>
+	      <row>
+		<entry><filename>api-pre-uninstall</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>native pre-removal script</entry>
+	      </row>
+	      <row>
+		<entry><filename>api-pre-configure</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>Prepare package configuration</entry>
+	      </row>
+	      <row>
+		<entry><filename>api-post-configure</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>Process results from package
+		configuration</entry>
+	      </row>
+	      <row>
+		<entry><filename>api-post-image</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>Perform configuration with knowledge about
+		cluster nodes</entry>
+	      </row>
+	      <row>
+		<entry><filename>api-post-deploy</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>Perform final configuration with fully
+		install/booted cluster nodes</entry>
+	      </row>
+	      <row>
+		<entry><filename>api-post-uninstall</filename></entry>
+		<entry><command>opkg-&lt;package&gt;</command></entry>
+		<entry>native post-removal script</entry>
+	      </row>
+	      <row>
+		<entry><filename>server-pre-install</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-server</command></entry>
+		<entry>native pre-install script</entry>
+	      </row>
+	      <row>
+		<entry><filename>server-post-install</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-server</command></entry>
+		<entry>native post-install script</entry>
+	      </row>
+	      <row>
+		<entry><filename>server-pre-uninstall</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-server</command></entry>
+		<entry>native pre-removal script</entry>
+	      </row>
+	      <row>
+		<entry><filename>server-post-uninstall</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-server</command></entry>
+		<entry>native post-removal script</entry>
+	      </row>
+	      <row>
+		<entry><filename>client-pre-install</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-client</command></entry>
+		<entry>native pre-install script</entry>
+	      </row>
+	      <row>
+		<entry><filename>client-post-install</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-client</command></entry>
+		<entry>native post-install script</entry>
+	      </row>
+	      <row>
+		<entry><filename>client-pre-uninstall</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-client</command></entry>
+		<entry>native pre-removal script</entry>
+	      </row>
+	      <row>
+		<entry><filename>client-post-uninstall</filename></entry>
+		<entry><command>opkg-&lt;package&gt;-client</command></entry>
+		<entry>native post-removal script</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </para>
+
+      <refsect3>
+	<title>Native Packaging System Scripts</title>
+
+	<para>
+	  As shown on <xref linkend="scriptstable" />, some scripts
+	  are integrated into the native package system (RPM or Deb)
+	  as pre | post - install | removal scripts. These scripts
+	  must be written in <emphasis>sh</emphasis> language. It is
+	  the responsability of the author to write scripts which
+	  comply with generated packages policies:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		for RPM packages, a detailed description of scripts
+		API is at <ulink
+		url="http://www.rpm.org/max-rpm/s1-rpm-inside-scripts.html#S2-RPM-INSIDE-ERASE-TIME-SCRIPTS"
+		>http://www.rpm.org/max-rpm/s1-rpm-inside-scripts.html#S2-RPM-INSIDE-ERASE-TIME-SCRIPTS</ulink>,
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		for Debian packages, please refer to the Debian Policy
+		Manual, at <ulink
+		url="http://www.debian.org/doc/debian-policy/ch-maintainerscripts.html"
+		>http://www.debian.org/doc/debian-policy/ch-maintainerscripts.html</ulink>
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+	<para>
+	  Sample scripts are available in
+	  <filename>/usr/share/doc/opkg/samples/scripts</filename>
+	  directory if you installed an <command>opkgc</command>
+	  package.
+	</para>
+      </refsect3>
+      
+      <refsect3>
+	<title>Non-Native Packaging System Scripts</title>
+
+	<para>
+	  All scripts which are not described as native scripts in
+	  <xref linkend="scriptstable" /> are installed with package
+	  <filename>opkg-&lt;package&gt;</filename> into
+	  <filename>/var/lib/oscar/packages/&lt;package&gt;</filename>.
+	</para>
+	<para>
+	  About <filename>api-pre-configure</filename> and
+	  <filename>api-post-configure</filename>, please see <xref
+	  linkend="configuration" />
+	</para>
+      </refsect3>
+    </refsect2>
+
+    <refsect2>
+      <title><filename>testing</filename> Directory</title>
+
+      <para>
+	All files in this directory are installed into
+	<filename>/var/lib/oscar/testing/&lt;package&gt;</filename>
+	directory by the <filename>opkg-&lt;package&gt;</filename>
+	package (hence on the server).
+      </para>
+      <para>
+	During the testing phase of the deployment, the OSCAR
+	framework look for <filename>test_root</filename> and
+	<filename>test_user</filename> in this directory:
+
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      <filename>test_root</filename> is executed as user
+	      <emphasis>root</emphasis>,
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      <filename>test_user</filename> is executed as user
+	      <emphasis>oscartst</emphasis>.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+
+	<caution>
+	  <title>Notes</title>
+
+	  <para>
+	    There are obvious security issues with this but currently
+	    all operations in the cluster installation are being
+	    performed by <emphasis>root</emphasis>so care is expected
+	    at all phases.
+	  </para>
+	</caution>
+      </para>
+    </refsect2>
+
+    <refsect2>
+      <title><filename>doc</filename> Directory</title>
+      <para>
+	All files in this directory are included as documentation of
+	the <command>opkg-&lt;package&gt;</command>
+	package. Depending on standards of distributions, these
+	files are translated into HTML or PDF files. Hence,
+	recommended language for documentation is either
+	<command>LaTeX</command> or <command>DocBook</command>.
+      </para>
+    </refsect2>
+
+  </refsect1>
+
+  <refsect1 id="configuration" >
+    <title>Package configuration</title>
+
+    <para>
+      Package may obtain use input via a simple facility called the
+      "Configurator". The package author writes a simple HTML form
+      style document that is presented to the user if the package is
+      selected for installation. The standard multi-pick lists, radio
+      button, checkbox fields are avilable. Typically default values
+      are provided to simplify matters where possible for users.
+    </para>
+    <para>
+      To make use of this facility create a file in the OSCAR Package
+      Source directory called
+      <filename>configurator.html</filename>. After the selection of
+      the package selection phase of the OSCAR Wizard all packages
+      containing this file are processed by the Configurator. The
+      results of this processing are written out in XML format in
+      <filename>/var/lib/oscar/packages/&lt;package&gt;/.configurator.values</filename>. At
+      this point, the <filename>api-post-configure</filename> scripts
+      are fired so packages may read the results of the configuration
+      phase. The Perl <varname>XML::Simple</varname> module is
+      typically used for processing these results in conjunction with
+      the <varname>OSCAR_PACKAGE_HOME</varname> environment
+      variable. Alternatively, you can use the Perl subroutine
+      <varname>readInConfigValues</varname> available in the
+      <varname>OSCAR::Configbox</varname> module.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Native Generated Packages</title>
+
+    <refsect2 id="base" >
+      <title><command>opkg-&lt;package&gt;</command></title>
+
+      <para>
+	<command>opkg-&lt;package&gt;</command> depends on
+	<command>oscar-base</command> package plus other specified
+	packages, if any. It is installed on the server. It contains
+	various scripts to execute on the OSCAR server before or after
+	other packahes have been installed. 
+      </para>
+    </refsect2>  
+    
+    <refsect2 id="baseserver" >
+      <title><command>opkg-&lt;package&gt;-server</command></title>
+
+      <para>
+	<command>opkg-&lt;package&gt;-server</command> depends on
+	<command>oscar-base-server</command> package plus other
+	specified packages, if any. It is installed on the server. Its
+	main goal is to describe dependancies for server side of the
+	software. It may also contain post installation or removal
+	scripts.
+      </para>
+    </refsect2>  
+    
+    <refsect2 id="baseclient" >
+      <title><command>opkg-&lt;package&gt;-client</command></title>
+
+      <para>
+	<command>opkg-&lt;package&gt;-client</command> depends on
+	<command>oscar-base-client</command> package plus other
+	specified packages, if any. It is installed on the client nodes
+	image. Its main goal is to describe dependancies for client side
+	of the software. It may also contain post installation or
+	removal scripts.
+      </para>
+    </refsect2>
+  </refsect1>
+
+  <refsect1>
+    <title>Author</title>
+    <para>
+      This manual has been written by the Core OSCAR Team.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>See Also</title>
+    <para>
+      <itemizedlist>
+	<listitem>
+	  <para>opkgc (1)</para>
+	</listitem>
+      </itemizedlist>
+    </para>
+  </refsect1>
+</refentry>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"/usr/share/xml/docbook/schema/dtd/4.4/docbook.dtd">
+
+<article class="whitepaper" id="documentation" lang="en">
+  
+  <articleinfo> 
+    <title>OSCAR Package Compiler Manual</title>
+
+    <authorgroup>
+      <author>
+	<firstname>Geoffroy</firstname>
+	<surname>Vallee</surname>
+	<affiliation>
+	  <address><email>valleegr@ornl.gov</email></address>
+	</affiliation>
+      </author>
+      <author>
+	<firstname>Jean</firstname>
+	<surname>Parpaillon</surname>
+	<affiliation>
+	  <address><email>jean.parpaillon@irisa.fr</email></address>
+	</affiliation>
+      </author>
+    </authorgroup>
+
+  </articleinfo>
+
+  <sect1>
+    <title>Introduction</title>
+
+    <para>
+      The OSCAR Package Compiler (OPKGC) aims to generate binary
+      packages (both RPMs and Debian packages) from OSCAR packages in
+      order to ease their management and diffusion.
+    </para>
+    <para>
+      The idea of an OSCAR Package (OPKG) compiler has been defined and
+      presented by Erich Focht during the OSCAR meeting in January 2007.
+    </para>
+    <para>
+      Few constraints have to be kept in mind since the OSCAR developers
+      started to implement OPKGC:
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    The implementation has to be simple in order to ease the
+	    work of the maintainers: the development team of the OSCAR
+	    project is quite small so smaller and simpler is the code,
+	    better it is.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    OSCAR core components are implemented in Perl or Python,
+	    therefore it is a real plus if OPKGC can do so.
+	  </para>
+	</listitem>
+      </itemizedlist>
+    </para>
+    <para>
+      The OPKGC works in two phases: (i) the generation of the
+      <emphasis>meta-files</emphasis> for the creation of binary
+      packages (e.g. the creation of a spec file for RPMs), and the
+      creation of binary packages based on these meta-files.
+    </para>
+  </sect1>
+
+  <sect1>
+    <title>Architecture</title>
+
+    <sect2>
+      <title>Generation of Meta-Files for the Creation of Binary
+      Packages</title>
+
+      <sect3>
+	<title>Introduction</title>
+	
+	<para>
+	  OSCAR packages are described by a set of files in a
+	  distribution independant way. These files contains mandatory
+	  informations for binary packages generation plus some
+	  optional informations common to distribution specific
+	  packages system.  <filename>config.xml</filename> file
+	  contains most of informations about OPKG. For instance, it
+	  provides dependences informations, package information (such
+	  as version, author's information) and changelog. The other
+	  files are scripts executed before or after package
+	  installation or removal, plus documenation and testing
+	  scripts. A complete description of an OPKG is available on
+	  the OSCAR developpers
+	  wiki<footnote><para><!-- uri>http://svn.oscar.openclustergroup.org/trac/oscar/wiki/opkgAPI</uri --></para></footnote>.
+	</para>
+	<para>
+	  The idea is therefore to use these files to generate
+	  meta-files for binary packages. Typically, OPKGC allows
+	  developers to generate meta-files for binary packages for
+	  different distribution. For instance, they may want to
+	  execute the following command for the generation of binary
+	  package meta-files for RHEL: <command>opkgc --dist="rhel"
+	  &lt;directory&gt;</command>. This command will parse files
+	  in the given directory of the OPKG and generate the
+	  appropriate binary package meta-files.
+	</para>
+      </sect3>
+      <sect3>
+	<title>Implementation</title>
+	<para>
+	  The core of the mechanism for the generation of binary
+	  package meta-files is divided into three parts: (i) the
+	  parsing of the <filename>config.xml</filename>, (ii) the
+	  transformation of this XML files to the binary package
+	  meta-files and (iii) the addition of the various scripts and
+	  documentation files into the binary packages.
+	</para>
+	<para>
+	  To parse <filename>config.xml</filename> file, which is an
+	  XML document, OPKG use a standard API available in the
+	  Python language, <command>etree</command>. That will ease
+	  the OPKGC maintenance and will avoid bugs implied by the
+	  implementation of a new parser.
+	</para>
+	<para>
+	  A naive approach for the transformation of
+	  <emphasis>config.xml</emphasis> into binary package
+	  meta-files is to use XSLT files. XSLT stylesheets are
+	  dedicated to XML files transformations and a language
+	  (XPATH) allows access to elements in the XML document in a
+	  concise form. The main drawback is that generated files are
+	  not XML files and XSLT does not allow to control fine enough
+	  the syntax of generated files (ie, regarding spaces, carriage
+	  returns, or other regex transformations).
+	</para>
+	<para>
+	  Therefore, the
+	  <emphasis>Cheetah</emphasis><footnote><para>Included into
+	  all Python distributions: 
+	  <!-- uri>http://cheetahtemplate.org/</uri --></para></footnote>
+	  template system is used for meta-files generations. It needs
+	  more code to be written, but, this is the only way to
+	  generate syntaxically correct files.
+	</para>
+	<para>
+	  Therefore OPKGC is composed of two parts: (i) Cheetah
+	  templates for generated files meta-files, and (ii) a python
+	  code that drives the templating system, creates the right
+	  meta-files tree and generate the packages.
+	</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title><command>opkgc</command> Installation</title>
+
+      <para>
+      </para>
+    </sect2>
+
+    <sect2>
+      <title>Creation Binary Packages Configuration Files for Specific
+      Linux Distributions</title>
+      <para>
+	OSCAR package configuration files
+	(<emphasis>config.xml</emphasis>) may integrate filter for the
+	specification of parameters for different Linux
+	distribution. For instance, it is possible to specify that the
+	OPKG lam-oscar depends on Red Hat Entreprise Linux on the
+	<emphasis>lam-mpi</emphasis> RPM, whereas on Mandriva, it
+	depends on the <emphasis>lam</emphasis> RPM.  The OPKGC should
+	then allows developers to specify the Linux distribution for
+	which they want to generate binary packages (for instance using
+	a command such as <emphasis>opkgc -rpm="rhel"
+	config.xml</emphasis>).  The specification of such dependences
+	in the confiugration files disable the capability to have one
+	single generic XSL template for the generation of binary
+	packages.
+      </para>
+      <para>
+	Typically the way to deal with such a solution is to set a
+	parameter when compiling an OPKC; paramater that gives the
+	target Linux distribution. The standard mechanism for the
+	implementation of such a solution is to combine XSLT
+	stylesheets. A first stylesheet give a generic template and a
+	second template define a constant (a parameter in the XSLT
+	terminology) defining the target Linux distribution. Therefore
+	when combining the two stylesheets, the final stylesheets
+	includes both the generic template and a variable that sets the
+	target Linux distribution. Therefore, only the stylesheet
+	defining the variable for the specification of the target Linux
+	distribution must be dynamically generated based on the OPKGC
+	parameters (simple task).
+      </para>
+    </sect2>
+  </sect1>
+</article>
+

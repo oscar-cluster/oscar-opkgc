@@ -1,0 +1,53 @@
+### Makefile.in for opkgc configuration file
+###
+### Copyright 2007 INRIA-IRISA
+###     Jean Parpaillon <jean.parpaillon@irisa.fr>
+###
+SOURCES = opkgc.conf.in
+
+DISTFILES = $(SOURCES) $(EXTRA_DIST) 
+DISTCLEAN_FILES = $(EXTRA_DISTCLEAN_FILES) opkgc.conf Makefile
+
+CLEAN_FILES = $(EXTRA_CLEAN_FILES)
+
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
+srcdir=@srcdir@
+prefix=@prefix@
+sysconfdir=/etc
+datadir=@datadir@
+datarootdir=@datarootdir@
+pkgdatadir=@datadir@/@PACKAGE@
+docdir=@docdir@
+htmldir=@htmldir@
+pdfdir=@docdir@
+mkdir_p = @mkdir_p@
+INSTALL = @install_sh@
+INSTALL_DATA = @INSTALL_DATA@
+
+all:
+
+distdir: $(DISTFILES)
+	for distfile in $(DISTFILES); do \
+	  distfile_dir=`dirname $$distfile`; \
+	  if test "$$distfile_dir" = "$(srcdir)"; then \
+	    cp -av $$distfile $(distdir); \
+	  else \
+	    test -d $(distdir)/$$distfile_dir || $(mkdir_p) $(distdir)/$$distfile_dir; \
+	    cp -av $$distfile $(distdir)/$$distfile_dir; \
+	  fi; \
+	done
+
+install: install-data
+install-data:
+	if test ! -e "$(DESTDIR)$(sysconfdir)/opkgc.conf"; then \
+	  $(INSTALL_DATA) opkgc.conf $(DESTDIR)$(sysconfdir)/opkgc.conf; \
+	fi
+
+uninstall: uninstall-data
+uninstall-data: 
+
+clean:
+	rm -rf $(CLEAN_FILES) *~
+
+distclean: clean
+	rm -rf $(DISTCLEAN_FILES)

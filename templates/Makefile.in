@@ -1,0 +1,55 @@
+### Makefile.in for opkgc templates
+###
+### Copyright 2007 INRIA-IRISA
+###     Jean Parpaillon <jean.parpaillon@irisa.fr>
+###
+TEMPLATES = debian rpm
+
+DISTFILES = $(TEMPLATES) $(EXTRA_DIST) 
+DISTCLEAN_FILES = $(EXTRA_DISTCLEAN_FILES) Makefile
+
+CLEAN_FILES = $(EXTRA_CLEAN_FILES)
+
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
+srcdir=@srcdir@
+prefix=@prefix@
+sysconfdir=/etc
+datadir=@datadir@
+datarootdir=@datarootdir@
+pkgdatadir=@datadir@/@PACKAGE@
+docdir=@docdir@
+htmldir=@htmldir@
+pdfdir=@docdir@
+mkdir_p = @mkdir_p@
+INSTALL = @install_sh@
+INSTALL_DATA = @INSTALL_DATA@
+
+all:
+
+distdir: $(DISTFILES)
+	for distfile in $(DISTFILES); do \
+	  distfile_dir=`dirname $$distfile`; \
+	  if test "$$distfile_dir" = "$(srcdir)"; then \
+	    rsync -av --exclude '.svn' --exclude '*~' $$distfile $(distdir); \
+	  else \
+	    test -d $(distdir)/$$distfile_dir || $(mkdir_p) $(distdir)/$$distfile_dir; \
+	    rsync -av --exclude '.svn' --exclude '*~' $$distfile $(distdir)/$$distfile_dir; \
+	  fi; \
+	done
+
+install: install-data
+install-data: $(TEMPLATES)
+	for t in $(TEMPLATES); do \
+	  $(mkdir_p) $(DESTDIR)$(pkgdatadir)/tmpl/$$t; \
+	  rsync -av --exclude '.svn' --exclude '*~' $$t $(DESTDIR)$(pkgdatadir)/tmpl; \
+	done
+
+uninstall: uninstall-data
+uninstall-data: 
+	rm -rf $(DESTDIR)$(pkgdatadir)/tmpl
+
+clean:
+	rm -rf $(CLEAN_FILES) *~
+
+distclean: clean
+	rm -rf $(DISTCLEAN_FILES)

@@ -1,0 +1,182 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<refentry id='opkgc.1'>
+  <refmeta>
+    <refentrytitle>opkgc</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>opkgc</refname>
+    <refpurpose>Generate distribution native packages from opkg</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>opkgc</command>
+      <arg>-h</arg>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>opkgc</command>
+      <group choice="opt" >
+	<arg choice="plain">-u</arg>
+	<arg choice="plain">--supported-dist</arg>
+      </group>
+    </cmdsynopsis>
+    <cmdsynopsis>
+      <command>opkgc</command>
+      <arg>--build</arg>
+      <group choice="opt" >
+	<arg choice="plain">-o</arg>
+	<arg choice="plain">--output-dir</arg>
+      </group>
+      <group choice="opt" >
+	<arg choice="plain">-i</arg>
+	<arg choice="plain">--input-dir</arg>
+      </group>
+      <arg choice="req" >--dist=targetDist</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+    <para>
+      <command>opkgc</command> generates distribution native packages
+      (RPM or Debian) from an OSCAR package description.
+    </para>
+    <para>
+      By default, <command>opkgc</command> must be run from the
+      <command>opkg</command> directory, i.e. containing
+      <filename>config.xml</filename> file. If not, this directory can
+      be specified with <option>--input-dir</option> optional
+      argument.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term><option>-h</option></term>
+	  <listitem><para>
+	    Print <command>opkgc</command> options list.
+	  </para></listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><option>-u</option></term>
+	  <term><option>--supported-dist</option></term>
+	  <listitem>
+	    <para>
+	      Print list of supported distributions (as for the
+	      <option>--dist</option> argument).
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><option>--build</option></term>
+	  <listitem>
+	    <para>
+	      If set, build the packages from generated meta-files.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><option>-o dir</option></term>
+	  <term><option>--output-dir=dir</option></term>
+	  <listitem>
+	    <para>
+	      Generate meta-files and packages in
+	      <filename>dir</filename>. Default to current directory.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><option>-i path</option></term>
+	  <term><option>--input-dir=path</option></term>
+	  <listitem>
+	    <para>
+	      Set the <command>opkg</command> directory, i.e. the one
+	      containing <filename>config.xml</filename>. Default to
+	      current directory.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><option>--dist=distname</option></term>
+	  <listitem>
+	    <para>
+	      Set the target distribution. Available distributions
+	      list can be obtained with
+	      <option>--supported-dist</option> argument.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Files</title>
+    <para>
+      <variablelist>
+	<varlistentry>
+	  <term>./opkgc.conf</term>
+	  <term>~/.opkgc</term>
+	  <term>/etc/opkgc.conf</term>
+	  <listitem>
+	    <para>
+	      Contains paths to templates and other files
+	      <command>opkgc</command> uses. The first of these 3 files
+	      found is used.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Author</title>
+    <para>
+      Written by Jean Parpaillon
+      <email>jean.parpaillon@irisa.fr</email> and Geoffroy Vallée
+      <email>valleegr@ornl.gov</email>.
+    </para>
+    <para>
+      From an original idea of Erich Focht.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Reporting Bugs</title>
+    <para>
+      Report bugs to <email>oscar-users@lists.sourceforge.net</email>
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>Copyright</title>
+    <para>
+      <simplelist>
+	<member>Copyright (c) 2007 INRIA-IRISA.</member>
+	<member>Copyright (c) 2007 ORNL.</member>
+      </simplelist>
+    </para>
+    <para>
+      This is free software.  You may redistribute copies of it under
+      the terms of the GNU General Public License
+      &lt;http://www.gnu.org/licenses/gpl.html&gt;.  There is NO
+      WARRANTY, to the extent permitted by law.
+    </para>
+  </refsect1>
+
+  <refsect1>
+    <title>See Also</title>
+    <para>
+      <simplelist>
+	<member>opkg (5)</member>
+      </simplelist>
+    </para>
+  </refsect1>
+</refentry>

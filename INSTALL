@@ -1,0 +1,12 @@
+Installing opkgc
+================
+
+Run
+$ ./configure
+$ make
+$ make install
+
+Dependancies
+------------
+
+* Python 2.4 (not tested with other versions)

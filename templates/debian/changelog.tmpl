@@ -1,0 +1,13 @@
+#for $entry in $changelog
+opkg-$name (${entry.version}) unstable; urgency=low
+
+#for $log in $entry.logs
+  [$log.name]
+#for $item in $log.items
+  - $item
+#end for
+#end for
+
+ -- ${entry.uploader}
+
+#end for

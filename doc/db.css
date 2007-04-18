@@ -1,0 +1,161 @@
+/* $Id: style.css,v 1.7 2005/02/26 23:52:24 kbahey Exp $ */
+/* SpreadFirefox */
+/*<group=HTML>*/
+
+body 
+{
+  color: #333;
+  font-family: verdana, sans-serif;
+  padding: 0;
+  margin: 1em;
+  background-color: #fff;
+  }
+
+p 
+{
+  padding: 0;
+  margin: 0;
+  margin-bottom: 0.8em;
+  } 
+
+hr 
+{
+  border: 1px dashed #666;
+  }
+
+pre 
+{
+  #background-color: #efefef;
+  padding: 0.75em 1.5em;
+  #border: 1px solid #ddd;
+  #width: 90%;
+  width: 100%;  
+  overflow: visible;
+  #overflow: hidden;
+  }
+
+code 
+{
+  white-space: pre;
+  }
+
+pre code 
+{
+  overflow: auto;
+  margin: 1em .5em;
+  padding: .2em;
+  border: solid 1px;
+  }
+img 
+{ 
+  border: 0; 
+  }
+
+blockquote 
+{
+  border: 0 #ddd dashed;
+  border-width: 1px 0;
+  margin: 0.5em 1.0em;
+  padding: 0.3em;
+  }
+
+h1, h2, h3, h4, h5, h6
+{
+  font-family: arial, verdana, sans-serif;
+  }
+
+h1, h2
+{
+  margin: 1em 0 0.2em 0;
+  padding: 0 0 0.1em 0;
+  border-bottom: 1px solid #ccc;
+  color: #039;
+  }
+
+h3 { padding-left: 1em; }
+h4 { padding-left: 2em; }
+h5 { padding-left: 3em; }
+h6 { padding-left: 4em; }
+
+/* Font sizes, font faces, font-style */
+
+body 
+{
+  font-size: 76%;  
+  }
+
+code 
+{
+  font-family: 'andale mono', 'Courier New', Monaco, monospace;
+  }
+
+
+/* Lists */
+dt {
+  font-weight: bold;
+}  
+dd {
+  margin: 0 0 1em 1em;
+}
+
+/* Links */
+  
+a:link {
+  color: #039;
+  text-decoration: underline;
+}
+a:visited {
+  color: #636;
+}
+a:hover {
+  color: #333;
+  text-decoration: underline;
+}
+a:active { 
+  color: #000; 
+}
+
+/* Utility */
+* html > .node_rating{
+  clear: both; /* for IE */
+}
+
+/* Tables */
+.table .title
+{ 
+  text-align: center;
+  }
+
+table 
+{ 
+  margin-left: auto;
+  margin-right: auto;
+  border: none;
+  border-collapse: collapse;
+  }
+
+th 
+{
+  background-color: #eee;
+  }
+
+th, td
+{
+  border: 1px solid #aaa;
+  padding: .2em;
+  }
+
+/* Special zones */
+.caution
+{
+  background-color: #eee;
+  padding: .5em;
+  border: 1px dashed #555;
+  }
+
+.caution .title
+{
+  margin: .5em 0 .5em 0;
+  padding: 0;
+  color: red;
+  }

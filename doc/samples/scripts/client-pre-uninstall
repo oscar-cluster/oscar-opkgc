@@ -1,0 +1,43 @@
+#!/bin/sh
+###
+### Sample pre-removal script for opkg-<package>-client
+###
+
+debian() {
+    action=$1
+
+    case $action in
+	remove)
+	    if test "$2" = "in-favour"; then
+		echo "Removing package which conflicts with $3 version $4"
+	    else
+		echo "Removing package"
+	    fi
+	    ;;
+	upgrade)
+	    echo "Upgrading to $2"
+	    ;;
+	failed-upgrade)
+	    echo "Upgrading failed, go back to version $2"
+	    ;;
+	deconfigure)
+	    echo "Package depends on $6 version $7 which is removed because it conflicts"
+	    echo " with $3 version $4. Deconfiguring."
+	    ;;
+    esac
+    
+    echo "Run by dpkg"
+}
+
+rpm() {
+    installed=$1
+
+    echo "Run by rpm"    
+    echo "After removal, $installed versions of the package will be installed"
+}
+
+scriptname=$0
+case $scriptname in
+    *prerm) debian $*;;
+    *rpm-tmp.*) rpm $*;;
+esac

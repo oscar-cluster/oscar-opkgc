@@ -1,0 +1,167 @@
+### Makefile.in for opkgc templates
+###
+### Copyright 2007 ORNL
+###     Geoffroy Vallee <valleegr@ornl.gov>
+### Copyright 2007 INRIA-IRISA
+###     Jean Parpaillon <jean.parpaillon@irisa.fr>
+###
+schemas = opkg.xsd
+manpages = opkgc.1 opkg.5
+pdfdocs = opkgc-manual.pdf opkgc.1.pdf opkg.5.pdf
+htmldocs = opkgc-manual
+onehtmldocs = opkgc-manual.html opkgc.1.html opkg.5.html
+
+html_stylesheet = db.css
+xsl_fragment = css.xslt
+
+MANS_SOURCES = $(patsubst %, %.xml, $(manpages))
+DOC_SOURCES = $(patsubst %.pdf, %.xml, $(pdfdocs))
+
+DISTFILES = $(DOC_SOURCES) $(MANS_SOURCES) $(schemas) $(EXTRA_DIST) samples $(html_stylesheet) $(xsl_fragment)
+DISTCLEAN_FILES = $(EXTRA_DISTCLEAN_FILES) Makefile
+
+CLEAN_FILES = $(manpages) $(EXTRA_CLEAN_FILES)
+
+PACKAGE_TARNAME=@PACKAGE_TARNAME@
+srcdir=@srcdir@
+prefix=@prefix@
+sysconfdir=/etc
+datadir=@datadir@
+datarootdir=@datarootdir@
+pkgdatadir=@datadir@/@PACKAGE@
+docdir=@docdir@
+htmldir=@htmldir@
+pdfdir=@docdir@
+mandir=@mandir@
+mkdir_p = @mkdir_p@
+INSTALL = @install_sh@
+INSTALL_DATA = @INSTALL_DATA@
+
+DB2PDF=db2pdf
+DB2HTML=xmlto xhtml
+DB2ONEHTML=xmlto xhtml-nochunks
+DB2MAN=xmlto man
+
+ifeq ("@PDFDOC@","yes")
+PDF_TARGETS=$(pdfdocs)
+else
+PDF_TARGETS=
+endif
+ifeq ("@HTMLDOC@","yes")
+HTML_TARGETS=$(htmldocs)
+else
+HTML_TARGETS=
+endif
+ifeq ("@ONEHTMLDOC@","yes")
+ONE_HTML_TARGETS=$(onehtmldocs)
+else
+ONE_HTML_TARGETS=
+endif
+ifeq ("@MANDOC@","yes")
+MAN_TARGETS=$(manpages)
+else
+MAN_TARGETS=
+endif
+
+ALL_TARGETS=$(PDF_TARGETS) $(HTML_TARGETS) $(ONE_HTML_TARGETS) $(MAN_TARGETS)
+
+all: $(ALL_TARGETS)
+
+pdf: $(PDF_TARGETS)
+
+html: $(HTML_TARGETS)
+
+one-html: $(ONE_HTML_TARGETS)
+
+man: $(MAN_TARGETS)
+
+%.pdf: %.xml
+	$(DB2PDF) $< 
+
+%.html: %.xml
+	fragments=""; \
+	if test -n "$(xsl_fragment)"; then \
+	  for f in $(xsl_fragment); do \
+	    fragments="$$fragments -m $$f"; \
+	  done; \
+	fi; \
+	$(DB2ONEHTML) $$fragments $<
+
+%: %.xml
+	$(DB2HTML) $<
+
+%.1: %.1.xml
+	$(DB2MAN) $<
+
+%.5: %.5.xml
+	$(DB2MAN) $<
+
+distdir: $(DISTFILES)
+	for distfile in $(DISTFILES); do \
+	  distfile_dir=`dirname $$distfile`; \
+	  if test "$$distfile_dir" = "$(srcdir)"; then \
+	    rsync -av --exclude '.svn' --exclude '*~' $$distfile $(distdir); \
+	  else \
+	    test -d $(distdir)/$$distfile_dir || $(mkdir_p) $(distdir)/$$distfile_dir; \
+	    rsync -av --exclude '.svn' --exclude '*~' $$distfile $(distdir)/$$distfile_dir; \
+	  fi; \
+	done
+
+install: install-data
+install-data: install-man $(PDF_TARGETS) $(HTML_TARGETS) $(ONE_HTML_TARGETS) $(SCHEMA)
+	if test "$(PDF_TARGETS)" != ""; then \
+	  for t in $(PDF_TARGETS); do \
+	    $(mkdir_p) "$(DESTDIR)$(pdfdir)"; \
+	    $(INSTALL_DATA) "$$t" "$(DESTDIR)$(pdfdir)/$$t"; \
+	  done; \
+	fi
+	if test "$(ONE_HTML_TARGETS)" != ""; then \
+	  for t in $(ONE_HTML_TARGETS); do \
+	    $(mkdir_p) "$(DESTDIR)$(htmldir)"; \
+	    $(INSTALL_DATA) "$$t" "$(DESTDIR)$(htmldir)/$$t"; \
+	  done; \
+	  $(INSTALL_DATA) $(html_stylesheet) "$(DESTDIR)$(htmldir)/"; \
+	fi
+	if test "$(HTML_TARGETS)" != ""; then \
+	  for t in $(HTML_TARGETS); do \
+	    $(mkdir_p) "$(DESTDIR)$(htmldir)/$$t"; \
+	    ( cd $$t; \
+	      $(INSTALL_DATA) * "$(DESTDIR)$(htmldir)/$$t"; \
+	    ) \
+	    $(INSTALL_DATA) $(html_stylesheet) "$(DESTDIR)$(htmldir)/"; \
+	  done; \
+	fi
+	for t in $(SCHEMAS); do \
+	  $(mkdir_p) "$(DESTDIR)$(pkgdatadir)"; \
+	  $(INSTALL_DATA) "$$t" "$(DESTDIR)$(pkgdatadir)/$$t"; \
+	done
+	$(mkdir_p) $(DESTDIR)$(docdir)/samples
+	rsync -avr --exclude '.svn' --exclude '*~' samples $(DESTDIR)$(docdir)/samples
+
+install-man: $(MAN_TARGETS)
+	for file in $(MAN_TARGETS); do \
+	  sect=`echo $$file | sed 's/^.*\([0-9]\)/\1/'`; \
+	  inst=`echo $$file | sed -e 's/^.*\///'`; \
+	  $(mkdir_p) "$(DESTDIR)$(mandir)/man$$section"; \
+	  $(INSTALL_DATA) "$$file" "$(DESTDIR)$(mandir)/man$$sect/$$inst"; \
+	done
+
+uninstall: uninstall-data
+uninstall-data: uninstall-man
+	rm -rf $(DESTDIR)$(pdfdir)
+	rm -rf $(DESTDIR)$(htmldir)
+	rm -rf $(DESTDIR)$(pkgdatadir)
+	rm -rf $(DESTDIR)$(docdir)/samples
+
+uninstall-man:
+	for file in $(MAN_TARGETS); do \
+	  sect=`echo $$file | sed 's/^.*\([0-9]\)/\1/'`; \
+	  inst=`echo $$file | sed -e 's/^.*\///'`; \
+	  rm -f "$(DESTDIR)$(mandir)/man$$sect/$$inst"; \
+	done	
+
+clean:
+	rm -rf $(ALL_TARGETS) $(CLEAN_FILES) *~
+
+distclean: clean
+	rm -rf $(DISTCLEAN_FILES)

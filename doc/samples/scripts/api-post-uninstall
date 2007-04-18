@@ -1,0 +1,47 @@
+#!/bin/sh
+###
+### Sample post-removal script for opkg-<package>
+###
+
+debian() {
+    action=$1
+
+    case $action in
+	remove)
+	    echo "Removing package"
+	    ;;
+	purge)
+	    echo "Purging package (remove config files)"
+	    ;;
+	upgrade)
+	    echo "Upgrading to $2"
+	    ;;
+	failed-upgrade)
+	    echo "Upgrading failed. Backward to version $2"
+	    ;;
+	abort-install)
+	    echo "Installing failed."
+	    if test -n "$2"; then
+		echo "(version $2 still installed)"
+	    fi
+	    ;;
+	abort-upgrade)
+	    echo "Upgrading failed. Old version $2 has been reconfigured."
+	    ;;
+    esac
+    
+    echo "Run by dpkg"
+}
+
+rpm() {
+    installed=$1
+
+    echo "Run by rpm"    
+    echo "After removal, $installed versions of the package will be installed"
+}
+
+scriptname=$0
+case $scriptname in
+    *postrm) debian $*;;
+    *rpm-tmp.*) rpm $*;;
+esac

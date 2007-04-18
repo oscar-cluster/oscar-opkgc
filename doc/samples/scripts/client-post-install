@@ -1,0 +1,46 @@
+#!/bin/sh
+###
+### Sample post-installation script for opkg-<package>-client
+###
+
+debian() {
+    action=$1
+
+    case $action in
+	configure)
+	    echo "Configuring package"
+	    if test -n "$2"; then
+		echo " (most recently configured version: $2)"
+	    fi
+	    ;;
+	abort-upgrade)
+	    echo "Upgrade to $2 failed"
+	    ;;
+	abort-remove)
+	    if test "$3" = "in-favour"; then
+		echo "Conflicting package removal failed (in favour of $3 version $4)"
+	    else
+		echo "Removing package failed"
+	    fi
+	    ;;
+	abort-deconfigure)
+	    echo "Was removing package $6 version $7 which conflicts with $3 version $4."
+	    echo "Installation of $3 failed so aborting deconfiguration."
+	    ;;
+    esac
+    
+    echo "Run by dpkg"
+}
+
+rpm() {
+    installed=$1
+
+    echo "Run by rpm"    
+    echo "After installation, $installed versions of the package will be installed"
+}
+
+scriptname=$0
+case $scriptname in
+    *postinst) debian $*;;
+    *rpm-tmp.*) rpm $*;;
+esac

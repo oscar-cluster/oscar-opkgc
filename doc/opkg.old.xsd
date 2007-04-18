@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!--
+      Copyright (c) 2007 INRIA-IRISA.
+      Authors: Jean Parpaillon <jean.parpaillon@irisa.fr>
+      All rights reserved.
+      
+      This file is part of the OSCAR software package.  For license
+      information, see the COPYING file in the top level directory of the
+      OSCAR source distribution.
+      
+      $Id:
+  -->
+
+
+  <xsd:element name="oscar" type="oscarType"></xsd:element>
+
+  <xsd:element name="name" type="xsd:string" ></xsd:element>
+  <xsd:element name="version" type="versionType" ></xsd:element>
+  <xsd:element name="class" type="xsd:string" ></xsd:element>
+  <xsd:element name="summary" type="summaryType" ></xsd:element>
+  <xsd:element name="license" type="licenseType" ></xsd:element>
+  <xsd:element name="copyright" type="xsd:string" ></xsd:element>
+  <xsd:element name="uri" type="xsd:anyURI" ></xsd:element>
+  <xsd:element name="maintainer" type="personType" ></xsd:element>
+  <xsd:element name="packager" type="personType" ></xsd:element>
+  <xsd:element name="vendor" type="xsd:string" ></xsd:element>
+  <xsd:element name="description" type="xsd:string" ></xsd:element>
+  <xsd:element name="binary-package-list" type="pkgListType"></xsd:element>
+  <xsd:element name="filter" type="filterType"></xsd:element>
+  <xsd:element name="group" type="groupType"></xsd:element>
+  <xsd:element name="distribution" type="distType"></xsd:element>
+  <xsd:element name="architecture" type="archType"></xsd:element>
+  <xsd:element name="pkg" type="xsd:string"></xsd:element>
+  <xsd:element name="provides" type="dependancyType"></xsd:element>
+  <xsd:element name="conflicts" type="dependancyType"></xsd:element>
+  <xsd:element name="requires" type="dependancyType"></xsd:element>
+  <xsd:element name="type" type="xsd:string"></xsd:element>
+  <xsd:element name="package-specific-attributes" type="specificType"></xsd:element>
+  <xsd:element name="switcher" type="switcherType"></xsd:element>
+  <xsd:element name="servicelist" type="serviceListType"></xsd:element>
+
+  <xsd:element name="major" type="xsd:int"></xsd:element>
+  <xsd:element name="minor" type="xsd:string"></xsd:element>
+  <xsd:element name="subversion" type="xsd:string"></xsd:element>
+  <xsd:element name="release" type="xsd:string"></xsd:element>
+  <xsd:element name="epoch" type="xsd:int"></xsd:element>
+
+  <xsd:complexType name="oscarType" >
+    <xsd:sequence>
+      <xsd:element ref="name" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="filter" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="version" minOccurs="1" maxOccurs="1"/>
+      <xsd:element ref="class" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="summary" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="license" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="copyright" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="group" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="uri" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="maintainer" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="packager" minOccurs="1" maxOccurs="unbounded" />
+      <xsd:element ref="vendor" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="description" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="provides" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="requires" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="binary-package-list" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="conflicts" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="package-specific-attributes" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="servicelist" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="versionType" >
+    <xsd:sequence>
+      <xsd:element ref="major" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="minor" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="subversion" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="release" minOccurs="1" maxOccurs="1" />
+      <xsd:element ref="epoch" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="summaryType" >
+    <xsd:restriction base="xsd:string" >
+      <xsd:maxLength value="80" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="licenseType" >
+    <xsd:restriction base="xsd:string" >
+      <xsd:enumeration value="GPL" />
+      <xsd:enumeration value="LGPL" />
+      <xsd:enumeration value="PBS license (see PBS_License.txt)" />
+      <xsd:enumeration value="Freely distributable" />
+      <xsd:enumeration value="Maui license" />
+      <xsd:enumeration value="BSD" />
+      <xsd:enumeration value="SISSL" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="personType" >
+    <xsd:sequence>
+      <xsd:element ref="name" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="email" type="xsd:anyURI" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="pkgListType" >
+    <xsd:sequence>
+      <xsd:element ref="filter" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="pkg" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="dependancyType" >
+    <xsd:sequence>
+      <xsd:element ref="type" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="name" minOccurs="1" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="filterType" >
+    <xsd:sequence>
+      <xsd:element ref="group" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="architecture" minOccurs="0" maxOccurs="1" />
+      <xsd:element ref="distribution" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="groupType">
+    <xsd:union memberTypes="xsd:string oscarGroupType" />
+  </xsd:simpleType>
+
+  <xsd:simpleType name="oscarGroupType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="oscar_api" />
+      <xsd:enumeration value="oscar_server" />
+      <xsd:enumeration value="oscar_client" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="distType" >
+    <xsd:sequence>
+      <xsd:element ref="name" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="version" minOccurs="0" maxOccurs="1" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:simpleType name="archType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="i386" />
+      <xsd:enumeration value="x86_64" />
+      <xsd:enumeration value="ia64" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="specificType" >
+    <xsd:sequence>
+      <xsd:element ref="switcher" minOccurs="0" maxOccurs="1" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="switcherType" >
+    <xsd:sequence>
+      <xsd:element name="tag" minOccurs="1" maxOccurs="1" type="xsd:string" />
+      <xsd:element ref="name" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="serviceListType" >
+    <xsd:sequence>
+      <xsd:element ref="filter" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="service" minOccurs="1" maxOccurs="unbounded" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

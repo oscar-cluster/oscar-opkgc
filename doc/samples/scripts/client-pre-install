@@ -1,0 +1,40 @@
+#!/bin/sh
+###
+### Sample pre-installation script for opkg-<package>-client
+###
+
+debian() {
+    action=$1
+    other_version=$2
+
+    case $action in
+	install)
+	    echo "Install package"
+	    if test -n "$other_version"; then
+		echo " ($other_version was already installed)"
+	    fi
+	    ;;
+	upgrade)
+	    echo "Upgrading package (replacing $other_version)"
+	    ;;
+	abort-upgrade)
+	    echo "Upgrade to $other_version failed"
+	    ;;
+	
+    esac
+    
+    echo "Run by dpkg"
+}
+
+rpm() {
+    installed=$1
+
+    echo "Run by rpm"    
+    echo "After installation, $installed versions of the package will be installed"
+}
+
+scriptname=$0
+case $scriptname in
+    *preinst) debian $*;;
+    *rpm-tmp.*) rpm $*;;
+esac

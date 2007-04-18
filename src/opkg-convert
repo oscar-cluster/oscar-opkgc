@@ -1,0 +1,298 @@
+#!/bin/bash
+
+###################################################################
+# Copyright (c) 2007 INRIA-IRISA,
+#                    Jean Parpaillon <jean.parpaillon@inria.fr>
+#                    All rights reserved
+# For license information, see the COPYING file in the top level
+# directory of the source
+#
+# Convert an opkg in old form into current form
+#
+###################################################################
+
+xsltfile=/tmp/opkg.xslt
+
+function usage() {
+    echo -e "Usage: $0 <opkg_dir>"
+    echo -e "\tNew opkg description is created in ./<opkg_dir>.new"
+}
+
+function check_tool() {
+    tool=`which $1`
+    [ -x "$tool" ] || exit 2
+    echo $tool
+}
+
+function write_convert_stylesheet() {
+    date=`date +%Y-%m-%dT%k:%M:%S%:z`
+
+    cat > $xsltfile <<EOF
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:output 
+      method="xml" 
+      encoding="ISO-8859-1" 
+      indent="yes" />
+
+  <xsl:template match="/" >
+    <oscar>
+      <xsl:apply-templates select="oscar" />
+    </oscar>
+  </xsl:template>
+
+  <xsl:template match="oscar"  >
+    <name><xsl:value-of select="name" /></name>
+    
+    <xsl:if test="class" >
+      <class><xsl:value-of select="class" /></class>
+    </xsl:if>
+    
+    <summary><xsl:value-of select="summary" /></summary>
+
+    <xsl:if test="description" >
+      <description><xsl:value-of select="description" /></description>
+    </xsl:if>
+
+    <license><xsl:value-of select="license" /></license>
+    
+    <xsl:for-each select="group" >
+      <group><xsl:value-of select="." /></group>
+    </xsl:for-each>
+
+    <xsl:if test="uri" >
+      <uri><xsl:value-of select="uri" /></uri>
+    </xsl:if>
+
+    <authors>
+      <xsl:apply-templates select="packager|maintainer" />
+    </authors>
+
+    <xsl:call-template name="filters" />
+
+    <serverDeps>
+      <xsl:apply-templates select="(provides|requires|binary-package-list|conflicts)[filter/group = 'oscar_server']" />
+    </serverDeps>
+
+    <clientDeps>
+      <xsl:apply-templates select="(provides|requires|binary-package-list|conflicts)[filter/group = 'oscar_client']" />
+    </clientDeps>
+
+    <apiDeps>
+      <xsl:apply-templates select="(provides|requires|binary-package-list|conflicts)[not(filter/group)]" />
+    </apiDeps>
+
+    <changelog>
+      <versionEntry>
+	<xsl:attribute name="version" >
+	  <xsl:apply-templates select="version" />
+	</xsl:attribute>
+	
+	<changelogEntry 
+	    authorName="{packager/name}" 
+	    date="$date" >
+	  <item>*** AUTO-GENERATED - FIXME ***</item>
+	</changelogEntry>
+      </versionEntry>
+    </changelog>
+
+    <xsl:call-template name="warning" />
+  </xsl:template>
+
+  <xsl:template match="packager|maintainer" >
+    <author>
+      <xsl:attribute name="cat" >
+	<xsl:choose>
+	  <xsl:when test="name() = 'packager' " >
+	    <xsl:text>maintainer</xsl:text>
+	  </xsl:when>
+	  <xsl:when test="name() = 'maintainer'" >
+	    <xsl:text>upstream</xsl:text>
+	  </xsl:when>
+	</xsl:choose>
+      </xsl:attribute>
+
+      <name><xsl:value-of select="name" /></name>
+
+      <email>
+	<xsl:choose>
+	  <xsl:when test="email" >
+	    <xsl:value-of select="email" />
+	  </xsl:when>
+	  <xsl:otherwise>
+	    <xsl:message terminate="no" >
+	      No email for <xsl:value-of select="name" />. Fix this.
+	    </xsl:message>
+	    <xsl:text>***FIXME***</xsl:text>
+	  </xsl:otherwise>
+	</xsl:choose>
+      </email>
+    </author>
+  </xsl:template>
+
+  <xsl:template name="filters" >
+    <xsl:if test="filter" >
+      <filters>
+	<xsl:apply-templates select="filter/distribution" />
+	<xsl:apply-templates select="filter/architecture" />
+      </filters>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="distribution" >
+    <dist><xsl:value-of select="name" /></dist>
+  </xsl:template>
+
+  <xsl:template match="architecture" >
+    <arch><xsl:value-of select="." /></arch>
+  </xsl:template>
+
+  <xsl:template match="provides|requires|binary-package-list|conflicts" >
+    <xsl:call-template name="pkgrelation" >
+      <xsl:with-param name="relation" >
+	<xsl:choose>
+	  <xsl:when test="name() = 'requires' or name() = 'binary-package-list'" >
+	    <xsl:text>requires</xsl:text>
+	  </xsl:when>
+	  <xsl:otherwise>
+	    <xsl:value-of select="name()" />
+	  </xsl:otherwise>
+	</xsl:choose>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template match="pkg" >
+    <pkg><xsl:value-of select="." /></pkg>
+  </xsl:template>
+
+  <xsl:template name="pkgrelation" >
+    <xsl:param name="relation" />
+
+    <xsl:choose>
+      <xsl:when test="\$relation = 'provides'" >
+	<provides>
+	  <xsl:call-template name="pkglist" />
+	</provides>
+      </xsl:when>
+      <xsl:when test="\$relation = 'conflicts'" >
+	<conflicts>
+	  <xsl:call-template name="pkglist" />
+	</conflicts>
+      </xsl:when>
+      <xsl:when test="\$relation = 'requires'" >
+	<requires>
+	  <xsl:call-template name="pkglist" />
+	</requires>
+      </xsl:when>
+      <xsl:when test="\$relation = 'suggests'" >
+	<suggests>
+	  <xsl:call-template name="pkglist" />
+	</suggests>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="pkglist" >
+    <xsl:call-template name="filters" />
+    <xsl:apply-templates select="pkg" />
+  </xsl:template>
+
+  <xsl:template match="version" >
+    <xsl:if test="epoch" >
+      <xsl:value-of select="epoch" />
+      <xsl:text>:</xsl:text>
+    </xsl:if>
+    <xsl:value-of select="major" />
+    <xsl:if test="minor" >
+      <xsl:text>.</xsl:text>
+      <xsl:value-of select="minor" />
+    </xsl:if>
+    <xsl:if test="subversion" >
+      <xsl:text>.</xsl:text>
+      <xsl:value-of select="subversion" />
+    </xsl:if>
+    <xsl:text>-</xsl:text>
+    <xsl:value-of select="release" />
+  </xsl:template>
+
+  <xsl:template name="warning" >
+    <xsl:message terminate="no"  >
+***
+*** Please check the following points in the generated config.xml:
+*** - changelog: a default changelog entry has been written, please modify it.
+***
+    </xsl:message>
+  </xsl:template>
+
+</xsl:stylesheet>
+EOF
+}
+
+function del_convert_stylesheet() {
+    rm -f $xsltfile
+}
+
+function convert_config_xml() {
+    oldconfig=$olddir/config.xml
+    newconfig=$newdir/config.xml
+
+    xsltproc=`check_tool xsltproc`
+
+    write_convert_stylesheet
+    echo "[CONVERT] config.xml"
+    $xsltproc $xsltfile $oldconfig > $newconfig
+    del_convert_stylesheet
+}
+
+function convert_scripts() {
+    mkdir $newdir/scripts
+
+    scripts=`find $olddir/scripts/ ! -type d ! -path '*/.svn*'`
+    for script in $scripts; do
+	s=''
+	case `basename $script` in
+	    setup)                     s='api-pre-install';;
+	    pre_configure)             s='api-pre-configure';;
+	    post_configure)            s='api-post-configure';;
+	    post_clients)              s='api-post-image';;
+	    post_install)              s='api-post-deploy';;
+	    post_server_rpm_install)   s='server-post-install';;
+	    post_server_rpm_uninstall) s='server-post-uninstall';;
+	    post_client_rpm_install)   s='client-post-install';;
+	    post_client_rpm_uninstall) s='client-post-uninstall';;
+	    *)                         s=`basename $script`;;
+	esac
+	echo "[COPY] $script to $newdir/scripts/$s"
+	cp $script $newdir/scripts/$s
+    done
+}
+
+function convert_doc() {
+    if [ -d $olddir/doc ]; then
+	echo "[COPY] $olddir/doc to $newdir/doc"
+	rsync -avr --exclude '.svn' --exclude '*~' $olddir/doc $newdir
+    fi
+}
+
+function convert_testing() {
+    if [ -d $olddir/testing ]; then
+	echo "[COPY] $olddir/testing to $newdir/testing"
+	rsync -avr --exclude '.svn' --exclude '*~' $olddir/testing $newdir
+    fi
+}
+
+if [ ! -e "$1/config.xml" ]; then
+    usage;
+    exit 1;
+fi
+
+olddir=$1
+newdir=`basename $1`.new
+
+[ -d $newdir ] && rm -rf $newdir
+mkdir $newdir
+convert_config_xml
+convert_scripts
+convert_doc
+convert_testing

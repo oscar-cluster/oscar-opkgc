@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<oscar 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:oscar-config="http://sf.net/oscar/2005/config.xml"
+  xsi:schemaLocation="http://sf.net/oscar/2005/config.xml oscar-config.xsd"
+>
+  <!--
+      Copyright (c) 2007 INRIA-IRISA.
+                         All rights reserved.
+			 Jean Parpaillon <jean.parpaillon@irisa.fr>
+     
+      $Id: config.xml 5616 2007-01-18 09:08:06Z bli $
+  -->
+  <name>sample-Package</name>
+
+  <class>core</class><!-- optional -->
+
+  <summary>A sample package for testing new config.xml</summary>
+  <description>
+    This is a long description of the test package.
+    Lorem ipsum bla bla bla, 
+    etc.
+  </description><!-- optional -->
+
+  <license>GPL</license>
+  
+  <group>Application/System</group>
+  
+  <uri>http://oscar.openclustergroup.org/</uri>
+
+  <authors>
+    <author cat="upstream" >
+      <name>Laurent Michel</name>
+      <nickname>zeUpstream</nickname><!-- optional -->
+      <email>laurent.michel@myorg.org</email>
+      <institution>Firm Inc.</institution><!-- optional -->
+      <beginYear>2004</beginYear><!-- optional -->
+      <endYear>2007</endYear><!-- optional -->
+    </author>
+    <author cat="maintainer" >
+      <name>John Foo</name>
+      <nickname>zeMaintainer</nickname><!-- optional -->
+      <email>john.foo@openclustergroup.org</email>
+      <institution>OSCAR Inc.</institution><!-- optional -->
+      <beginYear>2006</beginYear><!-- optional -->
+      <endYear>2007</endYear><!-- optional -->
+    </author>
+    <author cat="uploader" >
+      <name>John Foo Jr.</name>
+      <nickname>zeOtherContributor</nickname><!-- optional -->
+      <email>foo.jr@openclustergroup.org</email>
+      <institution>OSCAR Inc.</institution><!-- optional -->
+      <beginYear>2006</beginYear><!-- optional -->
+      <endYear>2006</endYear><!-- optional -->
+    </author>
+    <author cat="uploader" >
+      <name>Dr No</name>
+      <email>dr.no@uranus.com</email>
+      <institution>Corporation Inc.</institution><!-- optional -->
+      <beginYear>2030</beginYear><!-- optional -->
+      <endYear>2150</endYear><!-- optional -->
+    </author>
+  </authors>
+
+  <filters>
+    <dist rel="=" version="4.0" >Debian</dist>
+    <dist rel="&gt;" version="5" >fc</dist>
+    <arch>x86_64</arch>
+  </filters><!-- optional -->
+
+  <serverDeps>
+    <provides>
+      <pkg>shell</pkg>
+    </provides><!-- optional -->
+
+    <conflicts>
+      <filters>
+	<dist rel="=" version="4" >Debian</dist>
+      </filters>
+      <pkg rel="&lt;" version="1.1-4" >xmlto</pkg>      
+    </conflicts><!-- optional -->
+
+    <conflicts>
+      <filters>
+	<dist>fc</dist>
+      </filters>
+      <pkg rel="&lt;" version="1.4-4" >xml-to</pkg>
+    </conflicts><!-- optional -->
+
+    <requires>
+      <pkg rel="&gt;" version="0.7.4" >wormux</pkg>
+    </requires><!-- optional -->
+
+    <suggests>
+      <filters>
+	<dist>Debian</dist>
+      </filters>
+      <pkg rel="&gt;=" version="2.3-1" >anarchism</pkg>
+    </suggests><!-- optional -->
+  </serverDeps><!-- optional -->
+
+  <clientDeps>
+    <provides>
+      <pkg>fortunes</pkg>
+    </provides><!-- optional -->
+  </clientDeps><!-- optional -->
+
+  <apiDeps>
+    <requires>
+      <pkg rel="&gt;" version="0.1" >lsnipes</pkg>
+    </requires><!-- optional -->
+  </apiDeps><!-- optional -->
+
+  <changelog>
+    <versionEntry version="2.3.6-5" >
+      <changelogEntry authorName="John Foo Jr." date="2006-10-29T13:20:00.000+01:00" >
+	<item>Update from upstream</item>
+	<item>Add a little blue</item>
+      </changelogEntry>
+      <changelogEntry authorName="John Foo" date="2006-10-28T12:54:00" closes="452 1247" >
+	<item>Fix this bug</item>
+      </changelogEntry>
+    </versionEntry>
+    <versionEntry version="2.3.6-1" >
+      <changelogEntry authorName="Laurent Michel" date="2005-01-01T04:20:00-05:00" closes="123421" >
+	<item>Blurp</item>
+      </changelogEntry>
+    </versionEntry>
+  </changelog>
+</oscar>

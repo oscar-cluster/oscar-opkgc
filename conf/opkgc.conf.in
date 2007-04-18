@@ -1,0 +1,12 @@
+[GENERAL]
+xsdfile: @pkgdatadir@/opkg.xsd
+
+[DEBIAN]
+templatedir: @pkgdatadir@/tmpl/debian
+buildcmd: dpkg-buildpackage
+buildopts: -rfakeroot
+
+[RPM]
+templatedir: @pkgdatadir@/tmpl/rpm
+buildcmd: rpmbuild
+buildopts: 

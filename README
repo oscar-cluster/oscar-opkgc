@@ -1,0 +1,19 @@
+Opkgc - OSCAR Packages Compiler
+===============================
+
+opkgc is a tool, written in Python and XSLT, which transform an
+OSCAR [1] package description into RPM or Debian packages.
+
+Configuration
+-------------
+
+opkgc can be configured with the opkgc.conf file. This file use the
+syntax defined by the ConfigParser module in Python [2].
+opkgc looks for the configuration in the following places:
+order (the last available will be the right one):
+1/ /etc/opkgc.conf
+2/ ~/.opkgc
+3/ ./opkgc.conf
+
+[1] http://oscar.openclustergroup.org/
+[2] http://docs.python.org/lib/module-ConfigParser.html
