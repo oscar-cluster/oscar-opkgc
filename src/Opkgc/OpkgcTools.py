@@ -13,6 +13,8 @@ import os
 __all__ = ['Tools']
 
 class Tools:
+    scriptRe = re.compile(r'(?P<part>api|client|server)-(?P<time>pre|post)-(?P<action>un)?install')
+    
     def rmDir (d):
         """ Remove recursively a directory, even if not empty, like rm -r
         """
@@ -63,3 +65,33 @@ class Tools:
         p = re.compile(r'[^a-zA-Z0-9-]')
         return p.sub('-', s)
     normalizeWithDash = staticmethod(normalizeWithDash)
+
+    def isNativeScript(name):
+        """ True if script is one of scripts included as
+        {pre|post}{inst|rm} scripts
+        name: basename of the script
+        """
+        return Tools.scriptRe.match(name)
+    isNativeScript = staticmethod(isNativeScript)
+
+    def getRpmScriptName(name):
+        """ Convert opkg script name to RPM script name:
+        api-post-uninstall -> %postun
+        server-pre-install -> %pre server
+        """
+        m = Tools.scriptRe.match(name)
+        res = "%%%s" % m.group('time')
+        if m.group('action'):
+            res = "%s%s" % (res, m.group('action'))
+        if not m.group('part') == "api":
+            res = "%s %s" % (res, m.group('part'))
+        return res        
+    getRpmScriptName = staticmethod(getRpmScriptName)
+
+    def isBourneScript(file):
+        """ True if 'file' is a Bourne Shell script
+        """
+        file.seek(0)
+        shebang = file.readline()
+        return re.match(r'^#!.*/sh', shebang)
+    isBourneScript = staticmethod(isBourneScript)

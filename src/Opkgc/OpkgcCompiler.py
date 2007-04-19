@@ -131,15 +131,15 @@ class CompilerRpm(Compiler):
         self.xmlInit (self.getConfigFile())
         self.xmlValidate ()
 
-        desc = OpkgDescriptionRpm(self.xml_tool.getXmlDoc(), self.dist)
-
         pkgName = Tools.normalizeWithDash(self.getPackageName())
-        self.pkgDir = os.path.join(self.getMacro('%_sourcedir'), "opkg-%s" % pkgName)
+        self.pkgDir = os.path.join(self.getMacro('%_builddir'), "opkg-%s" % pkgName)
 
+        # Clean/Create package dir
         if (os.path.exists(self.pkgDir)):
             Tools.rmDir(self.pkgDir)
         os.makedirs(self.pkgDir)
 
+        # Clean existing .spec file
         specdir = self.getMacro('%_specdir')
         self.specfile = os.path.join(specdir, "opkg-%s.spec" % pkgName)
         if (not os.path.exists(specdir)):
@@ -147,6 +147,39 @@ class CompilerRpm(Compiler):
         else:
             if (os.path.exists(self.specfile)):
                 os.remove(self.specfile)
+
+        # Create template env from config.xml
+        desc = OpkgDescriptionRpm(self.xml_tool.getXmlDoc(), self.dist)
+
+        # Manage [pre|post]-scripts
+        filelist = []
+        scriptdir = os.path.join("var", "lib", "oscar", "packages", "opkg-%s" % pkgName)
+        if (not os.path.exists(os.path.join(self.pkgDir, scriptdir))):
+            os.makedirs(os.path.join(self.pkgDir, scriptdir))
+        for orig in self.getScripts():
+            basename = os.path.basename(orig)
+            if Tools.isNativeScript(basename):
+                # If script is one of scripts included as
+                # {pre|post}{inst|rm} scripts, include them into templating
+                # env
+                header = Tools.getRpmScriptName(basename)
+                content = "%s\n" % header
+                f = open(orig, 'r')
+                if Tools.isBourneScript(f):
+                    for line in f:
+                        content = "%s%s" % (content, line)
+                    content = "%s\n" % content
+                    desc.setScript(header, content)
+                else:
+                    f.close()
+                    print "Error: %s is not a bourne shell script, as required by RPM packaging policy " % orig
+                    raise SystemExit                
+                f.close()
+            else:
+                # else, file is packaged in /var/lib/oscar/packages/<packages>/
+                filelist.append(os.path.join(scriptdir, basename))
+                shutil.copy(orig, os.path.join(self.pkgDir, scriptdir))
+        desc.setFileList(filelist)
 
         # Produce spec file
         self.cheetahCompile(

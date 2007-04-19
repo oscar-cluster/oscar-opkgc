@@ -147,6 +147,9 @@ class OpkgDescriptionRpm(OpkgDescription):
                ">=":">=",
                ">":">"}
 
+    fileList = []
+    scripts = {}
+
     def version(self, part):
         """ Return part of version
         part: upstream|release
@@ -183,6 +186,28 @@ class OpkgDescriptionRpm(OpkgDescription):
         if version:
             ret += ' %s %s' % (self.relName[rel], version)
         return ret
+
+    def fileList(self):
+        return self.fileList
+
+    def setFileList(self, fileList):
+        """ Set file list for opkg-<package>
+        """
+        self.fileList = fileList
+
+    def script(self, name):
+        """ Return content of script given by 'name'
+        """
+        try:
+            return self.scripts[name]
+        except(KeyError):
+            return ""
+
+    def setScript(self, name, content):
+        """ Set content for script. 'name' follows Rpm naming:
+        %pre server, %post, %preun client, etc.
+        """
+        self.scripts[name] = content
 
 class OpkgDescriptionDebian(OpkgDescription):
     """ Filters out some fields in a opkg description,
