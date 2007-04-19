@@ -150,12 +150,15 @@ class OpkgDescriptionRpm(OpkgDescription):
     fileList = []
     scripts = {}
 
-    def version(self, part):
-        """ Return part of version
+    def version(self, part=""):
+        """ Return version. If no part is given, return whole version
         part: upstream|release
         """
         version = self.xmldoc.find('changelog/versionEntry').get('version').strip()
-        return re.match(r'^(?P<upstream>.*)-(?P<release>.*)', version).group(part)
+        if not part == "":
+            return re.match(r'^(?P<upstream>.*)-(?P<release>.*)', version).group(part)
+        else:
+            return version
 
     def description(self):
         """ Return the description with stripped lines.

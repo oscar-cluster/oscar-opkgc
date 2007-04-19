@@ -105,6 +105,10 @@ class Compiler:
             for p in os.listdir(scriptdir):
                 if not re.search("\.svn|.*~", p) and not os.path.isdir(p):
                     ret.append(os.path.join(self.inputdir, "scripts", p))
+        # add configurator.html, if any
+        configurator = os.path.join(self.inputdir, "configurator.html")
+        if os.path.exists(configurator):
+            ret.append(configurator)
         return ret
 
     def SupportedDist(cls):
@@ -151,9 +155,9 @@ class CompilerRpm(Compiler):
         # Create template env from config.xml
         desc = OpkgDescriptionRpm(self.xml_tool.getXmlDoc(), self.dist)
 
-        # Manage [pre|post]-scripts
         filelist = []
-        scriptdir = os.path.join("var", "lib", "oscar", "packages", "opkg-%s" % pkgName)
+        # Manage [pre|post]-scripts
+        scriptdir = os.path.join("var", "lib", "oscar", "packages", "%s" % pkgName)
         if (not os.path.exists(os.path.join(self.pkgDir, scriptdir))):
             os.makedirs(os.path.join(self.pkgDir, scriptdir))
         for orig in self.getScripts():
@@ -179,6 +183,27 @@ class CompilerRpm(Compiler):
                 # else, file is packaged in /var/lib/oscar/packages/<packages>/
                 filelist.append(os.path.join(scriptdir, basename))
                 shutil.copy(orig, os.path.join(self.pkgDir, scriptdir))
+
+        # Copy doc
+        docdir = os.path.join(self.inputdir, "doc")
+        outdocdir = os.path.join("usr", "share", "doc", "packages", "opkg-%s" % pkgName)
+        if os.path.isdir(docdir):
+            Tools.copy(docdir,
+                       os.path.join(self.pkgDir, outdocdir),
+                       True,
+                       '\.svn|.*~')
+            filelist.append(outdocdir)
+
+        # Copy testing scripts
+        testdir = os.path.join(self.inputdir, "testing")
+        outtestdir = os.path.join("var", "lib", "oscar", "testing", "%s" % pkgName)
+        if os.path.isdir(testdir):
+            Tools.copy(testdir,
+                       os.path.join(self.pkgDir, outtestdir),
+                       True,
+                       '\.svn|.*~')
+            filelist.append(outtestdir)
+
         desc.setFileList(filelist)
 
         # Produce spec file
@@ -186,6 +211,15 @@ class CompilerRpm(Compiler):
             desc,
             os.path.join(Config().get(self.configSection, "templatedir"), "opkg.spec.tmpl"),
             self.specfile)
+
+        # Copy generated packages into output dir
+        rpmdir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
+        shutil.copy(os.path.join(rpmdir, "opkg-%s-%s.noarch.rpm" % (pkgName, desc.version())),
+                    self.getDestDir())
+        shutil.copy(os.path.join(rpmdir, "opkg-%s-server-%s.noarch.rpm" % (pkgName, desc.version())),
+                    self.getDestDir())
+        shutil.copy(os.path.join(rpmdir, "opkg-%s-client-%s.noarch.rpm" % (pkgName, desc.version())),
+                    self.getDestDir())
 
     def getMacro(self, name):
         line = os.popen("rpm --eval %s" % name).readline()
@@ -204,10 +238,10 @@ class CompilerDebian(Compiler):
     configSection = "DEBIAN"
     supportedDist = ['debian']
     pkgDir = ''
-    scriptsOrigDest = {'api-pre-install'      : 'opkg-api-%s.preinst',
-                       'api-post-install'     : 'opkg-api-%s.postinst',
-                       'api-pre-uninstall'    : 'opkg-api-%s.prerm',
-                       'api-post-uninstall'   : 'opkg-api-%s.postrm',
+    scriptsOrigDest = {'api-pre-install'      : 'opkg-%s.preinst',
+                       'api-post-install'     : 'opkg-%s.postinst',
+                       'api-pre-uninstall'    : 'opkg-%s.prerm',
+                       'api-post-uninstall'   : 'opkg-%s.postrm',
                        'server-pre-install'   : 'opkg-server-%s.preinst',
                        'server-post-install'  : 'opkg-server-%s.postinst',
                        'server-pre-uninstall' : 'opkg-server-%s.prerm',
@@ -254,7 +288,7 @@ class CompilerDebian(Compiler):
                 shutil.copy(orig, os.path.join(debiandir, dest))
             except(KeyError):
                 # else, file is packaged in /var/lib/oscar/packages/<packages>/
-                filelist = open(os.path.join(debiandir, "opkg-api-%s.install" % pkgName), "a")
+                filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
                 filelist.write("%s /var/lib/oscar/packages/%s\n" % (basename, pkgName))
                 filelist.close()
                 shutil.copy(orig, self.pkgDir)
@@ -266,7 +300,7 @@ class CompilerDebian(Compiler):
                        self.pkgDir,
                        True,
                        '\.svn|.*~')
-            filelist = open(os.path.join(debiandir, "opkg-api-%s.install" % pkgName), "a")
+            filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
             filelist.write("doc/* /usr/share/doc/opkg-api-%s\n" % pkgName)
             filelist.close()
 
@@ -277,7 +311,7 @@ class CompilerDebian(Compiler):
                        self.pkgDir,
                        True,
                        '\.svn|.*~')
-            filelist = open(os.path.join(debiandir, "opkg-api-%s.install" % pkgName), "a")
+            filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
             filelist.write("testing/* /var/lib/oscar/testing/%s\n" % pkgName)
             filelist.close()
 
