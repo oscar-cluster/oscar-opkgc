@@ -1,8 +1,9 @@
 Opkgc - OSCAR Packages Compiler
 ===============================
 
-opkgc is a tool, written in Python and XSLT, which transform an
-OSCAR [1] package description into RPM or Debian packages.
+opkgc is a tool, written in Python and Cheetah templates, which
+transform an OSCAR [1] package description into RPM or Debian
+packages.
 
 Configuration
 -------------
