@@ -108,7 +108,7 @@ distdir: $(DISTFILES)
 	done
 
 install: install-data
-install-data: install-man $(PDF_TARGETS) $(HTML_TARGETS) $(ONE_HTML_TARGETS) $(SCHEMA)
+install-data: install-man $(PDF_TARGETS) $(HTML_TARGETS) $(ONE_HTML_TARGETS) $(schemas)
 	if test "$(PDF_TARGETS)" != ""; then \
 	  for t in $(PDF_TARGETS); do \
 	    $(mkdir_p) "$(DESTDIR)$(pdfdir)"; \
@@ -127,16 +127,16 @@ install-data: install-man $(PDF_TARGETS) $(HTML_TARGETS) $(ONE_HTML_TARGETS) $(S
 	    $(mkdir_p) "$(DESTDIR)$(htmldir)/$$t"; \
 	    ( cd $$t; \
 	      $(INSTALL_DATA) * "$(DESTDIR)$(htmldir)/$$t"; \
-	    ) \
+	    ); \
 	    $(INSTALL_DATA) $(html_stylesheet) "$(DESTDIR)$(htmldir)/"; \
 	  done; \
 	fi
-	for t in $(SCHEMAS); do \
+	for t in $(schemas); do \
 	  $(mkdir_p) "$(DESTDIR)$(pkgdatadir)"; \
 	  $(INSTALL_DATA) "$$t" "$(DESTDIR)$(pkgdatadir)/$$t"; \
 	done
 	$(mkdir_p) $(DESTDIR)$(docdir)/samples
-	rsync -avr --exclude '.svn' --exclude '*~' samples $(DESTDIR)$(docdir)/samples
+	rsync -avr --exclude '.svn' --exclude '*~' samples $(DESTDIR)$(docdir)
 
 install-man: $(MAN_TARGETS)
 	for file in $(MAN_TARGETS); do \
@@ -151,7 +151,7 @@ uninstall-data: uninstall-man
 	rm -rf $(DESTDIR)$(pdfdir)
 	rm -rf $(DESTDIR)$(htmldir)
 	rm -rf $(DESTDIR)$(pkgdatadir)
-	rm -rf $(DESTDIR)$(docdir)/samples
+	rm -rf $(DESTDIR)$(docdir)
 
 uninstall-man:
 	for file in $(MAN_TARGETS); do \

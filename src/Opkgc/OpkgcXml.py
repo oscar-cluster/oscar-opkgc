@@ -15,6 +15,7 @@ from lxml import etree
 from StringIO import StringIO
 from OpkgcConfig import *
 from OpkgcTools import *
+from OpkgcLogger import *
 
 class XmlTools:
     __instance = None
@@ -56,11 +57,13 @@ class XmlTools:
         """ Return false if config.xml is not valid
         """
         xmlschema = etree.XMLSchema(self.__xmlschema_doc)
+        Logger().info("Validating XML file against schema")
         if not xmlschema.validate(self.__xml_doc):
-            print "Config.xml file is invalid. Check against XML schema " + Config().get("GENERAL", "xsdfile")
+            Logger().error("config.xml file is invalid. Check against XML schema %s " % Config().get("GENERAL", "xsdfile"))
             raise SystemExit
 
     def parseXml (self, file):
+        Logger().debug("Load xml file %s" % file)
         xml_file = open(file)
         parser_xml = etree.XMLParser()
         xml_doc = etree.parse(xml_file, parser_xml)

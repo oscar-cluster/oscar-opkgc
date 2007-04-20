@@ -13,7 +13,7 @@ from OpkgcXml import *
 __all__ = ['OpkgDescription', 'OpkgDescriptionDebian', 'OpkgDescriptionRpm']
 
 class OpkgDescription:
-    """ Describe a config.xml file
+    """ Contains data for templates
     """
     oscarDepends = {"clientDeps":"oscar-base-client",
                     "apiDeps":"oscar-base",

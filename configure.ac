@@ -8,7 +8,7 @@ dnl autoconf version
 AC_PREREQ(2.59)
 
 dnl mandatory stuff
-AC_INIT([opkgc], [0.9], [oscar-users@lists.sourceforge.net])
+AC_INIT([opkgc], [0.1], [oscar-users@lists.sourceforge.net])
 
 dnl check host and target
 AC_CANONICAL_BUILD
@@ -32,16 +32,17 @@ else
 fi
 
 dnl check documentation tools and options
-AC_ARG_ENABLE([doc-pdf],
-	      [AS_HELP_STRING([--disable-doc-pdf],
-			      [Do not build pdf doc @<:@default: enable@:>@])],
-	      [],
-	      [enable_doc_pdf="yes"])
-if test "$enable_doc_pdf" = "yes"; then
-   AC_CHECK_PROG([PDFDOC], [db2pdf], [yes], [no])
-else
-   PDFDOC="no"
-fi
+dnl AC_ARG_ENABLE([doc-pdf],
+dnl 	      [AS_HELP_STRING([--disable-doc-pdf],
+dnl 			      [Do not build pdf doc @<:@default: enable@:>@])],
+dnl 	      [],
+dnl 	      [enable_doc_pdf="yes"])
+dnl if test "$enable_doc_pdf" = "yes"; then
+dnl    AC_CHECK_PROG([PDFDOC], [db2pdf], [yes], [no])
+dnl else
+dnl    PDFDOC="no"
+dnl fi
+PDFDOC="no"
 AC_SUBST(PDFDOC)
 
 AC_ARG_ENABLE([doc-html],
@@ -50,10 +51,10 @@ AC_ARG_ENABLE([doc-html],
 	      [],
 	      [enable_doc_html="no"])
 AC_ARG_ENABLE([doc-one-html],
-	      [AS_HELP_STRING([--enable-doc-one-html],
-			      [Build html doc (one page) @<:@default: disable@:>@])],
+	      [AS_HELP_STRING([--disable-doc-one-html],
+			      [Build html doc (one page) @<:@default: enable@:>@])],
 	      [],
-	      [enable_doc_one_html="no"])
+	      [enable_doc_one_html="yes"])
 AC_CHECK_PROG([DB2HTML], [xmlto], [yes], [no])
 if test "$enable_doc_html" = "yes" -a "$DB2HTML" = "yes"; then
    HTMLDOC="yes"
@@ -77,7 +78,6 @@ AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/setup.py])
 AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([conf/Makefile])
-AC_CONFIG_FILES([conf/opkgc.conf])
 AC_CONFIG_FILES([templates/Makefile])
 
 dnl write all stuff

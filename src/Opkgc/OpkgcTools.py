@@ -6,9 +6,11 @@
 # directory of the source
 ###################################################################
 
+from OpkgcLogger import *
 import shutil
 import re
 import os
+import subprocess
 
 __all__ = ['Tools']
 
@@ -23,8 +25,12 @@ class Tools:
                 if os.path.isdir(os.path.join(d,p)):
                     Tools.rmDir(os.path.join(d,p))
                 else:
-                    os.remove(os.path.join(d,p))
-            os.rmdir(os.path.join(d))
+                    abspath = os.path.join(d,p)
+                    os.remove(abspath)
+                    Logger().debug("Remove file: %s" % abspath)
+            abspath = os.path.join(d)
+            os.rmdir(abspath)
+            Logger().debug("Remove dir: %s" % abspath)
     rmDir = staticmethod(rmDir)
 
     def copy(orig, dest, recursive=True, exclude=''):
@@ -48,7 +54,9 @@ class Tools:
         if not re.search(exclude, orig):
             if os.path.isdir(orig):
                 if recursive:
-                    os.makedirs(os.path.join(dest, os.path.basename(orig)))
+                    abspath = os.path.join(dest, os.path.basename(orig))
+                    os.makedirs(abspath)
+                    Logger().info("Create dir: %s" % abspath)
                     filelist = [os.path.join(orig, f) for f in os.listdir(orig)]
                     for f in filelist:
                         Tools.__copy(f,
@@ -57,6 +65,7 @@ class Tools:
                                      exclude)
             else:
                 shutil.copy(orig, dest)
+                Logger().info("Copy %s to %s" % (orig, dest))
     __copy = staticmethod(__copy)
 
     def normalizeWithDash(s):
@@ -85,8 +94,25 @@ class Tools:
             res = "%s%s" % (res, m.group('action'))
         if not m.group('part') == "api":
             res = "%s %s" % (res, m.group('part'))
-        return res        
+        return res
     getRpmScriptName = staticmethod(getRpmScriptName)
+
+    def getDebScriptName(name, pkgName):
+        """ Convert opkg script name to Debian script name:
+        api-post-uninstall -> opkg-<pkgName>.postinst
+        server-pre-install -> opkg-<pkgName>-server.preinst
+        """
+        m = Tools.scriptRe.match(name)
+        res = "opkg-%s" % pkgName
+        if m.group('part') != "api":
+            res = "%s-%s" % (res, m.group('part'))
+        res = "%s.%s" % (res, m.group('time'))
+        if m.group('action') == "un":
+            res = "%srm" % res
+        else:
+            res = "%sinst" % res
+        return res
+    getDebScriptName = staticmethod(getDebScriptName)
 
     def isBourneScript(file):
         """ True if 'file' is a Bourne Shell script
@@ -95,3 +121,21 @@ class Tools:
         shebang = file.readline()
         return re.match(r'^#!.*/sh', shebang)
     isBourneScript = staticmethod(isBourneScript)
+
+    def command(command, cwd):
+        Logger().debug("Execute: %s" % command)
+        exe = subprocess.Popen(command,
+                               cwd=cwd,
+                               bufsize=0,
+                               stdin=None,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               shell=True)
+        if Logger().isDebug():
+            for l in exe.stdout:
+                Logger().debug(l.strip())
+        for l in exe.stderr:
+            Logger().info(l.strip())
+        return exe.wait()
+    command = staticmethod(command)
+

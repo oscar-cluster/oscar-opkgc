@@ -6,27 +6,31 @@
 # directory of the source
 ###################################################################
 
+from OpkgcLogger import *
 import ConfigParser, os
 
 __all__ = ['Config']
 
-class Config:
+class Config(object):
     __instance = None
 
-    config = None
-    configFile = ["./opkgc.conf", "~/.opkgc", "/etc/opkgc.conf"]
+    __config = None
 
     def __new__ (cls):
         if cls.__instance is None:
-            cls._instance = object.__new__(cls)
-        return cls._instance
+            cls.__instance = object.__new__(cls)
+            cls.__instance.readConfig()
+        return cls.__instance
 
-    def __init__(self):
-        self.config = ConfigParser.ConfigParser()
-        success = self.config.read(['/etc/opkgc.conf', os.path.expanduser('~/.opkgc'), './opkgc.conf'])
+    def readConfig (self):
+        self.__config = ConfigParser.ConfigParser()
+        success = self.__config.read(['/etc/opkgc.conf', os.path.expanduser('~/.opkgc'), './opkgc.conf'])
         if len(success) == 0:
-            print "No configuration file found (in /etc/opkgc.conf, ~/.opkgc or ./opkgc.conf)"
+            Logger().error("No configuration file found (in /etc/opkgc.conf, ~/.opkgc or ./opkgc.conf)")
             raise SystemExit
+        else:
+            for c in success:
+                Logger().info("Read config file %s" % c)
         
     def get (self, section, option):
-        return self.config.get(section, option)
+        return self.__config.get(section, option)

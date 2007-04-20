@@ -18,6 +18,7 @@ from OpkgcXml import *
 from OpkgcConfig import *
 from OpkgDescription import *
 from OpkgcTools import *
+from OpkgcLogger import *
 from Cheetah.Template import Template
 
 __all__ = ['Compiler', 'CompilerRpm', 'CompilerDebian']
@@ -65,18 +66,14 @@ class Compiler:
         
         'template' is a XSLT file
         """
+        Logger().info("Generates %s from template %s" % (dest, template))
         t = Template(file=template, searchList=[orig])
         f = open(dest, 'w')
         f.write(t.respond())
         f.close()
 
-    def compile(self):
+    def compile(self, build):
         """ Abstract method to generate packaging files
-        """
-        raise NotImplementedError
-
-    def build(self):
-        """ Abstract method to build 
         """
         raise NotImplementedError
 
@@ -89,11 +86,12 @@ class Compiler:
         """
         path = os.path.join(self.inputdir, "config.xml")
         if os.path.exists(path):
+            Logger().info("%s file found" % path)
             return path
         else:
-            print "No config.xml file found. Either:"
-            print "* specify the --input=dir option"
-            print "* run opkgc from the opkg directory"
+            Logger().error("No config.xml file found. Either:")
+            Logger().error("* specify the --input=dir option")
+            Logger().error("* run opkgc from the opkg directory")
             raise SystemExit
 
     def getScripts(self):
@@ -104,12 +102,20 @@ class Compiler:
         if os.path.isdir(scriptdir):
             for p in os.listdir(scriptdir):
                 if not re.search("\.svn|.*~", p) and not os.path.isdir(p):
-                    ret.append(os.path.join(self.inputdir, "scripts", p))
+                    path = os.path.join(self.inputdir, "scripts", p)
+                    ret.append(path)
         # add configurator.html, if any
         configurator = os.path.join(self.inputdir, "configurator.html")
         if os.path.exists(configurator):
             ret.append(configurator)
         return ret
+
+    def build(self, command, cwd='./'):
+        ret = Tools.command(command, cwd)
+        if ret == 0:
+            Logger().info("Packages succesfully generated")
+        else:
+            Logger().error("Package generation failed: return %d" % ret)
 
     def SupportedDist(cls):
         """ Return a list of supported dist
@@ -131,11 +137,15 @@ class CompilerRpm(Compiler):
     pkgDir = ''
     specfile = ''
 
-    def compile (self):
+    def compile (self, doBuild):
+        """ Compile opkg
+        doBuild: if True, generates packages, if False, only meta-files
+        """
         self.xmlInit (self.getConfigFile())
         self.xmlValidate ()
 
         pkgName = Tools.normalizeWithDash(self.getPackageName())
+        Logger().debug("Package name: %s" % pkgName)
         self.pkgDir = os.path.join(self.getMacro('%_builddir'), "opkg-%s" % pkgName)
 
         # Clean/Create package dir
@@ -212,25 +222,26 @@ class CompilerRpm(Compiler):
             os.path.join(Config().get(self.configSection, "templatedir"), "opkg.spec.tmpl"),
             self.specfile)
 
-        # Copy generated packages into output dir
-        rpmdir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
-        shutil.copy(os.path.join(rpmdir, "opkg-%s-%s.noarch.rpm" % (pkgName, desc.version())),
-                    self.getDestDir())
-        shutil.copy(os.path.join(rpmdir, "opkg-%s-server-%s.noarch.rpm" % (pkgName, desc.version())),
-                    self.getDestDir())
-        shutil.copy(os.path.join(rpmdir, "opkg-%s-client-%s.noarch.rpm" % (pkgName, desc.version())),
-                    self.getDestDir())
+        if doBuild:
+            cmd = "%s %s %s" % (Config().get(self.configSection, "buildcmd"),
+                                Config().get(self.configSection, "buildopts"),
+                                self.specfile)
+            self.build(cmd)
+
+            # Copy generated packages into output dir
+            pkgName = Tools.normalizeWithDash(self.getPackageName())
+            rpmdir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
+            shutil.copy(os.path.join(rpmdir, "opkg-%s-%s.noarch.rpm" % (pkgName, desc.version())),
+                        self.getDestDir())
+            shutil.copy(os.path.join(rpmdir, "opkg-%s-server-%s.noarch.rpm" % (pkgName, desc.version())),
+                        self.getDestDir())
+            shutil.copy(os.path.join(rpmdir, "opkg-%s-client-%s.noarch.rpm" % (pkgName, desc.version())),
+                        self.getDestDir())
+
 
     def getMacro(self, name):
         line = os.popen("rpm --eval %s" % name).readline()
         return line.strip()
-
-    def build(self):
-        cmd = Config().get(self.configSection, "buildcmd")
-        opts = Config().get(self.configSection, "buildopts")
-        opts += " %s" % self.specfile
-
-        ret = os.system("%s %s" % (cmd, opts))
 
 class CompilerDebian(Compiler):
     """ Extend Compiler for Debian packaging
@@ -242,17 +253,18 @@ class CompilerDebian(Compiler):
                        'api-post-install'     : 'opkg-%s.postinst',
                        'api-pre-uninstall'    : 'opkg-%s.prerm',
                        'api-post-uninstall'   : 'opkg-%s.postrm',
-                       'server-pre-install'   : 'opkg-server-%s.preinst',
-                       'server-post-install'  : 'opkg-server-%s.postinst',
-                       'server-pre-uninstall' : 'opkg-server-%s.prerm',
-                       'server-post-uninstall': 'opkg-server-%s.postrm',
-                       'client-pre-install'   : 'opkg-client-%s.preinst',
+                       'server-pre-install'   : 'opkg-%s.preinst',
+                       'server-post-install'  : 'opkg-%s.postinst',
+                       'server-pre-uninstall' : 'opkg-%s.prerm',
+                       'server-post-uninstall': 'opkg-%s.postrm',
+                       'client-pre-install'   : 'opkg-%s.preinst',
                        'client-post-install'  : 'opkg-client-%s.postinst',
                        'client-pre-uninstall' : 'opkg-client-%s.prerm',
                        'client-post-uninstall': 'opkg-client-%s.postrm'}
 
-    def compile (self):
+    def compile (self, doBuild):
         """ Creates debian package files
+        doBuild: if True, generate packages, if False only meta-files
         """
         self.xmlInit (self.getConfigFile())
         self.xmlValidate ()
@@ -260,6 +272,7 @@ class CompilerDebian(Compiler):
         desc = OpkgDescriptionDebian(self.xml_tool.getXmlDoc(), self.dist)
 
         pkgName = Tools.normalizeWithDash(self.getPackageName())
+        Logger().debug("Package base name: %s" % pkgName)
         self.pkgDir = os.path.join(self.getDestDir(), "opkg-%s" % pkgName)
 
         if (os.path.exists(self.pkgDir)):
@@ -276,22 +289,25 @@ class CompilerDebian(Compiler):
                 self.cheetahCompile(desc, template, os.path.join(debiandir, base))
             else:
                 shutil.copy(template, debiandir)
+                Logger().info("Copy %s to %s" % (template, debiandir))
 
         # Manage [pre|post]-scripts
         for orig in self.getScripts():
             basename = os.path.basename(orig)
-            try:
+            if Tools.isNativeScript(basename):
                 # If script is one of scripts included as
                 # {pre|post}{inst|rm} scripts, copy with appropriate filename
                 # (see Debian Policy for it)
-                dest = self.scriptsOrigDest[basename] % pkgName
+                dest = Tools.getDebScriptName(basename, pkgName)
                 shutil.copy(orig, os.path.join(debiandir, dest))
-            except(KeyError):
+                Logger().info("Install script: %s" % dest)
+            else:
                 # else, file is packaged in /var/lib/oscar/packages/<packages>/
                 filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
                 filelist.write("%s /var/lib/oscar/packages/%s\n" % (basename, pkgName))
                 filelist.close()
                 shutil.copy(orig, self.pkgDir)
+                Logger().info("Copy %s to %s" % (orig, self.pkgDir))
 
         # Copy doc
         docdir = os.path.join(self.inputdir, "doc")
@@ -315,6 +331,11 @@ class CompilerDebian(Compiler):
             filelist.write("testing/* /var/lib/oscar/testing/%s\n" % pkgName)
             filelist.close()
 
+        if doBuild:
+            cmd = "%s %s" % (Config().get(self.configSection, "buildcmd"),
+                             Config().get(self.configSection, "buildopts"))
+            self.build(cmd, cwd=self.pkgDir)
+
     def getTemplates(self):
         """ Return list of files in Debian templates dir
         """
@@ -324,10 +345,3 @@ class CompilerDebian(Compiler):
             if not re.search("\.svn|.*~", p) and not os.path.isdir(f):
                 ret.append(f)
         return ret
-
-    def build(self):
-        cdCmd = 'cd ' + self.pkgDir
-        cmd = Config().get(self.configSection, "buildcmd")
-        opts = Config().get(self.configSection, "buildopts")
-
-        ret = os.system(cdCmd + ';' + cmd + ' ' + opts)

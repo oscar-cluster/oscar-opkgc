@@ -27,6 +27,7 @@ import getopt
 import re
 from Opkgc.OpkgcCompiler import *
 from Opkgc.OpkgcConfig import *
+from Opkgc.OpkgcLogger import *
 
 compilers = ['CompilerRpm', 'CompilerDebian']
 
@@ -34,7 +35,8 @@ def usage():
     """ Print command usage
     """
     print "Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [--source]"
-    print "               [-o|--output=dir] [-i|--input=dir] --dist=targetDist"
+    print "               [-o|--output=dir] [-i|--input=dir] [-v|--verbose] "
+    print "               --dist=targetDist"
     print ""
     print "\t--supported-dist : list supported distributions for --dist option"
     print "\t--dist           : target distibution, default to current distribution"
@@ -42,6 +44,8 @@ def usage():
     print "\t--source : does not build package, only generate sources"
     print "\t--input  : opkg directory, default current dir"
     print "\t--output : build packages in specified dir"
+    print "\t-v       : verbose output"
+    print "\t-v -v    : debug output"
 
 def distList():
     """ Print supported target distributions
@@ -54,15 +58,12 @@ def distList():
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "husi:o:d:",
-                                   ["help", "supported-dist", "source", "input=", "output=", "dist="])
+                                   "husi:o:d:v",
+                                   ["help", "supported-dist", "source", "input=", "output=", "dist=", "verbose"])
     except getopt.GetoptError:
         # Print help information
         usage()
         sys.exit(2)
-
-    # Initialize config file. Here just to detect early lack of config file
-    Config()
 
     # Default values
     build = True
@@ -70,6 +71,7 @@ def main():
     output = "."
     validate = True
     dist = ''
+    debug = Logger.ERROR
     
     for o, a in opts:
         if o in ("-h", "--help"):
@@ -86,6 +88,13 @@ def main():
             output = a
         if o in ("-d", "--dist"):
             dist = a
+        if o in ("-v", "--verbose"):
+            debug = debug+1
+
+    Logger().level(debug)
+
+    # Initialize config file. Here just to detect early lack of config file
+    Config()
 
     # Build list of available target distributions and
     # associated compiler
@@ -100,9 +109,7 @@ def main():
         sys.exit(2)
 
     c = eval(targets[dist])( inputdir, output, dist, validate )
-    c.compile()
-    if build:
-        c.build()
+    c.compile(build)
 
 if __name__ == "__main__":
     main()
