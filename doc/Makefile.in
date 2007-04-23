@@ -7,7 +7,7 @@
 ###
 schemas = opkg.xsd
 manpages = opkgc.1 opkg.5
-pdfdocs = opkgc-manual.pdf opkgc.1.pdf opkg.5.pdf
+pdfdocs = opkgc-manual.pdf
 htmldocs = opkgc-manual
 onehtmldocs = opkgc-manual.html opkgc.1.html opkg.5.html
 
@@ -37,7 +37,7 @@ mkdir_p = @mkdir_p@
 INSTALL = @install_sh@
 INSTALL_DATA = @INSTALL_DATA@
 
-DB2PDF=db2pdf
+DB2PDF=dblatex --pdf
 DB2HTML=xmlto xhtml
 DB2ONEHTML=xmlto xhtml-nochunks
 DB2MAN=xmlto man

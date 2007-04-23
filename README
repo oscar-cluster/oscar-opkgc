@@ -5,6 +5,16 @@ opkgc is a tool, written in Python and Cheetah templates, which
 transform an OSCAR [1] package description into RPM or Debian
 packages.
 
+Requirements:
+-------------
+
+opkgc depends on:
+- Python (>= 2.4)
+- lxml
+- Cheetah template engine
+- dblatex (for PDF documentation)
+- xmlto (for HTML doc and manpages)
+
 Configuration
 -------------
 

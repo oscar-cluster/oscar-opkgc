@@ -23,28 +23,22 @@ AC_PROG_MAKE_SET
 AC_PROG_LN_S
 AC_PROG_INSTALL
 
-AC_MSG_CHECKING([python])
-if which python > /dev/null; then
-  AC_MSG_RESULT([yes])
-else
-  AC_MSG_RESULT([not found])
-  AC_MSG_ERROR([ *** Please install python ***])
-fi
+AM_PATH_PYTHON([2.4])
 
 dnl check documentation tools and options
-dnl AC_ARG_ENABLE([doc-pdf],
-dnl 	      [AS_HELP_STRING([--disable-doc-pdf],
-dnl 			      [Do not build pdf doc @<:@default: enable@:>@])],
-dnl 	      [],
-dnl 	      [enable_doc_pdf="yes"])
-dnl if test "$enable_doc_pdf" = "yes"; then
-dnl    AC_CHECK_PROG([PDFDOC], [db2pdf], [yes], [no])
-dnl else
-dnl    PDFDOC="no"
-dnl fi
-PDFDOC="no"
+AC_ARG_ENABLE([doc-pdf],
+	      [AS_HELP_STRING([--enable-doc-pdf],
+ 			      [Do not build pdf doc @<:@default: disable@:>@])],
+ 	      [],
+ 	      [enable_doc_pdf="no"])
+if test "$enable_doc_pdf" = "yes"; then
+   AC_CHECK_PROG([PDFDOC], [dblatex], [yes], [no])
+else
+   PDFDOC="no"
+fi
 AC_SUBST(PDFDOC)
 
+AC_CHECK_PROG([XMLTO], [xmlto], [yes], [no])
 AC_ARG_ENABLE([doc-html],
 	      [AS_HELP_STRING([--enable-doc-html],
 			      [Build html doc (splitted pages) @<:@default: disable@:>@])],
@@ -55,13 +49,12 @@ AC_ARG_ENABLE([doc-one-html],
 			      [Build html doc (one page) @<:@default: enable@:>@])],
 	      [],
 	      [enable_doc_one_html="yes"])
-AC_CHECK_PROG([DB2HTML], [xmlto], [yes], [no])
-if test "$enable_doc_html" = "yes" -a "$DB2HTML" = "yes"; then
+if test "$enable_doc_html" = "yes" -a "$XMLTO" = "yes"; then
    HTMLDOC="yes"
 else
    HTMLDOC="no"
 fi
-if test "$enable_doc_one_html" = "yes" -a "$DB2HTML" = "yes"; then
+if test "$enable_doc_one_html" = "yes" -a "$XMLTO" = "yes"; then
    ONEHTMLDOC="yes"
 else
    ONEHTMLDOC="no"
@@ -69,7 +62,12 @@ fi
 AC_SUBST(HTMLDOC)
 AC_SUBST(ONEHTMLDOC)
 
-AC_CHECK_PROG([MANDOC], [xmlto], [yes], [no])
+dnl AC_CHECK_PROG([MANDOC], [xmlto], [yes], [no])
+if test "$XMLTO" = "yes"; then
+   MANDOC="yes"
+else
+   MANDOC="no"
+fi
 AC_SUBST(MANDOC)
 
 dnl files to generate with automake
