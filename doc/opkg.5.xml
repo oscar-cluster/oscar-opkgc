@@ -84,8 +84,8 @@
 	<filename>/usr/share/doc/opkg/opkg.xsd</filename> if you
 	installed the <command>opkgc</command>. The schema is also
 	available online at <ulink
-	url="http://svn.oscar.openclustergroup.org/trac/oscar/browser/pkgsrc/tools/opkgc/doc/opkg.xsd"
-	>http://svn.oscar.openclustergroup.org/trac/oscar/browser/pkgsrc/tools/opkgc/doc/opkg.xsd</ulink>
+	url="http://svn.oscar.openclustergroup.org/trac/oscar/browser/pkgsrc/opkgc/trunk/doc/opkg.xsd"
+	>http://svn.oscar.openclustergroup.org/trac/oscar/browser/pkgsrc/opkgc/trunk/doc/opkg.xsd</ulink>
       </para>
     </refsect2>
 
