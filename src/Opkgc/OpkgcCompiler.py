@@ -85,14 +85,12 @@ class Compiler:
         Raise exception if not found
         """
         path = os.path.join(self.inputdir, "config.xml")
-        if os.path.exists(path):
-            Logger().info("%s file found" % path)
-            return path
-        else:
+        if not os.path.exists(path):
             Logger().error("No config.xml file found. Either:")
             Logger().error("* specify the --input=dir option")
             Logger().error("* run opkgc from the opkg directory")
             raise SystemExit
+        return path
 
     def getScripts(self):
         """ Return list of files in scripts/ dir
@@ -108,6 +106,10 @@ class Compiler:
         configurator = os.path.join(self.inputdir, "configurator.html")
         if os.path.exists(configurator):
             ret.append(configurator)
+
+        # add config.xml
+        ret.append(self.getConfigFile())
+            
         return ret
 
     def build(self, command, cwd='./'):
@@ -141,7 +143,9 @@ class CompilerRpm(Compiler):
         """ Compile opkg
         doBuild: if True, generates packages, if False, only meta-files
         """
-        self.xmlInit (self.getConfigFile())
+        configFile = self.getConfigFile()
+        
+        self.xmlInit (configFile)
         self.xmlValidate ()
 
         pkgName = Tools.normalizeWithDash(self.getPackageName())
@@ -166,7 +170,7 @@ class CompilerRpm(Compiler):
         desc = OpkgDescriptionRpm(self.xml_tool.getXmlDoc(), self.dist)
 
         filelist = []
-        # Manage [pre|post]-scripts
+        # Manage [pre|post]-scripts, config.xml, configurator.html
         scriptdir = os.path.join("var", "lib", "oscar", "packages", "%s" % pkgName)
         if (not os.path.exists(os.path.join(self.pkgDir, scriptdir))):
             os.makedirs(os.path.join(self.pkgDir, scriptdir))
@@ -196,7 +200,7 @@ class CompilerRpm(Compiler):
 
         # Copy doc
         docdir = os.path.join(self.inputdir, "doc")
-        outdocdir = os.path.join("usr", "share", "doc", "packages", "opkg-%s" % pkgName)
+        outdocdir = os.path.join("usr", "share", "doc", "opkg-%s" % pkgName)
         if os.path.isdir(docdir):
             Tools.copy(docdir,
                        os.path.join(self.pkgDir, outdocdir),
@@ -317,7 +321,7 @@ class CompilerDebian(Compiler):
                        True,
                        '\.svn|.*~')
             filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
-            filelist.write("doc/* /usr/share/doc/opkg-api-%s\n" % pkgName)
+            filelist.write("doc/* /usr/share/doc/opkg-%s\n" % pkgName)
             filelist.close()
 
         # Copy testing scripts
