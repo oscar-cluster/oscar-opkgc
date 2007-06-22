@@ -24,6 +24,15 @@
       </author>
     </authorgroup>
 
+    <revhistory>
+        <revision>
+            <revnumber>0.2</revnumber>
+            <date>06-22-07</date>
+            <author>Jean Parpaillon</author>
+            <revremark>Documentation for OPKG 0.2</revremark>
+        </revision>
+    </revhistory>
+
   </articleinfo>
 
   <sect1>
