@@ -45,19 +45,20 @@ distdir: $(DISTFILES)
 	done
 
 install: all
-	python setup.py install -f --prefix=$(prefix) $(destdircmd) | \
-	  egrep '^copying' | sed -e 's/.*\(\/[a-zA-Z0-9_-.]*\)\s*->\s*\(.*\)/\2\1/' > install.list
+#	python setup.py install -f --prefix=$(prefix) $(destdircmd) | \
+#	  egrep '^copying' | sed -e 's/.*\(\/[a-zA-Z0-9_-.]*\)\s*->\s*\(.*\)/\2\1/' > install.list
+	python setup.py install -f --prefix=$(prefix) $(destdircmd)
 	$(install_sh_SCRIPT) opkg-convert $(DESTDIR)$(bindir)
 
 uninstall:
-	if test -e install.list; then \
-	  for f in `cat install.list`; do \
-	    rm -f $$f; \
-	    if echo $$f | egrep '\.py$$' > /dev/null; then \
-	      rm -f `dirname $$f`/`basename $$f .py`.pyc; \
-	    fi; \
-	  done; \
-	fi
+#	if test -e install.list; then \
+#	  for f in `cat install.list`; do \
+#	    rm -f $$f; \
+#	    if echo $$f | egrep '\.py$$' > /dev/null; then \
+#	      rm -f `dirname $$f`/`basename $$f .py`.pyc; \
+#	    fi; \
+#	  done; \
+#	fi
 	rm -f $(DESTDIR)$(bindir)/opkg-convert 
 
 clean:
