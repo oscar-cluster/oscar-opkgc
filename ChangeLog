@@ -1,3 +1,10 @@
+0.2.1
+	* Release "Los peces"
+	* Fix make install target on some distros
+	Jean Parpaillon <jean.parpaillon@irisa.fr> - June 27th, 2007
+	* Add revision history in opkgc-manual
+	Geoffroy Vallée <valleegr@ornl.gov> - June 22th, 2007
+
 0.2	
 	* Release "Caravan"
 	* Put config.xml file in opkg-<name> package
