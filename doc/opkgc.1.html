@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>opkgc</title><link rel="stylesheet" href="./db.css" type="text/css" /><meta name="generator" content="DocBook XSL Stylesheets V1.72.0" /></head><body><div class="refentry" lang="en" xml:lang="en"><a id="opkgc.1"></a><div class="titlepage"></div><div class="refnamediv"><h2>Name</h2><p>opkgc — Generate distribution native packages from opkg</p></div><div class="refsynopsisdiv"><h2>Synopsis</h2><div class="cmdsynopsis"><p><code class="command">opkgc</code>  [-h]</p></div><div class="cmdsynopsis"><p><code class="command">opkgc</code>  [ -u  |   --supported-dist ]</p></div><div class="cmdsynopsis"><p><code class="command">opkgc</code>  [--source] [ -o  |   --output-dir ] [ -i  |   --input-dir ] {--dist=targetDist}</p></div></div><div class="refsect1" lang="en" xml:lang="en"><a id="id2487121"></a><h2>Description</h2><p>
+      <span><strong class="command">opkgc</strong></span> generates distribution native packages
+      (RPM or Debian) from an OSCAR package description.
+    </p><p>
+      By default, <span><strong class="command">opkgc</strong></span> must be run from the
+      <span><strong class="command">opkg</strong></span> directory, i.e. containing
+      <code class="filename">config.xml</code> file. If not, this directory can
+      be specified with <code class="option">--input-dir</code> optional
+      argument.
+    </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id2487164"></a><h2>Options</h2><p>
+      </p><div class="variablelist"><dl><dt><span class="term"><code class="option">-h</code></span></dt><dd><p>
+	    Print <span><strong class="command">opkgc</strong></span> options list.
+	  </p></dd><dt><span class="term"><code class="option">-u</code>, </span><span class="term"><code class="option">--supported-dist</code></span></dt><dd><p>
+	      Print list of supported distributions (as for the
+	      <code class="option">--dist</code> argument).
+	    </p></dd><dt><span class="term"><code class="option">--source</code></span></dt><dd><p>
+	      If set, does not build the packages, only generates
+	      meta-files.
+	    </p></dd><dt><span class="term"><code class="option">-o dir</code>, </span><span class="term"><code class="option">--output-dir=dir</code></span></dt><dd><p>
+	      Generate meta-files and packages in
+	      <code class="filename">dir</code>. Default to current directory.
+	    </p></dd><dt><span class="term"><code class="option">-i path</code>, </span><span class="term"><code class="option">--input-dir=path</code></span></dt><dd><p>
+	      Set the <span><strong class="command">opkg</strong></span> directory, i.e. the one
+	      containing <code class="filename">config.xml</code>. Default to
+	      current directory.
+	    </p></dd><dt><span class="term"><code class="option">--dist=distname</code></span></dt><dd><p>
+	      Set the target distribution. Available distributions
+	      list can be obtained with
+	      <code class="option">--supported-dist</code> argument.
+	    </p></dd></dl></div><p>
+    </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id2492141"></a><h2>Files</h2><p>
+      </p><div class="variablelist"><dl><dt><span class="term">./opkgc.conf, </span><span class="term">~/.opkgc, </span><span class="term">/etc/opkgc.conf</span></dt><dd><p>
+	      Contains paths to templates and other files
+	      <span><strong class="command">opkgc</strong></span> uses. The first of these 3 files
+	      found is used.
+	    </p></dd></dl></div><p>
+    </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id2492182"></a><h2>Author</h2><p>
+      Written by Jean Parpaillon
+      <code class="email">&lt;<a href="mailto:jean.parpaillon@irisa.fr">jean.parpaillon@irisa.fr</a>&gt;</code> and Geoffroy Vallée
+      <code class="email">&lt;<a href="mailto:valleegr@ornl.gov">valleegr@ornl.gov</a>&gt;</code>.
+    </p><p>
+      From an original idea of Erich Focht.
+    </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id2492205"></a><h2>Reporting Bugs</h2><p>
+      Report bugs to <code class="email">&lt;<a href="mailto:oscar-users@lists.sourceforge.net">oscar-users@lists.sourceforge.net</a>&gt;</code>
+    </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id2492219"></a><h2>Copyright</h2><p>
+      </p><table class="simplelist" border="0" summary="Simple list"><tr><td>Copyright (c) 2007 INRIA-IRISA.</td></tr><tr><td>Copyright (c) 2007 ORNL.</td></tr></table><p>
+    </p><p>
+      This is free software.  You may redistribute copies of it under
+      the terms of the GNU General Public License
+      &lt;http://www.gnu.org/licenses/gpl.html&gt;.  There is NO
+      WARRANTY, to the extent permitted by law.
+    </p></div><div class="refsect1" lang="en" xml:lang="en"><a id="id2492245"></a><h2>See Also</h2><p>
+      </p><table class="simplelist" border="0" summary="Simple list"><tr><td>opkg (5)</td></tr></table><p>
+    </p></div></div></body></html>
