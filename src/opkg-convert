@@ -11,7 +11,7 @@
 #
 ###################################################################
 
-xsltfile=/tmp/opkg.xslt
+xsltfile=/tmp/opkg.xslt.$USER
 
 function usage() {
     echo -e "Usage: $0 <opkg_dir>"
