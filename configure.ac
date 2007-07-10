@@ -22,6 +22,14 @@ dnl check tools
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
 AC_PROG_INSTALL
+AC_CHECK_PROG([RSYNC], [rsync], [yes], [no])
+if test "$RSYNC" = "no"; then
+   AC_MSG_ERROR([
+***
+*** rsync was not found, but is required
+***
+])
+fi
 
 AM_PATH_PYTHON([2.4])
 
