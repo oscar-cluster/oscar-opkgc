@@ -10,7 +10,10 @@ import re
 from time import *
 from OpkgcXml import *
 
-__all__ = ['OpkgDescription', 'OpkgDescriptionDebian', 'OpkgDescriptionRpm']
+__all__ = ['OpkgDescription',
+           'OpkgDescriptionDebian',
+           'OpkgDescriptionRpm',
+           'OpkgSyntaxException']
 
 class OpkgDescription:
     """ Contains data for templates
@@ -59,8 +62,12 @@ class OpkgDescription:
             return date
 
     def name(self):
-        p = re.compile(r'[^a-zA-Z0-9-]')
-        return p.sub('-', self.node("/name", 'lower'))
+        p = re.compile('^[a-z0-9][a-z0-9+-\.]+$')
+        name = self.node("/name")
+        if p.match(name):
+            return name
+        else:
+            raise OpkgSyntaxException('Incorrect package name syntax (pattern: [a-z0-9][a-z0-9+-\.]+)')
 
     def node(self, path, capitalize=''):
         s = self.xmldoc.findtext(path)
@@ -296,10 +303,6 @@ class OpkgDescriptionDebian(OpkgDescription):
             if a.findtext('name').strip() == name:
                 return "%s  %s" % (self.author(a), self.date(date, "RFC822"))
 
-    def name(self):
-        p = re.compile(r'[^a-zA-Z0-9-]')
-        return p.sub('-', self.node("/name", 'lower'))
-
     def copyrights(self, cat):
         """ Return list of copyrights for 'cat'
         cat: mainstream|uploader|upstream
@@ -338,3 +341,10 @@ class OpkgDescriptionDebian(OpkgDescription):
         if version:
             ret += ' (%s %s)' % (self.relName[rel], version)
         return ret
+
+class OpkgSyntaxException(Exception):
+
+    msg = None
+
+    def __init__(self, msg):
+        self.msg = msg

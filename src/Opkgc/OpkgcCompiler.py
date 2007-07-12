@@ -54,23 +54,20 @@ class Compiler:
     def getXmlDoc(self):
         return self.xml_tool.getXmlDoc()
 
-    def xmlCompile(self, template, dest, params):
-        """ Transform 'orig' to 'dest' with XSLT template 'template'
-        'template' is a XSLT file
-        'params' is a dictionnary with params to give to the template
-        """
-        self.xml_tool.transform (template, dest, params)
-
     def cheetahCompile(self, orig, template, dest):
         """ Transform 'orig' to 'dest' with Cheetah template 'template'
         
         'template' is a XSLT file
         """
-        Logger().info("Generates %s from template %s" % (dest, template))
-        t = Template(file=template, searchList=[orig])
-        f = open(dest, 'w')
-        f.write(t.respond())
-        f.close()
+        try:
+            Logger().info("Generates %s from template %s" % (dest, template))
+            t = Template(file=template, searchList=[orig])
+            f = open(dest, 'w')
+            f.write(t.respond())
+            f.close()
+        except OpkgSyntaxException,e :
+            Logger().error(e.msg)
+            sys.exit(1)
 
     def compile(self, build):
         """ Abstract method to generate packaging files
