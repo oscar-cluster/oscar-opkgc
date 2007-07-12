@@ -71,7 +71,7 @@ def main():
     output = "."
     validate = True
     dist = ''
-    debug = Logger.ERROR
+    debug = Logger.INFO
     
     for o, a in opts:
         if o in ("-h", "--help"):
