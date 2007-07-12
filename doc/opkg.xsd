@@ -81,7 +81,13 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <!-- 
+       Element name is used for autors and package name.
+       Syntax is not the same, so we declare the less strict here
+       and check into the compiler.
+  -->
   <xsd:element name="name" type="xsd:string" />
+
   <xsd:element name="nickname" type="xsd:string" />
   <xsd:element name="email" type="xsd:anyURI" />
   <xsd:element name="institution" type="xsd:string" />

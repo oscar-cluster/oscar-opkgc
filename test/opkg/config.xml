@@ -11,14 +11,18 @@
      
       $Id: config.xml 5616 2007-01-18 09:08:06Z bli $
   -->
-  <name>sample-Package</name>
+  <name>sample-package</name>
 
   <class>core</class><!-- optional -->
 
-  <summary>A sample package for testing new config.xml</summary>
+  <summary>A sample package for 
+testing new config.xml</summary>
   <description>
-    This is a long description of the test package.
-    Lorem ipsum bla bla bla, 
+    This is a long description of the test package. uer adipiscing elit. Duis mattis, eros at iaculis nonummy, magna mi aliquam dolor
+    Lorem ipsum Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Duis mattis, eros at iaculis nonummy, magna mi aliquam dolor, et luctus lorem sapien a enim. Fusce luctus justo vitae elit. Sed interdum, diam vel adipiscing dictum, ipsum lacus pharetra purus, at pretium enim pede et ante. Fusce elit mauris, dapibus vel, ornare suscipit, ultrices et, purus. Vivamus bibendum tempor massa. Phasellus mi. In cursus vestibulum enim. Mauris nec risus a dolor molestie suscipit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. 
+
+Nunc rhoncus, felis at tincidunt sollicitudin, diam tellus porttitor augue, sit amet ullamcorper mauris tellus a purus. Morbi in sapien. Aliquam rutrum elementum arcu.
+
     etc.
   </description><!-- optional -->
 

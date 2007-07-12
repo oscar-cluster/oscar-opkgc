@@ -10,3 +10,5 @@ Dependancies
 ------------
 
 * Python 2.4 (not tested with other versions)
+* lxml
+* Cheetah templating system

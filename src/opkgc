@@ -36,6 +36,7 @@ def usage():
     """
     print "Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [--source]"
     print "               [-o|--output=dir] [-i|--input=dir] [-v|--verbose] "
+    print "               [-q|--quiet]"    
     print "               --dist=targetDist"
     print ""
     print "\t--supported-dist : list supported distributions for --dist option"
@@ -44,8 +45,8 @@ def usage():
     print "\t--source : does not build package, only generate sources"
     print "\t--input  : opkg directory, default current dir"
     print "\t--output : build packages in specified dir"
-    print "\t-v       : verbose output"
-    print "\t-v -v    : debug output"
+    print "\t-v       : increase verbosity level (can be repeated)"
+    print "\t-q       : decrease verbosity level"
 
 def distList():
     """ Print supported target distributions
@@ -58,8 +59,15 @@ def distList():
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "husi:o:d:v",
-                                   ["help", "supported-dist", "source", "input=", "output=", "dist=", "verbose"])
+                                   "husi:o:d:vq",
+                                   ["help",
+                                    "supported-dist",
+                                    "source",
+                                    "input=",
+                                    "output=",
+                                    "dist=",
+                                    "verbose",
+                                    "quiet"])
     except getopt.GetoptError:
         # Print help information
         usage()
@@ -90,6 +98,8 @@ def main():
             dist = a
         if o in ("-v", "--verbose"):
             debug = debug+1
+        if o in ("-q", "--quiet"):
+            debug = debug-1
 
     Logger().level(debug)
 

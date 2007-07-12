@@ -9,6 +9,7 @@
 import re
 from time import *
 from OpkgcXml import *
+from OpkgcTools import *
 
 __all__ = ['OpkgDescription',
            'OpkgDescriptionDebian',
@@ -70,7 +71,15 @@ class OpkgDescription:
             raise OpkgSyntaxException('Incorrect package name syntax (pattern: [a-z0-9][a-z0-9+-\.]+)')
 
     def node(self, path, capitalize=''):
-        s = self.xmldoc.findtext(path)
+        """ Return the node given by path. Newlines are removed.
+        capitalize: lower|upper|<none>
+          lower: lower-case node text
+          upper: upper-case node text
+          <none>: don't touch case
+          
+        """
+        p = re.compile('\n')
+        s = p.sub(' ', self.xmldoc.findtext(path))
         if capitalize == 'lower':
             return s.lower()
         elif capitalize == 'upper':
@@ -168,13 +177,13 @@ class OpkgDescriptionRpm(OpkgDescription):
             return version
 
     def description(self):
-        """ Return the description with stripped lines.
+        """ Return the description formatted as lines of 80 columns
         """
-        desc = ''
         t = self.xmldoc.findtext('/description')
-        for line in t.split('\n'):
-            desc += line.strip()
-        return desc.strip()
+        desc = ''
+        for p in Tools.align_paragraphs(t, 80):
+            desc += "%s\n" % p
+        return desc
 
     def depends(self, part, relation):
         """ Return list of dependencies of type 'relation' for
@@ -244,10 +253,16 @@ class OpkgDescriptionDebian(OpkgDescription):
             each line begin with a space
         """
         desc = ''
+        pat = re.compile(r'\n')
         t = self.xmldoc.findtext('/description')
-        for line in t.split('\n'):
-            desc += ' ' + line.strip() + '\n'
-        return desc.strip()
+        paragraphs = Tools.align_paragraphs(t, 80)
+        i = 0
+        while i < len(paragraphs):
+            desc += pat.sub(r'\n ', paragraphs[i])
+            if i != len(paragraphs)-1:
+                desc += '\n .\n'
+            i += 1
+        return desc
 
     def arch(self):
         """ Return 'all'

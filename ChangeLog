@@ -1,5 +1,9 @@
+0.3
+        * Add strictness for package name
+	* Add formatting of summary and description
+
 0.2.1
-	* Release "Los peces"
+        * Release "Los peces"
 	* Fix make install target on some distros
 	Jean Parpaillon <jean.parpaillon@irisa.fr> - June 27th, 2007
 	* Add revision history in opkgc-manual

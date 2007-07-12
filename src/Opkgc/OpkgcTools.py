@@ -139,3 +139,66 @@ class Tools:
         return exe.wait()
     command = staticmethod(command)
 
+    def add_word(line, word, width):
+        """ Add a word at the end of a line. 
+        Return a duet (complete_lines, uncomplete_line)
+        """
+        complete = ''
+        uncomplete = ''
+        if (len(line) + len(word) + 1) > width:
+            complete = "%s\n" % line
+            if len(word) > width:
+                complete += "%s-\n" % word[:width]
+                uncomplete = word[width:]
+            else:
+                uncomplete = word
+        else:
+            uncomplete += "%s %s" % (line, word)
+        return (complete, uncomplete)
+    add_word = staticmethod(add_word)
+
+    def align_lines(s, width):
+        """ Cut a line in lines of 'width' columns, with no word
+        truncating, except for words greater than 'width'
+        """
+        out = ""
+        cur_line = ''
+        cur_word = ''
+        for c in s:
+            if c == ' ':
+                (newline, cur_line) = Tools.add_word(cur_line, cur_word, width)
+                if newline != '':
+                    out += newline
+                cur_word = ''
+            else:
+                cur_word += c
+        (newline, cur_line) = Tools.add_word(cur_line, cur_word, width)
+        if newline != '':
+            out += newline
+        if cur_line != '':
+            out += cur_line
+
+        return out
+    align_lines = staticmethod(align_lines)
+
+    def align_paragraphs(s, width):
+        """Return a list of paragraphs of 'width' cols, with
+        no word truncated.
+        Paragraphs in original string are marked with empty lines
+        """
+        paragraphs = []
+        cur_par = ''
+        s = s.strip()
+        for line in s.split('\n'):
+            line = line.strip()
+            if line == '':
+                if cur_par != '':
+                    paragraphs.append(Tools.align_lines(cur_par, width))
+                cur_par = ''
+            else:
+                cur_par += line
+        if cur_par != '':
+            paragraphs.append(Tools.align_lines(cur_par, width))
+
+        return paragraphs
+    align_paragraphs = staticmethod(align_paragraphs)
