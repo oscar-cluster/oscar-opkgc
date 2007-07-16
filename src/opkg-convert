@@ -255,12 +255,13 @@ function convert_scripts() {
 	    setup)                     s='api-pre-install';;
 	    pre_configure)             s='api-pre-configure';;
 	    post_configure)            s='api-post-configure';;
-	    post_clients)              s='api-post-image';;
+	    post_clients)              s='api-post-clientdef';;
 	    post_install)              s='api-post-deploy';;
 	    post_server_rpm_install)   s='server-post-install';;
 	    post_server_rpm_uninstall) s='server-post-uninstall';;
 	    post_client_rpm_install)   s='client-post-install';;
 	    post_client_rpm_uninstall) s='client-post-uninstall';;
+	    post_rpm_nochroot)	       s='api-post-image';;
 	    *)                         s=`basename $script`;;
 	esac
 	echo "[COPY] $script to $newdir/scripts/$s"
