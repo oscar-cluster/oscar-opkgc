@@ -33,8 +33,6 @@ class Compiler:
     inputdir = ''
     dist = ''
     
-    xml_tool = XmlTools()
-
     def __init__(self, inputdir, dest_dir, dist, validate):
         self.dest_dir = dest_dir
         self.validate = validate
@@ -45,14 +43,14 @@ class Compiler:
         return self.dest_dir
 
     def xmlInit(self, orig):
-        self.xml_tool.init (orig)
+        XmlTools().init (orig)
 
     def xmlValidate(self):
         if self.validate:
-            self.xml_tool.validate()
+            XmlTools().validate()
 
     def getXmlDoc(self):
-        return self.xml_tool.getXmlDoc()
+        return XmlTools().getXmlDoc()
 
     def cheetahCompile(self, orig, template, dest):
         """ Transform 'orig' to 'dest' with Cheetah template 'template'
@@ -75,7 +73,7 @@ class Compiler:
         raise NotImplementedError
 
     def getPackageName(self):
-        return self.xml_tool.getXmlDoc().find('/name').text.lower()
+        return XmlTools().getXmlDoc().find('/name').text.lower()
 
     def getConfigFile(self):
         """ Return path of config.xml file
@@ -164,7 +162,7 @@ class CompilerRpm(Compiler):
                 os.remove(self.specfile)
 
         # Create template env from config.xml
-        desc = OpkgDescriptionRpm(self.xml_tool.getXmlDoc(), self.dist)
+        desc = OpkgDescriptionRpm(XmlTools().getXmlDoc(), self.dist)
 
         filelist = []
         # Manage [pre|post]-scripts, config.xml, configurator.html
@@ -270,7 +268,7 @@ class CompilerDebian(Compiler):
         self.xmlInit (self.getConfigFile())
         self.xmlValidate ()
 
-        desc = OpkgDescriptionDebian(self.xml_tool.getXmlDoc(), self.dist)
+        desc = OpkgDescriptionDebian(XmlTools().getXmlDoc(), self.dist)
 
         pkgName = Tools.normalizeWithDash(self.getPackageName())
         Logger().debug("Package base name: %s" % pkgName)
