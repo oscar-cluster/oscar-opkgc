@@ -6,13 +6,13 @@
 # directory of the source
 ###################################################################
 
+from UserDict import UserDict
+from UserList import UserList
 from OpkgcLogger import *
 import shutil
 import re
 import os
 import subprocess
-
-__all__ = ['Tools']
 
 class Tools:
     scriptRe = re.compile(r'(?P<part>api|client|server)-(?P<time>pre|post)-(?P<action>un)?install')
@@ -202,3 +202,40 @@ class Tools:
 
         return paragraphs
     align_paragraphs = staticmethod(align_paragraphs)
+
+class NoneDict(UserDict):
+    """ UserDict which returns None on __getitem__ with
+    invalid key
+    """
+    def __init__(self, initdict=None):
+        UserDict.__init__(self, initdict)
+
+    def __getitem__(self, key):
+        try:
+            return UserDict.__getitem__(self, key)
+        except KeyError, e:
+            return None
+
+class NoneList(UserList):
+    """ UserList which contains 'None'
+    """
+    def __init__(self, initlist=None):
+        UserList.__init__(self, initlist)
+
+    def __contains__(self, item):
+        if item == None:
+            return True
+        else:
+            return UserList.__contains__(self, item)
+
+class KeyDict(UserDict):
+    """ UserDict which return the key if no value is found
+    """
+    def __init__(self, initdict=None):
+        UserDict.__init__(self, initdict)
+
+    def __getitem__(self, key):
+        try:
+            return UserDict.__getitem__(self, key)
+        except KeyError, e:
+            return key
