@@ -235,7 +235,7 @@ function del_convert_stylesheet() {
 
 function convert_config_xml() {
     oldconfig=$olddir/config.xml
-    newconfig=$newdir/config.xml
+    newconfig=$olddir/config.xml.new
 
     xsltproc=`check_tool xsltproc`
 
@@ -262,25 +262,27 @@ function convert_scripts() {
 	    post_client_rpm_install)   s='client-post-install';;
 	    post_client_rpm_uninstall) s='client-post-uninstall';;
 	    post_rpm_nochroot)	       s='api-post-image';;
-	    *)                         s=`basename $script`;;
+	    *)                         return;;
 	esac
-	echo "[COPY] $script to $newdir/scripts/$s"
-	cp $script $newdir/scripts/$s
+	echo "[RENAME] $script to $olddir/scripts/$s.new"
+	cp $script $olddir/scripts/$s.new
     done
 }
 
 function convert_doc() {
-    if [ -d $olddir/doc ]; then
-	echo "[COPY] $olddir/doc to $newdir/doc"
-	rsync -avr --exclude '.svn' --exclude '*~' $olddir/doc $newdir
-    fi
+#    if [ -d $olddir/doc ]; then
+#	echo "[COPY] $olddir/doc to $newdir/doc"
+#	rsync -avr --exclude '.svn' --exclude '*~' $olddir/doc $newdir
+#    fi
+    true
 }
 
 function convert_testing() {
-    if [ -d $olddir/testing ]; then
-	echo "[COPY] $olddir/testing to $newdir/testing"
-	rsync -avr --exclude '.svn' --exclude '*~' $olddir/testing $newdir
-    fi
+#    if [ -d $olddir/testing ]; then
+#	echo "[COPY] $olddir/testing to $newdir/testing"
+#	rsync -avr --exclude '.svn' --exclude '*~' $olddir/testing $newdir
+#    fi
+    true
 }
 
 if [ ! -e "$1/config.xml" ]; then
