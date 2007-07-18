@@ -114,6 +114,14 @@ class Compiler:
         else:
             Logger().error("Package generation failed: return %d" % ret)
 
+    def checkDist(self, desc, pkg):
+        """ Check that package is available on given dist (regarding filters on config.xml)
+        """
+        if not desc.isDist(self.dist):
+            Logger().info("Package '%s' is not available on distribution '%s'" % (pkg, self.dist))
+            raise SystemExit
+
+
     def SupportedDist(cls):
         """ Return a list of supported dist
         """
@@ -143,8 +151,15 @@ class CompilerRpm(Compiler):
         self.xmlInit (configFile)
         self.xmlValidate ()
 
-        pkgName = Tools.normalizeWithDash(self.getPackageName())
+        # Create template env from config.xml
+        desc = OpkgDescriptionRpm(XmlTools().getXmlDoc(), self.dist)
+
+        pkgName = self.getPackageName()
         Logger().debug("Package name: %s" % pkgName)
+
+        # Check if package is available on target dist
+        self.checkDist(desc, pkgName)
+
         self.pkgDir = os.path.join(self.getMacro('%_builddir'), "opkg-%s" % pkgName)
 
         # Clean/Create package dir
@@ -160,9 +175,6 @@ class CompilerRpm(Compiler):
         else:
             if (os.path.exists(self.specfile)):
                 os.remove(self.specfile)
-
-        # Create template env from config.xml
-        desc = OpkgDescriptionRpm(XmlTools().getXmlDoc(), self.dist)
 
         filelist = []
         # Manage [pre|post]-scripts, config.xml, configurator.html
@@ -186,7 +198,7 @@ class CompilerRpm(Compiler):
                 else:
                     f.close()
                     print "Error: %s is not a bourne shell script, as required by RPM packaging policy " % orig
-                    raise SystemExit                
+                    raise SystemExit
                 f.close()
             else:
                 # else, file is packaged in /var/lib/oscar/packages/<packages>/
@@ -228,7 +240,7 @@ class CompilerRpm(Compiler):
             self.build(cmd)
 
             # Copy generated packages into output dir
-            pkgName = Tools.normalizeWithDash(self.getPackageName())
+            pkgName = self.getPackageName()
             rpmdir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
             shutil.copy(os.path.join(rpmdir, "opkg-%s-%s.noarch.rpm" % (pkgName, desc.version())),
                         self.getDestDir())
@@ -270,8 +282,12 @@ class CompilerDebian(Compiler):
 
         desc = OpkgDescriptionDebian(XmlTools().getXmlDoc(), self.dist)
 
-        pkgName = Tools.normalizeWithDash(self.getPackageName())
+        pkgName = self.getPackageName()
         Logger().debug("Package base name: %s" % pkgName)
+
+        # Check if package is available on target dist
+        self.checkDist(desc, pkgName)
+
         self.pkgDir = os.path.join(self.getDestDir(), "opkg-%s" % pkgName)
 
         if (os.path.exists(self.pkgDir)):

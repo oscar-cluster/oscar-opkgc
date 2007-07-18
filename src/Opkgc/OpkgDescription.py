@@ -26,6 +26,13 @@ class OpkgDescription:
         self.dist = dist
         self.depsFactory = DependsFactory(xmldoc)
 
+    def isDist(self, dist):
+        """ Return true if no package-wide filter on distros or
+        dist is part of accepted distros
+        """
+        distNodes = self.xmldoc.findall('/filters/dist')
+        return len(distNodes) == 0 or dist in [d.text for d in distNodes]
+        
     def date(self, date, format):
         """ Convert 'xsdDate' in xsd:dateTime format
         (cf. http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/datatypes.html#dateTime)
@@ -130,6 +137,20 @@ class OpkgDescriptionRpm(OpkgDescription):
     
     fileList = []
     scripts = {}
+
+    def archFilters(self):
+        """ Return an ExclusiveArch tag if package-wide filter on arch
+        """
+        archNodes = self.xmldoc.findall('/filters/arch')
+        archs = ""        
+        for archNode in archNodes:
+            archs += " %s" % archNode.text
+
+        out = ""
+        if archs != "":
+            out = "ExclusiveArch: %s\n" % archs
+
+        return out
 
     def version(self, part=""):
         """ Return version. If no part is given, return whole version
@@ -243,7 +264,7 @@ class OpkgDescriptionDebian(OpkgDescription):
         return desc
 
     def arch(self):
-        """ Return 'all'
+        """ Return list of supported archs for the package
         """
         return "all"
 
