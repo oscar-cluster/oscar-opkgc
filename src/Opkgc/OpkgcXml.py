@@ -51,8 +51,8 @@ class XmlTools(object):
             xml_file.close()
             Logger().debug("%s loaded" % file)
         except Exception, e:
-            Logger.error(e)
-            sys.exit(1)
+            Logger().error(e)
+            raise SystemExit(1)
 
         return xml_doc
 

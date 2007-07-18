@@ -1,6 +1,8 @@
 0.3
+        * Release "Ain Ghazel"
         * Add strictness for package name
 	* Add formatting of summary and description
+	* Add better support of arch and dist filtering
 
 0.2.1
         * Release "Los peces"
