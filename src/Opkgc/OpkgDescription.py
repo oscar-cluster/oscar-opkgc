@@ -80,7 +80,11 @@ class OpkgDescription:
           
         """
         p = re.compile('\n')
-        s = p.sub(' ', self.xmldoc.findtext(path))
+        text = self.xmldoc.findtext(path)
+        if not text:
+            return ""
+        
+        s = p.sub(' ', text)
         if capitalize == 'lower':
             return s.lower()
         elif capitalize == 'upper':
