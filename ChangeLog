@@ -1,3 +1,13 @@
+0.3.1
+	* Release "Vandanaa Trayee"
+	* Add a --version option (Closes #383)
+	* Several fix for generated Debian packages to be 
+	lintian error-free (Closes #355)
+	* Does not fail if uri tag is missing in config.xml 
+	(Closes #352 #360)
+	* Fix duplication of fields in Debian meta-files which caused 
+	error in dependancies (Closes #359)
+
 0.3
         * Release "Ain Ghazel"
         * Add strictness for package name
