@@ -241,6 +241,13 @@ class OpkgDescriptionDebian(OpkgDescription):
         for Debian templates
     """
 
+    licenses = {"GPL":("GNU General Public License",
+                       "/usr/share/common-licenses/GPL"),
+                "LGPL":("GNU Lesser General Public License",
+                        "/usr/share/common-licenses/LGPL"),
+                "BSD":("Berkeley Software Distribution License",
+                       "/usr/share/common-licenses/BSD")}
+
     archName = KeyDict({"x86_64":"ia64"})
 
     dependsName = {"requires":"Depends",
@@ -377,6 +384,20 @@ class OpkgDescriptionDebian(OpkgDescription):
                 out += "%s" % a
             out += "]"
         return out
+
+    def license(self):
+        """ Return license name.
+        If one of listed in 'licenseFiles' variable, add the path
+        to the license file on Debian system (required by Debian Policy, 
+        section 12.5)
+        """
+        out = self.xmldoc.findtext('/license')
+        try:
+            (lName, lPath) = self.licenses[out]
+            out += ". On Debian GNU/Linux systems, the complete text of the %s can be found in `%s`." % (lName, lPath)
+        except KeyError, e:
+            pass
+        return Tools.align_lines(out, 80)
 
 class OpkgSyntaxException(Exception):
 
