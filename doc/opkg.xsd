@@ -123,7 +123,7 @@
   <xsd:element name="summary" type="summaryType" />
   <xsd:simpleType name="summaryType" >
     <xsd:restriction base="xsd:string" >
-      <xsd:maxLength value="80" />
+      <xsd:maxLength value="67" />
     </xsd:restriction>
   </xsd:simpleType>
 
