@@ -33,7 +33,7 @@ install-stamp:
 
 	touch $@
 
-bianry-arch: build install
+binary-arch: build install
 	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
 
 binary-indep: build install

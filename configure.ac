@@ -8,7 +8,7 @@ dnl autoconf version
 AC_PREREQ(2.59)
 
 dnl mandatory stuff
-AC_INIT([opkgc], [0.3.1], [oscar-users@lists.sourceforge.net])
+AC_INIT([opkgc], [0.3.2], [oscar-devel@lists.sourceforge.net])
 
 dnl check host and target
 AC_CANONICAL_BUILD
