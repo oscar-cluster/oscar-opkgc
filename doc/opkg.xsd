@@ -39,7 +39,11 @@
       -->
       <xsd:element ref="class" minOccurs="0" maxOccurs="1" />
       
-      <!-- A short description (max 80 chars) -->
+      <!-- 
+	   A short description (max 67 chars). Max for Debian is 80, but 
+	   ', server part' or ', 'client part' is added by the compiler to 
+	   this summary.
+      -->
       <xsd:element ref="summary" minOccurs="1" maxOccurs="1" />
       
       <!-- Long description -->
