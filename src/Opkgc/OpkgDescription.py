@@ -330,6 +330,14 @@ class OpkgDescriptionDebian(OpkgDescription):
 
         return changelog
 
+    def debAuthors(self):
+        m = self.authors('maintainer')
+        u = self.authors('uploader')
+        out = "Maintainer: %s\n" % m
+        if u:
+            out += "Uploaders: %s\n" % u
+        return out
+
     def uploader(self, versionEntry):
         """ Return the version uploader
         """
