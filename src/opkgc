@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# coding=utf8
 
 ###################################################################
 # Copyright (c) 2007 Oak Ridge National Laboratory,
@@ -29,18 +30,30 @@ from Opkgc.OpkgcCompiler import *
 from Opkgc.OpkgcConfig import *
 from Opkgc.OpkgcLogger import *
 
+version = '''opkgc 0.3.1
+
+Copyright (C) 2007 IRISA-INRIA
+              2007 ORNL
+This is free software.  You may redistribute copies of it under the terms of
+the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Jean Parpaillon and Geoffroy Vallée.'''
+
 compilers = ['CompilerRpm', 'CompilerDebian']
 
 def usage():
     """ Print command usage
     """
-    print "Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [--source]"
-    print "               [-o|--output=dir] [-i|--input=dir] [-v|--verbose] "
-    print "               [-q|--quiet]"    
+    print "Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [-V|--version]"
+    print "               [-o|--output=dir] [-i|--input=dir] [--source]"
+    print "               [-q|--quiet] [-v|--verbose]"
     print "               --dist=targetDist"
     print ""
+    print "\t--version : print version and exit"
+    print ""
     print "\t--supported-dist : list supported distributions for --dist option"
-    print "\t--dist           : target distibution, default to current distribution"
+    print "\t--dist           : target distibution"
     print ""
     print "\t--source : does not build package, only generate sources"
     print "\t--input  : opkg directory, default current dir"
@@ -48,6 +61,9 @@ def usage():
     print "\t-v       : increase verbosity level (can be repeated)"
     print "\t-q       : decrease verbosity level"
 
+def printVersion():
+    print version
+    
 def distList():
     """ Print supported target distributions
     """
@@ -59,8 +75,9 @@ def distList():
 def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "husi:o:d:vq",
-                                   ["help",
+                                   "Vhusi:o:d:vq",
+                                   ["version",
+                                    "help",
                                     "supported-dist",
                                     "source",
                                     "input=",
@@ -71,7 +88,7 @@ def main():
     except getopt.GetoptError:
         # Print help information
         usage()
-        sys.exit(2)
+        raise SystemExit(2)
 
     # Default values
     build = True
@@ -84,10 +101,13 @@ def main():
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
-            sys.exit()
+            raise SystemExit(0)
+        if o in ("-V", "--version"):
+            printVersion()
+            raise SystemExit(0)
         if o in ("-u", "--supported-dist"):
             distList()
-            sys.exit()
+            raise SystemExit(0)
         if o in ("-s", "--source"):
             build = False
         if o in ("-i", "--input"):
@@ -116,7 +136,7 @@ def main():
     # Check if given target dist is available
     if dist == '' or not(targets[dist]):
         distList()
-        sys.exit(2)
+        raise SystemExit(2)
 
     c = eval(targets[dist])( inputdir, output, dist, validate )
     c.compile(build)
