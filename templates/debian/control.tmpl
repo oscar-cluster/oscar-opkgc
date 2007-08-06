@@ -10,7 +10,7 @@ Package: opkg-${name}
 Architecture: $arch
 $depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')$depends('apiDeps', 'suggests')#slurp
 Description: ${node('/summary')}
- ${description}
+${description}
  .
  This package contains cluster wide scripts for $name.
  .
@@ -20,7 +20,7 @@ Package: opkg-${name}-server
 Architecture: $arch
 $depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')$depends('serverDeps', 'suggests')#slurp
 Description: ${node('/summary')}, server part
- $description
+$description
  .
  This package contains the server part of the package.
  .
@@ -30,7 +30,7 @@ Package: opkg-${name}-client
 Architecture: $arch
 $depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('clientDeps', 'provides')$depends('clientDeps', 'suggests')#slurp
 Description: ${node('/summary')}, client part
- $description
+$description
  .
  This package contains the client part of the package.
  .
