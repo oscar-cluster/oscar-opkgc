@@ -23,7 +23,6 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 build: build-stamp
 build-stamp:
 	dh_testdir
-
 	touch $@
 
 install: install-stamp
@@ -34,7 +33,13 @@ install-stamp:
 
 	touch $@
 
-binary: build install
+bianry-arch: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
+
+binary-indep: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+binary-common:
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
@@ -63,8 +68,10 @@ binary: build install
 	dh_md5sums
 	dh_builddeb
 
+binary: binary-arch binary-indep
+
 clean:
 	dh_testdir
 	dh_clean
 
-.PHONY: build clean binary binary install install
+.PHONY: build clean binary binary-arch binary-indep binary-common install
