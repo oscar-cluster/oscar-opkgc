@@ -14,10 +14,14 @@
   <refsynopsisdiv>
     <cmdsynopsis>
       <command>opkgc</command>
-      <arg>-h</arg>
-    </cmdsynopsis>
-    <cmdsynopsis>
-      <command>opkgc</command>
+      <group choice="opt" >
+	<arg choice="plain" >-h</arg>
+	<arg choice="plain" >--help</arg>
+      </group>
+      <group choice="opt" >
+	<arg choice="plain" >-V</arg>
+	<arg choice="plain" >--version</arg>
+      </group>
       <group choice="opt" >
 	<arg choice="plain">-u</arg>
 	<arg choice="plain">--supported-dist</arg>
@@ -25,6 +29,8 @@
     </cmdsynopsis>
     <cmdsynopsis>
       <command>opkgc</command>
+      <arg>-q</arg>
+      <arg>-v</arg>
       <arg>--source</arg>
       <group choice="opt" >
 	<arg choice="plain">-o</arg>
@@ -64,6 +70,13 @@
 	  </para></listitem>
 	</varlistentry>
 	<varlistentry>
+	  <term><option>-V</option></term>
+	  <term><option>--version</option></term>
+	  <listitem><para>
+	    Print <command>opkgc</command> version and exit.
+	  </para></listitem>
+	</varlistentry>
+	<varlistentry>
 	  <term><option>-u</option></term>
 	  <term><option>--supported-dist</option></term>
 	  <listitem>
@@ -71,6 +84,18 @@
 	      Print list of supported distributions (as for the
 	      <option>--dist</option> argument).
 	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><option>-v</option></term>
+	  <listitem>
+	    <para>Increase logging level (can be used several times).</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><option>-q</option></term>
+	  <listitem>
+	    <para>Decrease logging level (can be used several times).</para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
@@ -152,7 +177,7 @@
   <refsect1>
     <title>Reporting Bugs</title>
     <para>
-      Report bugs to <email>oscar-users@lists.sourceforge.net</email>
+      Report bugs to <email>oscar-devel@lists.sourceforge.net</email>
     </para>
   </refsect1>
 

@@ -121,6 +121,10 @@ def main():
         if o in ("-q", "--quiet"):
             debug = debug-1
 
+    if not dist:
+        usage()
+        raise SystemExit(1)
+
     Logger().level(debug)
 
     # Initialize config file. Here just to detect early lack of config file
