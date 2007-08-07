@@ -246,8 +246,6 @@ function convert_config_xml() {
 }
 
 function convert_scripts() {
-    mkdir $newdir/scripts
-
     scripts=`find $olddir/scripts/ ! -type d ! -path '*/.svn*'`
     for script in $scripts; do
 	s=''
@@ -291,10 +289,10 @@ if [ ! -e "$1/config.xml" ]; then
 fi
 
 olddir=$1
-newdir=`basename $1`.new
+#newdir=`basename $1`.new
 
-[ -d $newdir ] && rm -rf $newdir
-mkdir $newdir
+#[ -d $newdir ] && rm -rf $newdir
+#mkdir $newdir
 convert_config_xml
 convert_scripts
 convert_doc
