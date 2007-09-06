@@ -191,19 +191,9 @@ class CompilerRpm(Compiler):
                             self.getSpecFile())
         ret = Tools.command(cmd, "./")
         if ret == 0:
-            Logger().info("Packages succesfully generated")
+            Logger().info("Packages succesfully generated in %s" % self.getMacro('%_rpmdir'))
         else:
             Logger().error("Package generation failed: return %d" % ret)
-
-        # Copy generated packages into output dir
-        rpmdir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
-        shutil.copy(os.path.join(rpmdir, "opkg-%s-%s.noarch.rpm" % (self.pkgName, rpmDesc.version())),
-                    self.dest_dir)
-        shutil.copy(os.path.join(rpmdir, "opkg-%s-server-%s.noarch.rpm" % (self.pkgName, rpmDesc.version())),
-                    self.dest_dir)
-        shutil.copy(os.path.join(rpmdir, "opkg-%s-client-%s.noarch.rpm" % (self.pkgName, rpmDesc.version())),
-                    self.dest_dir)
-
 
     def getMacro(self, name):
         line = os.popen("rpm --eval %s" % name).readline()
