@@ -1,14 +1,13 @@
-Summary:        $node('/summary')
+Summary:        $summary
 Name:           opkg-$name
 Version:        $version('upstream')
 Release:        $version('release')
-License: 	$node('/license')
-Group:          $node('/group')
+License: 	$license
+Group:          $group
 Distribution:   OSCAR
-Vendor:         Open Cluster Group <http://OSCAR.OpenClusterGroup.org/>
+Vendor:         Open Cluster Group <http://oscar.openclustergroup.org/>
 Packager:       $authors('maintainer')
 BuildRoot:      %{_builddir}/%{name}
-BuildArch:	noarch
 $archFilters#slurp
 %description
 $description
@@ -16,8 +15,8 @@ $description
 $depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')#slurp
 
 %package server
-Group:          $node('/group')
-Summary:        $node('summary'), server part
+Group:          $group
+Summary:        $summary, server part
 %description server
 $description 
 This is the server part of $name.
@@ -25,8 +24,8 @@ This is the server part of $name.
 $depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')#slurp
 
 %package client
-Group:          $node('/group')
-Summary:        $node('summary'), client part
+Group:          $group
+Summary:        $summary, client part
 %description client
 $description 
 This is the client part of $name.
@@ -35,26 +34,21 @@ $depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('c
 
 %files server
 %defattr(-,root,root)
+#for $f in $filelist('server')
+$f
+#end for
 
 %files client
 %defattr(-,root,root)
+#for $f in $filelist('client')
+$f
+#end for
 
 %files
 %defattr(-,root,root)
-#for $f in $fileList
-/$f
+#for $f in $filelist
+$f
 #end for
 
-$script('%pre')
-$script('%post')
-$script('%preun')
-$script('%postun')
-$script('%pre server')
-$script('%post server')
-$script('%preun server')
-$script('%postun server')
-$script('%pre client')
-$script('%post client')
-$script('%preun client')
-$script('%postun client')
+$scripts
 

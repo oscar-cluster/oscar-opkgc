@@ -1,4 +1,4 @@
-Source: opkg-${name}
+Source: opkg-$name
 Section: oscar
 Priority: optional
 $debAuthors#slurp
@@ -8,29 +8,29 @@ Standards-Version: 3.7.2
 Package: opkg-${name}
 Architecture: $arch
 $depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')$depends('apiDeps', 'suggests')#slurp
-Description: ${node('/summary')}
-${description}
+Description: $summary
+$description
  .
  This package contains cluster wide scripts for $name.
  .
-  ${node('/uri')}
+  $uri
 
-Package: opkg-${name}-server
+Package: opkg-$name-server
 Architecture: $arch
 $depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')$depends('serverDeps', 'suggests')#slurp
-Description: ${node('/summary')}, server part
+Description: $summary, server part
 $description
  .
  This package contains the server part of the package.
  .
-  ${node('/uri')}
+  $uri
 
-Package: opkg-${name}-client
+Package: opkg-$name-client
 Architecture: $arch
 $depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('clientDeps', 'provides')$depends('clientDeps', 'suggests')#slurp
-Description: ${node('/summary')}, client part
+Description: $summary, client part
 $description
  .
  This package contains the client part of the package.
  .
-  ${node('/uri')}
+  $uri

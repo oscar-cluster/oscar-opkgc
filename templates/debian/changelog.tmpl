@@ -1,13 +1,16 @@
-#for $entry in $changelog
-opkg-$name (${entry.version}) unstable; urgency=low
+#for $versionEntry in $changelog
+opkg-$name (${versionEntry.version}) unstable; urgency=low
 
-#for $log in $entry.logs
+#for $log in $versionEntry.centries
   [$log.name]
 #for $item in $log.items
   - $item
 #end for
+#for $bug in $log.closes
+  - Closes: Bug\#$bug
+#end for
 #end for
 
- -- ${entry.uploader}
+ -- $uploader(versionEntry)
 
 #end for

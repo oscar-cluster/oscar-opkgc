@@ -16,6 +16,7 @@ class Logger(object):
     ERROR = 0
     INFO  = 1
     DEBUG = 2
+    TRACE = 3
 
     __instance = None
     __level = ERROR
@@ -49,3 +50,10 @@ class Logger(object):
     def debug(self, msg):
         if self.__level >= Logger.DEBUG:
             print "[DEBUG] %s" % msg
+
+    def isTrace(self):
+        return self.__level >= Logger.TRACE
+        
+    def trace(self, msg):
+        if self.__level >= Logger.TRACE:
+            print "[TRACE] %s" % msg

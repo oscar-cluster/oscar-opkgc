@@ -15,8 +15,7 @@
 ###################################################################
 #
 # Description:
-#   Transform config.xml description file for OSCAR packages into
-#   Debian or RPM packages.
+#   Transform opkg (OSCAR package) description into Debian or RPM
 #
 # Requires:
 #   python-lxml
@@ -94,7 +93,6 @@ def main():
     build = True
     inputdir = "."
     output = "."
-    validate = True
     dist = ''
     debug = Logger.INFO
     
@@ -142,7 +140,7 @@ def main():
         distList()
         raise SystemExit(2)
 
-    c = eval(targets[dist])( inputdir, output, dist, validate )
+    c = eval(targets[dist])( inputdir, output, dist )
     c.compile(build)
 
 if __name__ == "__main__":

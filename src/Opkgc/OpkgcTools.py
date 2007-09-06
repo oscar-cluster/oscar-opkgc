@@ -16,6 +16,25 @@ import subprocess
 
 class Tools:
     scriptRe = re.compile(r'(?P<part>api|client|server)-(?P<time>pre|post)-(?P<action>un)?install')
+    newlineRe = re.compile(r'\n')
+
+    def listFiles(path):
+        """ List files in path, excluding .svn, *~ and subdirs
+        """
+        ret = []
+        if os.path.isdir(path):
+            for p in os.listdir(path):
+                if not re.search("\.svn|.*~", p) and not os.path.isdir(p):
+                    ret.append(os.path.join(path, p))
+
+        return ret
+    listFiles = staticmethod(listFiles)
+
+    def rmNewline (text):
+        """ Replace newlines with spaces
+        """
+        return Tools.newlineRe.sub(' ', text)
+    rmNewline = staticmethod(rmNewline)
     
     def rmDir (d):
         """ Remove recursively a directory, even if not empty, like rm -r
@@ -27,10 +46,10 @@ class Tools:
                 else:
                     abspath = os.path.join(d,p)
                     os.remove(abspath)
-                    Logger().debug("Remove file: %s" % abspath)
+                    Logger().trace("Remove file: %s" % abspath)
             abspath = os.path.join(d)
             os.rmdir(abspath)
-            Logger().debug("Remove dir: %s" % abspath)
+            Logger().trace("Remove dir: %s" % abspath)
     rmDir = staticmethod(rmDir)
 
     def copy(orig, dest, recursive=True, exclude=''):
@@ -75,28 +94,6 @@ class Tools:
         return p.sub('-', s)
     normalizeWithDash = staticmethod(normalizeWithDash)
 
-    def isNativeScript(name):
-        """ True if script is one of scripts included as
-        {pre|post}{inst|rm} scripts
-        name: basename of the script
-        """
-        return Tools.scriptRe.match(name)
-    isNativeScript = staticmethod(isNativeScript)
-
-    def getRpmScriptName(name):
-        """ Convert opkg script name to RPM script name:
-        api-post-uninstall -> %postun
-        server-pre-install -> %pre server
-        """
-        m = Tools.scriptRe.match(name)
-        res = "%%%s" % m.group('time')
-        if m.group('action'):
-            res = "%s%s" % (res, m.group('action'))
-        if not m.group('part') == "api":
-            res = "%s %s" % (res, m.group('part'))
-        return res
-    getRpmScriptName = staticmethod(getRpmScriptName)
-
     def getDebScriptName(name, pkgName):
         """ Convert opkg script name to Debian script name:
         api-post-uninstall -> opkg-<pkgName>.postinst
@@ -113,14 +110,6 @@ class Tools:
             res = "%sinst" % res
         return res
     getDebScriptName = staticmethod(getDebScriptName)
-
-    def isBourneScript(file):
-        """ True if 'file' is a Bourne Shell script
-        """
-        file.seek(0)
-        shebang = file.readline()
-        return re.match(r'^#!.*/sh', shebang)
-    isBourneScript = staticmethod(isBourneScript)
 
     def command(command, cwd):
         Logger().debug("Execute: %s" % command)

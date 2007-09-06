@@ -4,6 +4,9 @@
 #                    All rights reserved
 # For license information, see the COPYING file in the top level
 # directory of the source
+#
+# Classes handling description of opkg
+#
 ###################################################################
 
 import re
@@ -11,408 +14,182 @@ from time import *
 from OpkgcXml import *
 from OpkgcTools import *
 
-class OpkgDescription:
-    """ Contains data for templates
+class OpkgDescription(object):
+    """ Description of an opkg
     """
-    xmldoc = None
-    month = {"01":"Jan", "02":"Feb", "03":"Mar", "04":"Apr",
-             "05":"May", "06":"Jun", "07":"Jul", "08":"Aug",
-             "09":"Sep", "10":"Oct", "11":"Nov", "12":"Dec"}
-    dist = ""
-    depsFactory = None
+    opkgdir = None
+    configXml = None
 
-    def __init__(self, xmldoc, dist):
-        self.xmldoc = xmldoc
-        self.dist = dist
-        self.depsFactory = DependsFactory(xmldoc)
+    def __init__(self, opkgdir):
+        self.opkgdir = opkgdir
+        self.configXml = ConfigXml(self.getConfigFile())
 
-    def isDist(self, dist):
-        """ Return true if no package-wide filter on distros or
-        dist is part of accepted distros
+    def getPackageName(self):
+        return self.configXml['name']
+
+    def getConfigFile(self):
+        """ Return path of config.xml file
+        Raise exception if not found
         """
-        distNodes = self.xmldoc.findall('/filters/dist')
-        return len(distNodes) == 0 or dist in [d.text for d in distNodes]
+        path = os.path.join(self.opkgdir, "config.xml")
+        if not os.path.exists(path):
+            Logger().error("No config.xml file found. Either:")
+            Logger().error("* specify the --input=dir option")
+            Logger().error("* run opkgc from the opkg directory")
+            raise SystemExit
+        return path
+
+    def checkDist(self, dist):
+        """ Check if package is available on given dist (regarding filters on config.xml)
+        """
+        distFilters = self.configXml.getGlobalDistFilters()
+        return len(distFilters) == 0 or dist in [df['name'] for df in distFilters]
+
+    def getScripts(self):
+        """ Return list of OpkgScript, listing files in scripts/
+        """
+        return [ OpkgScript(self.getPackageName(), path)
+                 for path in Tools.listFiles(os.path.join(self.opkgdir, "scripts"))]
+
+    def getDocFiles(self):
+        """ Return list of OpkgDoc, listing files in doc/
+        """
+        return [ OpkgDoc(self.getPackageName(), path)
+                 for path in Tools.listFiles(os.path.join(self.opkgdir, "doc"))]
+
+    def getTestingFiles(self):
+        """ Return list of OpkgTest, listing files in testing/
+        """
+        return [ OpkgTest(self.getPackageName(), path)
+                 for path in Tools.listFiles(os.path.join(self.opkgdir, "testing"))]
+
+    def getSourceFiles(self):
+        """ Return list of OpkgFile to package
+        """
+        files = []
+        files.extend(self.getScripts())
+        files.extend(self.getDocFiles())
+        files.extend(self.getTestingFiles())
         
-    def date(self, date, format):
-        """ Convert 'xsdDate' in xsd:dateTime format
-        (cf. http://www.w3.org/TR/2004/REC-xmlschema-2-20041028/datatypes.html#dateTime)
-        and return in the format specified.
-        Format is one of:
-        'RFC822'
-        """
-        p = re.compile(r'^-?(?P<year>[0-9]{4})'
-                       r'-(?P<month>[0-9]{2})'
-                       r'-(?P<day>[0-9]{2})'
-                       r'T(?P<hour>[0-9]{2}):'
-                       r'(?P<min>[0-9]{2}):'
-                       r'(?P<sec>[0-9]{2})(?P<sfrac>\.[0-9]+)?'
-                       r'(?P<tz>((?P<tzs>-|\+)(?P<tzh>[0-9]{2}):(?P<tzm>[0-9]{2}))|Z)?')
-        m = p.search(date)
-        if format == 'RFC822':
-            date = "%s %s %s" % (m.group('day'), self.month[m.group('month')], m.group('year'))
-            time = "%s:%s" % (m.group('hour'), m.group('min'))
-            if m.group('sec'):
-                time += ":%s" % m.group('sec')
-            zone = ""
-            if m.group('tz'):
-                if m.group('tz') == "Z":
-                    zone = "GMT"
-                else:
-                    zone = "%s%s%s" % (m.group('tzs'), m.group('tzh'), m.group('tzm'))
-            return "%s %s %s" % (date, time, zone)
-        else:
-            return date
+        configFile = OpkgFile(self.getPackageName(), self.getConfigFile())
+        configFile['dest'] = os.path.join("var", "lib", "oscar", "packages",
+                                          self.getPackageName(),
+                                          configFile['basename'])
+        files.append(configFile)
 
-    def name(self):
-        p = re.compile('^[a-z0-9][a-z0-9+-\.]+$')
-        name = self.node("/name")
-        if p.match(name):
-            return name
-        else:
+        configuratorPath = os.path.join(self.opkgdir, "configurator.html")
+        if os.path.exists(configuratorPath):
+            configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
+            configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages",
+                                                    self.getPackageName(),
+                                                    configuratorFile['basename'])
+            files.append(configuratorFile)
+
+        return files
+
+class ConfigXml(UserDict):
+
+    xmldoc = None
+    depsFactory = None
+    dist = None
+
+    nameRe = re.compile(r'^[a-z0-9][a-z0-9+-\.]+$')
+
+    def __init__(self, configfile):
+        UserDict.__init__(self)
+        XmlTools().init(configfile)
+        self.xmldoc = XmlTools().getXmlDoc()
+        self.depsFactory = DependsFactory(self.xmldoc)
+
+        self.__validate__()
+
+    def __validate__(self):
+        XmlTools().validate()
+        if not self.nameRe.match(self['name']):
             raise OpkgSyntaxException('Incorrect package name syntax (pattern: [a-z0-9][a-z0-9+-\.]+)')
 
-    def node(self, path, capitalize=''):
-        """ Return the node given by path. Newlines are removed.
-        capitalize: lower|upper|<none>
-          lower: lower-case node text
-          upper: upper-case node text
-          <none>: don't touch case
-          
-        """
-        p = re.compile('\n')
-        text = self.xmldoc.findtext(path)
-        if not text:
-            return ""
-        
-        s = p.sub(' ', text)
-        if capitalize == 'lower':
-            return s.lower()
-        elif capitalize == 'upper':
-            return s.upper()
+    def __getitem__(self, key):
+        if key == 'version':
+            return self.xmldoc.find('changelog/versionEntry').get('version').strip()
         else:
-            return s
+            return self.xmldoc.findtext('/%s' % key).strip()
 
-    def authors(self, type):
-        """ Return comma separated list of authors of type 'type'
-        """
+    def getAuthors(self, cat=None):
+        al = [ Author(e) for e in self.xmldoc.findall("authors/author")]
+        if cat:
+            al = [ a for a in al if a['cat'] == cat ]
+        return al
 
-        # Get filtered list of authors
-        alist = [a for a in self.xmldoc.findall("authors/author") if a.get('cat') == type]
-        authors = ''
-        i = 0
-        for a in alist:
-            if i != 0:
-                authors += ', '
-            authors += self.author(a)
-            i += 1
-        return authors
+    def getDeps(self, relation, part, arch, dist):
+        return self.depsFactory.getDeps(relation, part, arch, dist)
 
-    def author(self, etree):
-        """ Format an author node:
-            Name (nickname) <email@site.ext>
-        """
-        author = etree.findtext('name')
-        nickname = etree.findtext('nickname')
-        if nickname != None:
-            author += ' (%s)' % nickname
-        author += ' <%s>' % etree.findtext('email')
-        return author
+    def getChangelog(self):
+        return [ ChangelogVEntry(e) for e in self.xmldoc.findall('/changelog/versionEntry') ]
 
+    def getGlobalDistFilters(self):
+        (dists, arch) = self.depsFactory.getFilters(self.xmldoc.find('/filters'))
+        return dists
+
+    def getGlobalArchFilters(self):
+        (dists, arch) = self.depsFactory.getFilters(self.xmldoc.find('/filters'))
+        return arch
+
+class ConfigSchema(object):
+
+    schemaTree = None
+
+    def __init__(self):
+        self.schemaTree = XmlTools().getXsdDoc()        
+    
     def getArchs(self):
-        """ Return list of authorized arch filters from config.xml XML schema
+        """ Return list of authorized arch filters
         """
-        schema = XmlTools().getXsdDoc()
         complexType = filter(lambda x: x.get("name") == "archType",
-                             schema.findall("{%s}simpleType" % XmlTools.xsd_uri))[0]
+                             self.schemaTree.findall("{%s}simpleType" % XmlTools.xsd_uri))[0]
         archs = [e.get("value")
                  for e in complexType.find("{%s}restriction" % XmlTools.xsd_uri).findall("{%s}enumeration" % XmlTools.xsd_uri)]
 
         return archs
 
-class OpkgDescriptionRpm(OpkgDescription):
-    """ Filters out some fields in a opkg description,
-        for RPM templates
-    """
-    dependsName = {"requires":"Requires",
-                   "conflicts":"Conflicts",
-                   "provides":"Provides"}
+class Author(UserDict):
+    etree = None
 
-    relName = KeyDict()
-    
-    fileList = []
-    scripts = {}
+    def __init__(self, etree):
+        UserDict.__init__(self)
+        self.etree = etree
 
-    def archFilters(self):
-        """ Return an ExclusiveArch tag if package-wide filter on arch
-        """
-        archNodes = self.xmldoc.findall('/filters/arch')
-        archs = ""        
-        for archNode in archNodes:
-            archs += " %s" % archNode.text
-
-        out = ""
-        if archs != "":
-            out = "ExclusiveArch: %s\n" % archs
-
-        return out
-
-    def version(self, part=""):
-        """ Return version. If no part is given, return whole version
-        part: upstream|release
-        """
-        version = self.xmldoc.find('changelog/versionEntry').get('version').strip()
-        if not part == "":
-            return re.match(r'^(?P<upstream>.*)-(?P<release>.*)', version).group(part)
+    def __getitem__(self, key):
+        if key == 'cat':
+            return self.etree.get(key)
         else:
-            return version
+            s = self.etree.findtext(key)
+            if s:
+                return Tools.rmNewline(s)
+            else:
+                return None
 
-    def description(self):
-        """ Return the description formatted as lines of 80 columns
-        """
-        t = self.xmldoc.findtext('/description')
-        desc = ''
-        for p in Tools.align_paragraphs(t, 80):
-            desc += "%s\n" % p
-        return desc
-
-    def depends(self, part, relation):
-        """ Return list of dependencies of type 'relation' for
-        the 'part' package part.
-        Relation is one of: requires, conflicts, provides
-        Part is one of: apiDeps, serverDeps, clientDeps
-        """
-        archs = self.getArchs()
-        archs.append(None)
-
-        out = ""
-        for arch in archs:
-            deps = []
-            deps.extend(self.depsFactory.getDeps(part=part, relation=relation, arch=arch, dist=None))
-            deps.extend(self.depsFactory.getDeps(part=part, relation=relation, arch=arch, dist=self.dist))
-
-            if len(deps) != 0:
-                archout = ""
-                if arch != None:
-                    archout += "%%ifarch %s\n" % arch
-                archout += "%s: " % self.dependsName[relation]
-                for i, d in enumerate(deps):
-                    if i != 0:
-                        archout += ', '
-                    archout += self.formatPkg(d)
-                archout += "\n"
-                if arch != None:
-                    archout += "%endif\n"
-                out += archout
-
-        return out
-
-    def formatPkg(self, p):
-        """ Return formatted package dep
-        """
-        out = p['name']
-        if p['version']:
-            out += ' %s %s' % (self.relName[p['op']], p['version'])
-        return out
-
-    def fileList(self):
-        return self.fileList
-
-    def setFileList(self, fileList):
-        """ Set file list for opkg-<package>
-        """
-        self.fileList = fileList
-
-    def script(self, name):
-        """ Return content of script given by 'name'
-        """
-        try:
-            return self.scripts[name]
-        except(KeyError):
-            return ""
-
-    def setScript(self, name, content):
-        """ Set content for script. 'name' follows Rpm naming:
-        %pre server, %post, %preun client, etc.
-        """
-        self.scripts[name] = content
-
-class OpkgDescriptionDebian(OpkgDescription):
-    """ Filters out some fields in a opkg description,
-        for Debian templates
+class ChangelogVEntry(UserDict):
+    """ Contains all changelog infos for a version
     """
 
-    licenses = {"GPL":("GNU General Public License",
-                       "/usr/share/common-licenses/GPL"),
-                "LGPL":("GNU Lesser General Public License",
-                        "/usr/share/common-licenses/LGPL"),
-                "BSD":("Berkeley Software Distribution License",
-                       "/usr/share/common-licenses/BSD")}
+    def __init__(self, etree):
+        UserDict.__init__(self)
+        self['version'] = etree.get('version')
+        self['centries'] = [ ChangelogCEntry(e) for e in etree.findall('changelogEntry') ]
 
-    archName = KeyDict({"x86_64":"ia64"})
-
-    dependsName = {"requires":"Depends",
-                   "conflicts":"Conflicts",
-                   "provides":"Provides",
-                   "suggests":"Suggests"}
-
-    relName = KeyDict({"<":"<<",
-                       ">":">>"})
-
-    def description(self):
-        """ Return the description in Debian format:
-            each line begin with a space
-        """
-        desc = ''
-        pat = re.compile(r'\n')
-        t = self.xmldoc.findtext('/description')
-        paragraphs = Tools.align_paragraphs(t, 80)
-        i = 0
-        while i < len(paragraphs):
-            desc += pat.sub(r'\n ', paragraphs[i])
-            if i != len(paragraphs)-1:
-                desc += '\n .\n'
-            i += 1
-        return desc
-
-    def arch(self):
-        """ Return list of supported archs for the package
-        """
-        return "all"
-
-    def depends(self, part, relation):
-        """ Return list of dependencies of type 'relation' for
-        the 'part' package part.
-        Relation is one of: requires, conflicts, provides, suggests
-        Part is one of: apiDeps, serverDeps, clientDeps
-        """
-        deps = []
-        deps.extend(self.depsFactory.getDeps(part=part, relation=relation, arch="*", dist=None))
-        deps.extend(self.depsFactory.getDeps(part=part, relation=relation, arch="*", dist='debian'))
-
-        if len(deps) == 0:
-            return ""
+class ChangelogCEntry(UserDict):
+    """ Contains all changelog infos for an author in a version
+    """
+    def __init__(self, etree):
+        UserDict.__init__(self)
+        self['items'] = [ e.text.strip() for e in etree.findall('item')]
+        closes = etree.get('closes')
+        if closes:
+            self['closes'] = closes.split()
         else:
-            out = "%s: " % self.dependsName[relation]
-            for i, d in enumerate(deps):
-                if i != 0:
-                    out += ', '
-                out += self.formatPkg(d)
-            out += "\n"
-
-        Logger().debug(out)
-
-        return out
-
-    def changelog(self):
-        """ Return a list of versionEntries
-        """
-        changelog = []
-        vEntryNodes = self.xmldoc.findall('/changelog/versionEntry')
-        for vEntryNode in vEntryNodes:
-
-            cEntries = []
-            cEntryNodes = vEntryNode.findall('changelogEntry')
-            for cEntryNode in cEntryNodes:
-                items = [i.text.strip() for i in cEntryNode.findall('item')]
-                
-                closes = cEntryNode.get('closes')
-                if closes:
-                    for bug in closes.split():
-                        items.append("closes: Bug#%s" % bug)
-                
-                cEntries.append({"items":items,
-                                 "name":cEntryNode.get('authorName')})
-            
-            vEntry = {"version":vEntryNode.get('version'),
-                      "uploader":(self.uploader(vEntryNode)),
-                      "logs":cEntries}
-            changelog.append(vEntry)
-
-        return changelog
-
-    def debAuthors(self):
-        m = self.authors('maintainer')
-        u = self.authors('uploader')
-        out = "Maintainer: %s\n" % m
-        if u:
-            out += "Uploaders: %s\n" % u
-        return out
-
-    def uploader(self, versionEntry):
-        """ Return the version uploader
-        """
-        cEntry = versionEntry.find('changelogEntry')
-        name = cEntry.get('authorName').strip()
-        date = cEntry.get('date')
-        authors = self.xmldoc.findall('authors/author')
-        for a in authors:
-            if a.findtext('name').strip() == name:
-                return "%s  %s" % (self.author(a), self.date(date, "RFC822"))
-
-    def copyrights(self, cat):
-        """ Return list of copyrights for 'cat'
-        cat: mainstream|uploader|upstream
-        """
-        copyrights = []
-        clist = self.xmldoc.findall('authors/author')
-        for c in clist:
-            if c.get('cat') == cat:
-                company = c.findtext('institution')
-                if company:
-                    ccholder = company
-                else:
-                    ccholder = "%s <%s>" % (c.findtext('name'), c.findtext('email'))
-                beginyear = c.findtext('beginYear')
-                endyear = c.findtext('endYear')
-                if not(endyear):
-                    endyear = "%i" % gmtime().tm_year
-                ccyear = ""
-                if beginyear:
-                    ccyears = "%s-" % beginyear
-                ccyear += "%s" % endyear
-
-                cc = "Copyright (c) %s %s\n" % (ccyear, ccholder)
-                if company:
-                    cc += "\t%s <%s>" % (c.findtext('name'), c.findtext('email'))
-                copyrights.append(cc)
-
-        return copyrights
-
-    def formatPkg(self, p):
-        """ Return formatted package information for Debian
-        """
-        out = p['name']
-        if p['version']:
-            out += " (%s %s)" % (self.relName[p['op']], p['version'])
-        if len(p['arch']) != 0:
-            out += " ["
-            for i, a in enumerate(p['arch']):
-                if i != 0:
-                    out += " "
-                out += "%s" % a
-            out += "]"
-        return out
-
-    def license(self):
-        """ Return license name.
-        If one of listed in 'licenseFiles' variable, add the path
-        to the license file on Debian system (required by Debian Policy, 
-        section 12.5)
-        """
-        out = self.xmldoc.findtext('/license')
-        try:
-            (lName, lPath) = self.licenses[out]
-            out += ". On Debian GNU/Linux systems, the complete text of the %s can be found in `%s`." % (lName, lPath)
-        except KeyError, e:
-            pass
-        return Tools.align_lines(out, 80)
-
-class OpkgSyntaxException(Exception):
-
-    msg = None
-
-    def __init__(self, msg):
-        self.msg = msg
+            self['closes'] = []
+        self['name'] = etree.get('authorName').strip()
+        self['date'] = etree.get('date')
 
 class DependsFactory(object):
     """ Store an retrieve package dependancy informations
@@ -427,7 +204,7 @@ class DependsFactory(object):
     def __init__(self, xmldoc):
         self.packageDeps = []
         self.filters = []
-        self.__loadFromXml(xmldoc)
+        self.__loadFromXml__(xmldoc)
 
         # Add OSCAR automatic deps
         for part in self.partsReqs.keys():
@@ -436,7 +213,7 @@ class DependsFactory(object):
                             part=part)
             self.packageDeps.append(p)
 
-    def __loadFromXml(self, xmldoc):
+    def __loadFromXml__(self, xmldoc):
         """ Load packageDeps from xmldoc
         """
         for pn in self.getPartNames():
@@ -523,12 +300,6 @@ class DistFilter(NoneDict):
         self['op'] = op
         self['version'] = version
 
-    def __str__(self):
-        out = self['name']
-        if self['op']:
-            out += "%s%s" % (self['op'], self['version'])
-        return out
-
 class PackageDeps(NoneDict):
 
     def __init__(self, name, relation, part, op=None, version=None, arch=[], dist=[]):
@@ -541,17 +312,61 @@ class PackageDeps(NoneDict):
         self['version'] = version
         self['part'] = part
 
-    def __str__(self):
-        out = "%s %s %s" % (self['part'], self['relation'], self['name'])
-        if self['version']:
-            out += " (%s%s)" % (self['op'], self['version'])
-        if len(self['dist']) > 0:
-            out += " for distro "
-            for d in self['dist']:
-                out += "%s, " % d
-        if len(self['arch']):
-            out += " for arch "
-            for a in self['arch']:
-                out += "%s, " % a
+class OpkgFile(UserDict):
 
-        return out
+    def __init__(self, pkg, filename):
+        UserDict.__init__(self)
+        self['pkg'] = pkg
+        self['part'] = 'api'
+        self['path'] = filename
+        self['basename'] = os.path.basename(filename)
+
+class OpkgDoc(OpkgFile):
+
+    def __init__(self, pkg, filename):
+        OpkgFile.__init__(self, pkg, filename)
+        self['dest'] = os.path.join("usr", "share", "doc", "opkg-%s" % pkg, self['basename'])
+
+class OpkgTest(OpkgFile):
+
+    def __init__(self, pkg, filename):
+        OpkgFile.__init__(self, pkg, filename)
+        self['dest'] = os.path.join("var", "lib", "oscar", "testing", "%s" % pkg, self['basename'])
+
+class OpkgScript(OpkgFile):
+
+    scriptRe = re.compile(r'(?P<part>api|client|server)-(?P<time>pre|post)-(?P<action>un)?install')
+
+    def __init__(self, pkg, filename):
+        OpkgFile.__init__(self, pkg, filename)
+        self['native'] = self.__isNative__()
+
+        part = self.__extract__('part')
+        if part:
+            self['part'] = part
+        else:
+            self['part'] = 'api'
+        self['time'] = self.__extract__('time')
+        self['action'] = self.__extract__('action')
+        self['dest'] = os.path.join("var", "lib", "oscar", "packages", pkg, self['basename'])
+
+    def __isNative__(self):
+        """ True if script is one of scripts included as
+        {pre|post}{inst|rm} scripts
+        name: basename of the script
+        """
+        return self.scriptRe.match(self['basename'])
+
+    def __extract__(self, group):
+        m = self.scriptRe.match(self['basename'])
+        if m:
+            return m.group(group)
+        else:
+            return ''
+        
+class OpkgSyntaxException(Exception):
+
+    msg = None
+
+    def __init__(self, msg):
+        self.msg = msg

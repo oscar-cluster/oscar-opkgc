@@ -14,12 +14,15 @@ import os
 import re
 import shutil
 import exceptions
-from OpkgcXml import *
 from OpkgcConfig import *
-from OpkgDescription import *
 from OpkgcTools import *
 from OpkgcLogger import *
 from Cheetah.Template import Template
+
+from OpkgDescription import *
+from PkgDescription import *
+from Rpm import *
+from Deb import *
 
 __all__ = ['Compiler', 'CompilerRpm', 'CompilerDebian']
 
@@ -29,28 +32,14 @@ class Compiler:
     config = None
 
     dest_dir = ''
-    validate = True
     inputdir = ''
     dist = ''
+    pkgName = None
     
-    def __init__(self, inputdir, dest_dir, dist, validate):
+    def __init__(self, inputdir, dest_dir, dist):
         self.dest_dir = dest_dir
-        self.validate = validate
         self.inputdir = inputdir
         self.dist = dist
-
-    def getDestDir(self):
-        return self.dest_dir
-
-    def xmlInit(self, orig):
-        XmlTools().init (orig)
-
-    def xmlValidate(self):
-        if self.validate:
-            XmlTools().validate()
-
-    def getXmlDoc(self):
-        return XmlTools().getXmlDoc()
 
     def cheetahCompile(self, orig, template, dest):
         """ Transform 'orig' to 'dest' with Cheetah template 'template'
@@ -67,60 +56,81 @@ class Compiler:
             Logger().error(e.msg)
             sys.exit(1)
 
-    def compile(self, build):
-        """ Abstract method to generate packaging files
+    def compile (self, doBuild):
+        """ Compile opkg
+        doBuild: if True, generates packages, if False, only meta-files
         """
-        raise NotImplementedError
+        opkgDesc = OpkgDescription(self.inputdir)
+        outputDesc = self.getOutputDesc(opkgDesc)
 
-    def getPackageName(self):
-        return XmlTools().getXmlDoc().find('/name').text.lower()
+        self.pkgName = opkgDesc.getPackageName()
+        Logger().debug("Package name: %s" % self.pkgName)
 
-    def getConfigFile(self):
-        """ Return path of config.xml file
-        Raise exception if not found
-        """
-        path = os.path.join(self.inputdir, "config.xml")
-        if not os.path.exists(path):
-            Logger().error("No config.xml file found. Either:")
-            Logger().error("* specify the --input=dir option")
-            Logger().error("* run opkgc from the opkg directory")
+        # Check if package is available on target dist
+        if not opkgDesc.checkDist(self.dist):
+            Logger().info("Package '%s' is not available on distribution '%s'" % (self.pkgName, self.dist))
             raise SystemExit
-        return path
 
-    def getScripts(self):
-        """ Return list of files in scripts/ dir
+        self.pkgDir = self.getSourceDir()
+
+        self.cleanSources()
+        self.prepareBuildEnv()
+        
+        # Copy files from opkg dir to sources dir
+        for f in outputDesc.getSourceFiles():
+            fDest = os.path.join(self.pkgDir, f['sourcedest'])
+            fDir = os.path.dirname(fDest)
+            if (not os.path.exists(fDir)):
+                os.makedirs(fDir)
+            shutil.copy(f['path'], fDest)
+
+        # Produce templated files
+        self.createSources(outputDesc)
+
+        if doBuild:
+            self.build(outputDesc)
+
+    def getOutputDesc(self, opkgDesc):
+        """ Implemented by sub-classes
         """
-        ret = []
-        scriptdir = os.path.join(self.inputdir, "scripts")
-        if os.path.isdir(scriptdir):
-            for p in os.listdir(scriptdir):
-                if not re.search("\.svn|.*~", p) and not os.path.isdir(p):
-                    path = os.path.join(self.inputdir, "scripts", p)
-                    ret.append(path)
-        # add configurator.html, if any
-        configurator = os.path.join(self.inputdir, "configurator.html")
-        if os.path.exists(configurator):
-            ret.append(configurator)
+        raise NotImplemented
 
-        # add config.xml
-        ret.append(self.getConfigFile())
-            
-        return ret
+    def cleanSources(self):
+        """ Implemented in sub-classes
+        """
+        raise NotImplemented
 
-    def build(self, command, cwd='./'):
+    def prepareBuildEnv(self):
+        """ Implemented in sub-classes
+        """
+        raise NotImplemented
+
+    def getSourceDir(self):
+        """ Implemented in sub-classes
+        """
+        raise NotImplemented        
+
+    def prepareSources(self):
+        """ Implemented in sub-classes
+        """
+        raise NotImplemented
+
+    def createSources(self, outputDesc):
+        """ Implemented in sub-classes
+        """
+        raise NotImplemented
+
+    def build(self, outputDesc):
+        """ Implemented in sub-classes
+        """
+        raise NotImplemented        
+
+    def execBuild(self, command, cwd='./'):
         ret = Tools.command(command, cwd)
         if ret == 0:
             Logger().info("Packages succesfully generated")
         else:
             Logger().error("Package generation failed: return %d" % ret)
-
-    def checkDist(self, desc, pkg):
-        """ Check that package is available on given dist (regarding filters on config.xml)
-        """
-        if not desc.isDist(self.dist):
-            Logger().info("Package '%s' is not available on distribution '%s'" % (pkg, self.dist))
-            raise SystemExit
-
 
     def SupportedDist(cls):
         """ Return a list of supported dist
@@ -140,114 +150,59 @@ class CompilerRpm(Compiler):
     configSection = "RPM"
     supportedDist = ['fc', 'rhel', 'mdv', 'suse']
     pkgDir = ''
-    specfile = ''
 
-    def compile (self, doBuild):
-        """ Compile opkg
-        doBuild: if True, generates packages, if False, only meta-files
-        """
-        configFile = self.getConfigFile()
-        
-        self.xmlInit (configFile)
-        self.xmlValidate ()
+    def getOutputDesc(self, opkgDesc):
+        return RpmSpec(opkgDesc, self.dist)
 
-        # Create template env from config.xml
-        desc = OpkgDescriptionRpm(XmlTools().getXmlDoc(), self.dist)
-
-        pkgName = self.getPackageName()
-        Logger().debug("Package name: %s" % pkgName)
-
-        # Check if package is available on target dist
-        self.checkDist(desc, pkgName)
-
-        self.pkgDir = os.path.join(self.getMacro('%_builddir'), "opkg-%s" % pkgName)
-
-        # Clean/Create package dir
+    def cleanSources(self):
         if (os.path.exists(self.pkgDir)):
             Tools.rmDir(self.pkgDir)
-        os.makedirs(self.pkgDir)
 
         # Clean existing .spec file
+        specfile = self.getSpecFile()
+        if os.path.exists(os.path.dirname(specfile)):
+            if os.path.exists(specfile):
+                os.remove(specfile)
+
+    def getSpecFile(self):
         specdir = self.getMacro('%_specdir')
-        self.specfile = os.path.join(specdir, "opkg-%s.spec" % pkgName)
-        if (not os.path.exists(specdir)):
+        return os.path.join(specdir, "opkg-%s.spec" % self.pkgName)
+
+    def prepareBuildEnv(self):
+        os.makedirs(self.pkgDir)
+
+        specdir = self.getMacro('%_specdir')
+        if not os.path.exists(specdir):
             os.makedirs(specdir)
-        else:
-            if (os.path.exists(self.specfile)):
-                os.remove(self.specfile)
 
-        filelist = []
-        # Manage [pre|post]-scripts, config.xml, configurator.html
-        scriptdir = os.path.join("var", "lib", "oscar", "packages", "%s" % pkgName)
-        if (not os.path.exists(os.path.join(self.pkgDir, scriptdir))):
-            os.makedirs(os.path.join(self.pkgDir, scriptdir))
-        for orig in self.getScripts():
-            basename = os.path.basename(orig)
-            if Tools.isNativeScript(basename):
-                # If script is one of scripts included as
-                # {pre|post}{inst|rm} scripts, include them into templating
-                # env
-                header = Tools.getRpmScriptName(basename)
-                content = "%s\n" % header
-                f = open(orig, 'r')
-                if Tools.isBourneScript(f):
-                    for line in f:
-                        content = "%s%s" % (content, line)
-                    content = "%s\n" % content
-                    desc.setScript(header, content)
-                else:
-                    f.close()
-                    print "Error: %s is not a bourne shell script, as required by RPM packaging policy " % orig
-                    raise SystemExit
-                f.close()
-            else:
-                # else, file is packaged in /var/lib/oscar/packages/<packages>/
-                filelist.append(os.path.join(scriptdir, basename))
-                shutil.copy(orig, os.path.join(self.pkgDir, scriptdir))
+    def getSourceDir(self):
+        return os.path.join(self.getMacro('%_builddir'), "opkg-%s" % self.pkgName)
 
-        # Copy doc
-        docdir = os.path.join(self.inputdir, "doc")
-        outdocdir = os.path.join("usr", "share", "doc", "opkg-%s" % pkgName)
-        if os.path.isdir(docdir):
-            Tools.copy(docdir,
-                       os.path.join(self.pkgDir, outdocdir),
-                       True,
-                       '\.svn|.*~')
-            filelist.append(outdocdir)
-
-        # Copy testing scripts
-        testdir = os.path.join(self.inputdir, "testing")
-        outtestdir = os.path.join("var", "lib", "oscar", "testing", "%s" % pkgName)
-        if os.path.isdir(testdir):
-            Tools.copy(testdir,
-                       os.path.join(self.pkgDir, outtestdir),
-                       True,
-                       '\.svn|.*~')
-            filelist.append(outtestdir)
-
-        desc.setFileList(filelist)
-
+    def createSources(self, rpmDesc):
         # Produce spec file
         self.cheetahCompile(
-            desc,
+            rpmDesc,
             os.path.join(Config().get(self.configSection, "templatedir"), "opkg.spec.tmpl"),
-            self.specfile)
+            self.getSpecFile())
 
-        if doBuild:
-            cmd = "%s %s %s" % (Config().get(self.configSection, "buildcmd"),
-                                Config().get(self.configSection, "buildopts"),
-                                self.specfile)
-            self.build(cmd)
+    def build(self, rpmDesc):
+        cmd = "%s %s %s" % (Config().get(self.configSection, "buildcmd"),
+                            Config().get(self.configSection, "buildopts"),
+                            self.getSpecFile())
+        ret = Tools.command(cmd, "./")
+        if ret == 0:
+            Logger().info("Packages succesfully generated")
+        else:
+            Logger().error("Package generation failed: return %d" % ret)
 
-            # Copy generated packages into output dir
-            pkgName = self.getPackageName()
-            rpmdir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
-            shutil.copy(os.path.join(rpmdir, "opkg-%s-%s.noarch.rpm" % (pkgName, desc.version())),
-                        self.getDestDir())
-            shutil.copy(os.path.join(rpmdir, "opkg-%s-server-%s.noarch.rpm" % (pkgName, desc.version())),
-                        self.getDestDir())
-            shutil.copy(os.path.join(rpmdir, "opkg-%s-client-%s.noarch.rpm" % (pkgName, desc.version())),
-                        self.getDestDir())
+        # Copy generated packages into output dir
+        rpmdir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
+        shutil.copy(os.path.join(rpmdir, "opkg-%s-%s.noarch.rpm" % (self.pkgName, rpmDesc.version())),
+                    self.dest_dir)
+        shutil.copy(os.path.join(rpmdir, "opkg-%s-server-%s.noarch.rpm" % (self.pkgName, rpmDesc.version())),
+                    self.dest_dir)
+        shutil.copy(os.path.join(rpmdir, "opkg-%s-client-%s.noarch.rpm" % (self.pkgName, rpmDesc.version())),
+                    self.dest_dir)
 
 
     def getMacro(self, name):
@@ -260,103 +215,49 @@ class CompilerDebian(Compiler):
     configSection = "DEBIAN"
     supportedDist = ['debian']
     pkgDir = ''
-    scriptsOrigDest = {'api-pre-install'      : 'opkg-%s.preinst',
-                       'api-post-install'     : 'opkg-%s.postinst',
-                       'api-pre-uninstall'    : 'opkg-%s.prerm',
-                       'api-post-uninstall'   : 'opkg-%s.postrm',
-                       'server-pre-install'   : 'opkg-%s.preinst',
-                       'server-post-install'  : 'opkg-%s.postinst',
-                       'server-pre-uninstall' : 'opkg-%s.prerm',
-                       'server-post-uninstall': 'opkg-%s.postrm',
-                       'client-pre-install'   : 'opkg-%s.preinst',
-                       'client-post-install'  : 'opkg-client-%s.postinst',
-                       'client-pre-uninstall' : 'opkg-client-%s.prerm',
-                       'client-post-uninstall': 'opkg-client-%s.postrm'}
+    def getOutputDesc(self, opkgDesc):
+        return DebDescription(opkgDesc, self.dist)
 
-    def compile (self, doBuild):
-        """ Creates debian package files
-        doBuild: if True, generate packages, if False only meta-files
-        """
-        self.xmlInit (self.getConfigFile())
-        self.xmlValidate ()
+    def getSourceDir(self):
+        return os.path.join(self.dest_dir, "opkg-%s" % self.pkgName)
 
-        desc = OpkgDescriptionDebian(XmlTools().getXmlDoc(), self.dist)
+    def cleanSources(self):
+        sourceDir = self.getSourceDir()
+        if os.path.exists(sourceDir):
+            Tools.rmDir(sourceDir)
 
-        pkgName = self.getPackageName()
-        Logger().debug("Package base name: %s" % pkgName)
-
-        # Check if package is available on target dist
-        self.checkDist(desc, pkgName)
-
-        self.pkgDir = os.path.join(self.getDestDir(), "opkg-%s" % pkgName)
-
-        if (os.path.exists(self.pkgDir)):
-            Tools.rmDir(self.pkgDir)
-
-        debiandir = os.path.join(self.pkgDir, 'debian')
+    def prepareBuildEnv(self):
+        debiandir = os.path.join(self.getSourceDir(), 'debian')
         os.makedirs(debiandir)
 
+    def createSources(self, debDesc):
+        debiandir = os.path.join(self.getSourceDir(), 'debian')
+        
         # Compile template files
-        for template in self.getTemplates():
+        templateDir = Config().get(self.configSection, "templatedir")
+        for template in Tools.listFiles(templateDir):
             if re.search("\.tmpl", template):
                 (head, tail) = os.path.split(template)
                 (base, ext) = os.path.splitext(tail)
-                self.cheetahCompile(desc, template, os.path.join(debiandir, base))
+                self.cheetahCompile(debDesc, template, os.path.join(debiandir, base))
             else:
                 shutil.copy(template, debiandir)
                 Logger().info("Copy %s to %s" % (template, debiandir))
 
-        # Manage [pre|post]-scripts
-        for orig in self.getScripts():
-            basename = os.path.basename(orig)
-            if Tools.isNativeScript(basename):
-                # If script is one of scripts included as
-                # {pre|post}{inst|rm} scripts, copy with appropriate filename
-                # (see Debian Policy for it)
-                dest = Tools.getDebScriptName(basename, pkgName)
-                shutil.copy(orig, os.path.join(debiandir, dest))
-                Logger().info("Install script: %s" % dest)
-            else:
-                # else, file is packaged in /var/lib/oscar/packages/<packages>/
-                filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
-                filelist.write("%s /var/lib/oscar/packages/%s\n" % (basename, pkgName))
-                filelist.close()
-                shutil.copy(orig, self.pkgDir)
-                Logger().info("Copy %s to %s" % (orig, self.pkgDir))
+        for part in ['api', 'server', 'client']:
+            fl = debDesc.getPackageFiles(part)
+            installFile = os.path.join(debiandir, debDesc.getInstallFile(part))
+            filelist = open(installFile, "a")
+            for f in fl:
+                Logger().debug("File: %s" % f['path'])
+                filelist.write("%s /%s\n" % (f['sourcedest'], f['dest']))
+            filelist.close()        
 
-        # Copy doc
-        docdir = os.path.join(self.inputdir, "doc")
-        if os.path.isdir(docdir):
-            Tools.copy(docdir,
-                       self.pkgDir,
-                       True,
-                       '\.svn|.*~')
-            filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
-            filelist.write("doc/* /usr/share/doc/opkg-%s\n" % pkgName)
-            filelist.close()
-
-        # Copy testing scripts
-        testdir = os.path.join(self.inputdir, "testing")
-        if os.path.isdir(testdir):
-            Tools.copy(testdir,
-                       self.pkgDir,
-                       True,
-                       '\.svn|.*~')
-            filelist = open(os.path.join(debiandir, "opkg-%s.install" % pkgName), "a")
-            filelist.write("testing/* /var/lib/oscar/testing/%s\n" % pkgName)
-            filelist.close()
-
-        if doBuild:
-            cmd = "%s %s" % (Config().get(self.configSection, "buildcmd"),
-                             Config().get(self.configSection, "buildopts"))
-            self.build(cmd, cwd=self.pkgDir)
-
-    def getTemplates(self):
-        """ Return list of files in Debian templates dir
-        """
-        ret = []
-        for p in os.listdir(Config().get(self.configSection, "templatedir")):
-            f = os.path.join(Config().get(self.configSection, "templatedir"), p)
-            if not re.search("\.svn|.*~", p) and not os.path.isdir(f):
-                ret.append(f)
-        return ret
+    def build(self, debDesc):
+        cmd = "%s %s" % (Config().get(self.configSection, "buildcmd"),
+                         Config().get(self.configSection, "buildopts"))
+        ret = Tools.command(cmd, self.getSourceDir())
+        if ret == 0:
+            Logger().info("Packages succesfully generated")
+        else:
+            Logger().error("Package generation failed: return %d" % ret)
