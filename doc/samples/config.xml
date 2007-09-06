@@ -11,7 +11,7 @@
      
       $Id: config.xml 5616 2007-01-18 09:08:06Z bli $
   -->
-  <name>sample-Package</name>
+  <name>sample-package</name>
 
   <class>core</class><!-- optional -->
 
@@ -63,9 +63,9 @@
   </authors>
 
   <filters>
-    <dist rel="=" version="4.0" >Debian</dist>
+    <dist rel="=" version="4.0" >debian</dist>
     <dist rel="&gt;" version="5" >fc</dist>
-    <arch>x86_64</arch>
+    <arch>i386</arch>
   </filters><!-- optional -->
 
   <serverDeps>
