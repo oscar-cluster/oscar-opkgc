@@ -8,7 +8,7 @@
 
 from UserDict import UserDict
 from UserList import UserList
-from OpkgcLogger import *
+from Logger import *
 import shutil
 import re
 import os

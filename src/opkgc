@@ -25,9 +25,9 @@
 import sys
 import getopt
 import re
-from Opkgc.OpkgcCompiler import *
-from Opkgc.OpkgcConfig import *
-from Opkgc.OpkgcLogger import *
+from Opkgc.Compiler import *
+from Opkgc.Config import *
+from Opkgc.Logger import *
 
 version = '''opkgc 0.4
 

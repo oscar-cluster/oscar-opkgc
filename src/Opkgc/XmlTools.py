@@ -13,9 +13,9 @@ import sys
 import os
 from lxml import etree
 from StringIO import StringIO
-from OpkgcConfig import *
-from OpkgcTools import *
-from OpkgcLogger import *
+from Config import *
+from Tools import *
+from Logger import *
 
 class XmlTools(object):
     xsd_uri = "http://www.w3.org/2001/XMLSchema"

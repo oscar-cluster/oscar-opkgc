@@ -6,7 +6,7 @@
 # directory of the source
 ###################################################################
 
-from OpkgcLogger import *
+from Logger import *
 import ConfigParser, os
 
 __all__ = ['Config']

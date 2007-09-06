@@ -11,8 +11,8 @@
 
 import re
 from time import *
-from OpkgcLogger import *
-from OpkgcTools import *
+from Logger import *
+from Tools import *
 from OpkgDescription import *
 
 class PkgDescription(object):

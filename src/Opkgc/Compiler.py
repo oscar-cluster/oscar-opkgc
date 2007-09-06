@@ -14,9 +14,9 @@ import os
 import re
 import shutil
 import exceptions
-from OpkgcConfig import *
-from OpkgcTools import *
-from OpkgcLogger import *
+from Config import *
+from Tools import *
+from Logger import *
 from Cheetah.Template import Template
 
 from OpkgDescription import *

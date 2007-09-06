@@ -11,8 +11,8 @@
 
 import re
 from time import *
-from OpkgcXml import *
-from OpkgcTools import *
+from XmlTools import *
+from Tools import *
 
 class OpkgDescription(object):
     """ Description of an opkg

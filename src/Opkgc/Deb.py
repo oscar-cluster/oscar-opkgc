@@ -8,7 +8,7 @@
 
 from PkgDescription import *
 from OpkgDescription import *
-from OpkgcLogger import *
+from Logger import *
 
 class DebDescription(PkgDescription):
     """ Describe Debian packages
