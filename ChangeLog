@@ -2,7 +2,7 @@
         * 
 
 0.3.2
-    * Release "It is not that i do not like people, it is just that i don't like when the speak to me".
+    * Release "It is not that i do not like people, it is just that i don't like when they speak to me".
     * Include assert in opkg-convert to avoid a crash if xsltproc is not installed.
 
 0.3.1
