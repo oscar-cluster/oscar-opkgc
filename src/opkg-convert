@@ -238,6 +238,10 @@ function convert_config_xml() {
     newconfig=$olddir/config.xml.new
 
     xsltproc=`check_tool xsltproc`
+    if [ ! -n "$xsltproc" ]; then
+        echo "ERROR: XSLT tool not found (executing \"check_tool xsltproc\")"
+        exit 1
+    fi
 
     write_convert_stylesheet
     echo "[CONVERT] config.xml"
