@@ -8,7 +8,8 @@ Distribution:   OSCAR
 Vendor:         Open Cluster Group <http://oscar.openclustergroup.org/>
 Packager:       $authors('maintainer')
 BuildRoot:      %{_builddir}/%{name}
-$archFilters#slurp
+BuildArch:	noarch
+$exclusiveArch#slurp
 %description
 $description
 

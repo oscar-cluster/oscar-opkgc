@@ -86,18 +86,18 @@ class RpmSpec(PkgDescription):
         
         return out
 
-    def archFilters(self):
+    def exclusiveArch(self):
         """ Return an ExclusiveArch tag if package-wide filter on arch
         """
         afl = self.configXml.getGlobalArchFilters()
         if len(afl) > 0:
             out = "ExclusiveArch: "
             for af in afl:
-                out += " %s" % af
+               out += " %s" % af
             out += "\n"
             return out
         else:
-            return "BuildArch: noarch\n"
+            return ""
 
     def getSourceFiles(self):
         return [RpmSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
