@@ -10,28 +10,25 @@ Packager:       $authors('maintainer')
 BuildRoot:      %{_builddir}/%{name}
 BuildArch:	noarch
 $exclusiveArch#slurp
+$depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')#slurp
 %description
 $description
-
-$depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')#slurp
 
 %package server
 Group:          $group
 Summary:        $summary, server part
+$depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')#slurp
 %description server
 $description 
 This is the server part of $name.
 
-$depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')#slurp
-
 %package client
 Group:          $group
 Summary:        $summary, client part
+$depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('clientDeps', 'provides')#slurp
 %description client
 $description 
 This is the client part of $name.
-
-$depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('clientDeps', 'provides')#slurp
 
 %files server
 %defattr(-,root,root)
@@ -52,4 +49,3 @@ $f
 #end for
 
 $scripts
-
