@@ -47,7 +47,7 @@ class RpmSpec(PkgDescription):
             if len(deps) != 0:
                 archout = ""
                 if arch != None:
-                    archout += "%%ifarch %s\n" % arch
+                    archout += "%%if %%{_build_arch} == %s\n" % arch
                 archout += "%s: " % self.dependsName[relation]
                 for i, d in enumerate(deps):
                     if i != 0:
