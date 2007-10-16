@@ -11,6 +11,20 @@ BuildRoot:      %{_builddir}/%{name}
 BuildArch:	noarch
 $exclusiveArch#slurp
 $depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')#slurp
+%define is_fc   %(test -e /etc/fedora-release && echo 1 || echo 0)
+%define is_rh   %(test -e /etc/redhat-release && echo 1 || echo 0)
+%define is_mdk  %(test -e /etc/mandrake-release && echo 1 || echo 0)
+%define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
+
+%if %{is_fc}
+%define vtag %(sed -e 's/^.*release //' -e 's/ .*$//' -e 's/\\./_/g' < /etc/fedora-release)
+%endif
+
+%if %{is_rh}
+%define vtag %(sed -e 's/^.*release //' -e 's/ .*$//' -e 's/\\./_/g' < /etc/redhat-release)
+%endif
+
+
 %description
 $description
 

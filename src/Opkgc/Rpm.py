@@ -39,6 +39,11 @@ class RpmSpec(PkgDescription):
         archs.append(None)
 
         out = ""
+        distro_d = {"rhel":"is_rh",
+                    "fc":"is_fc",
+                    "mdv":"is_mdv",
+                    "suse":"is_suse"}
+
         for arch in archs:
             deps = []
             deps.extend(self.configXml.getDeps(relation, part, arch, None))
@@ -49,13 +54,33 @@ class RpmSpec(PkgDescription):
                 if arch != None:
                     archout += "%%if %%{_build_arch} == %s\n" % arch
                 archout += "%s: " % self.dependsName[relation]
+                pkg_d = {}
+                ver_d = {}
                 for i, d in enumerate(deps):
+                    if len(d) != 0:
+                        xs = d['dist']
+                        if len(xs) != 0:
+                            for x in xs:
+                                if x['version'] != None and x['name'] == self.dist:
+                                    xx = x['version']
+                                    if xx not in ver_d:
+                                        ver_d[xx] = 1
+                                        xx = self.replace_comp_sign(xx)
+                                        archout += "\n%%if %%{%s}" % distro_d[x['name']]
+                                        archout += "\n%%define is_version %%(test %%{vtag} %s && echo 1 || echo 0)" % xx
+                                        archout += "\n%if %{is_version}\n"
+                                        archout += "%s: " % self.dependsName[relation]
+                    archout += self.formatPkg(d)
                     if i != 0:
                         archout += ', '
-                    archout += self.formatPkg(d)
+                    if self.formatPkg(d) not in pkg_d and len(ver_d) != 0:
+                        pkg_d[self.formatPkg(d)] = 1
+                        archout += "\n%endif\n"
+                        archout += "%endif\n"
                 archout += "\n"
                 if arch != None:
                     archout += "%endif\n"
+                archout += "\n"
                 out += archout
 
         return out
@@ -101,6 +126,19 @@ class RpmSpec(PkgDescription):
 
     def getSourceFiles(self):
         return [RpmSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
+
+    def replace_comp_sign(self, str):
+        sign_only = str.strip('1234567890')
+        num_only = str.strip('<=>')
+        sign_hash = { "=":"-eq",
+                      ">":"-gt",
+                      ">=":"-ge",
+                      "<":"-lt",
+                      "<=":"-le",
+                      "":"-eq"}
+        changed_str = sign_hash[sign_only] + " " + num_only
+        return changed_str
+
 
 class RpmScript(UserDict):
 
