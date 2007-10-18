@@ -70,16 +70,37 @@ function write_convert_stylesheet() {
 
     <xsl:call-template name="filters" />
 
+
     <serverDeps>
-      <xsl:apply-templates select="(provides|requires|binary-package-list|conflicts)[filter/group = 'oscar_server']" />
+      <xsl:choose >
+        <xsl:when test="not(filter/group)" >
+      <xsl:apply-templates select="(provides|conflicts|requires|binary-package-list)[not(fileter/group)]">
+        <xsl:with-param name="grp" select="'server'" />
+      </xsl:apply-templates>
+        </xsl:when>
+        <xsl:otherwise>
+      <xsl:apply-templates select="(provides|conflicts|requires|binary-package-list)[filter/group =
+'oscar_server']" />
+        </xsl:otherwise>
+      </xsl:choose>
     </serverDeps>
 
     <clientDeps>
-      <xsl:apply-templates select="(provides|requires|binary-package-list|conflicts)[filter/group = 'oscar_client']" />
+      <xsl:choose >
+        <xsl:when test="not(filter/group)" >
+      <xsl:apply-templates select="(provides|conflicts|requires|binary-package-list)[not(filter/group)]" >
+        <xsl:with-param name="grp" select="'client'" />
+      </xsl:apply-templates>
+        </xsl:when>
+        <xsl:otherwise>
+      <xsl:apply-templates select="(provides|conflicts|requires|binary-package-list)[filter/group =
+'oscar_client']" />
+        </xsl:otherwise>
+      </xsl:choose>
     </clientDeps>
 
     <apiDeps>
-      <xsl:apply-templates select="(provides|requires|binary-package-list|conflicts)[not(filter/group)]" />
+      <xsl:apply-templates select="(provides|requires)[not(filter/group)]" />
     </apiDeps>
 
     <changelog>
@@ -140,14 +161,26 @@ function write_convert_stylesheet() {
   </xsl:template>
 
   <xsl:template match="distribution" >
-    <dist><xsl:value-of select="name" /></dist>
+    <xsl:choose>
+      <xsl:when test="version">
+        <dist>
+          <xsl:attribute name="version" >
+            <xsl:value-of select="version" />
+          </xsl:attribute>
+        <xsl:value-of select="name" /></dist>
+      </xsl:when>
+      <xsl:otherwise>
+        <dist><xsl:value-of select="name" /></dist>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="architecture" >
     <arch><xsl:value-of select="." /></arch>
   </xsl:template>
 
-  <xsl:template match="provides|requires|binary-package-list|conflicts" >
+  <xsl:template match="provides|conflicts|requires|binary-package-list" >
+    <xsl:param name="grp" />
     <xsl:call-template name="pkgrelation" >
       <xsl:with-param name="relation" >
 	<xsl:choose>
@@ -159,6 +192,7 @@ function write_convert_stylesheet() {
 	  </xsl:otherwise>
 	</xsl:choose>
       </xsl:with-param>
+      <xsl:with-param name="grp" select="\$grp" />
     </xsl:call-template>
   </xsl:template>
 
@@ -166,9 +200,23 @@ function write_convert_stylesheet() {
     <pkg><xsl:value-of select="." /></pkg>
   </xsl:template>
 
+  <xsl:template name="cfs" >
+    <xsl:param name="grp" />
+    <pkg><xsl:text>opkg-</xsl:text><xsl:value-of select="name" />
+       <xsl:choose>
+        <xsl:when test="\$grp = 'server'">
+            <xsl:text>-server</xsl:text>
+        </xsl:when>
+        <xsl:when test="\$grp = 'client'">
+            <xsl:text>-client</xsl:text>
+        </xsl:when>
+       </xsl:choose>
+    </pkg>
+  </xsl:template>
+
   <xsl:template name="pkgrelation" >
     <xsl:param name="relation" />
-
+    <xsl:param name="grp" />
     <xsl:choose>
       <xsl:when test="\$relation = 'provides'" >
 	<provides>
@@ -177,7 +225,9 @@ function write_convert_stylesheet() {
       </xsl:when>
       <xsl:when test="\$relation = 'conflicts'" >
 	<conflicts>
-	  <xsl:call-template name="pkglist" />
+	  <xsl:call-template name="conflict_list" >
+          <xsl:with-param name="grp" select="\$grp" />
+	  </xsl:call-template>
 	</conflicts>
       </xsl:when>
       <xsl:when test="\$relation = 'requires'" >
@@ -196,6 +246,14 @@ function write_convert_stylesheet() {
   <xsl:template name="pkglist" >
     <xsl:call-template name="filters" />
     <xsl:apply-templates select="pkg" />
+  </xsl:template>
+
+  <xsl:template name="conflict_list" >
+    <xsl:param name="grp" />
+    <xsl:call-template name="filters" />
+    <xsl:call-template name="cfs" >
+          <xsl:with-param name="grp" select="\$grp" />
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template match="version" >
@@ -246,7 +304,7 @@ function convert_config_xml() {
     write_convert_stylesheet
     echo "[CONVERT] config.xml"
     $xsltproc $xsltfile $oldconfig > $newconfig
-    del_convert_stylesheet
+#    del_convert_stylesheet
 }
 
 function convert_scripts() {
