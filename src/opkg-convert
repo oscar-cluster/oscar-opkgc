@@ -304,7 +304,7 @@ function convert_config_xml() {
     write_convert_stylesheet
     echo "[CONVERT] config.xml"
     $xsltproc $xsltfile $oldconfig > $newconfig
-#    del_convert_stylesheet
+    del_convert_stylesheet
 }
 
 function convert_scripts() {
