@@ -28,6 +28,9 @@ class RpmSpec(PkgDescription):
             desc += "%s\n" % p
         return desc
         
+    def opkg_class(self):
+        return self.configXml['class']
+
     def depends(self, part, relation):
         """ Return list of dependencies of type 'relation' for
         the 'part' package part.
@@ -42,8 +45,9 @@ class RpmSpec(PkgDescription):
         distro_d = {"rhel":"is_rh",
                     "fc":"is_fc",
                     "mdv":"is_mdv",
-                    "suse":"is_suse"}
-
+                    "suse":"is_suse",
+                    "sles":"is_suse"}
+                    
         for arch in archs:
             deps = []
             deps.extend(self.configXml.getDeps(relation, part, arch, None))
@@ -59,17 +63,17 @@ class RpmSpec(PkgDescription):
                 for i, d in enumerate(deps):
                     if len(d) != 0:
                         xs = d['dist']
-                        if len(xs) != 0:
-                            for x in xs:
-                                if x['version'] != None and x['name'] == self.dist:
-                                    xx = x['version']
-                                    if xx not in ver_d:
-                                        ver_d[xx] = 1
-                                        xx = self.replace_comp_sign(xx)
-                                        archout += "\n%%if %%{%s}" % distro_d[x['name']]
-                                        archout += "\n%%define is_version %%(test %%{vtag} %s && echo 1 || echo 0)" % xx
-                                        archout += "\n%if %{is_version}\n"
-                                        archout += "%s: " % self.dependsName[relation]
+                        for x in xs:
+                            if x['version'] != None: 
+                                xx = x['version']
+                                if xx not in ver_d:
+                                    ver_d[xx] = 1
+                                    xx = self.replace_comp_sign(xx)
+                                    archout += "\n%%if %%{%s}" % distro_d[x['name']]
+                                    archout += "\n%%define is_version %%(test %%{vtag} %s && echo 1 || echo 0)" % xx
+                                    archout += "\n%if %{is_version}\n"
+                                    archout += "%s: " % self.dependsName[relation]
+
                     archout += self.formatPkg(d)
                     if i != 0:
                         archout += ', '

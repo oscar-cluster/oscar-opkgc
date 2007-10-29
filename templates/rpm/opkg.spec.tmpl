@@ -29,7 +29,7 @@ $depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps
 $description
 
 %package server
-Group:          $group
+Group:          $group:$opkg_class
 Summary:        $summary, server part
 $depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')#slurp
 %description server
