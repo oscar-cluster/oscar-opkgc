@@ -3,7 +3,7 @@ Name:           opkg-$name
 Version:        $version('upstream')
 Release:        $version('release')
 License: 	$license
-Group:          $group
+Group:          $group:$opkg_class
 Distribution:   OSCAR
 Vendor:         Open Cluster Group <http://oscar.openclustergroup.org/>
 Packager:       $authors('maintainer')
@@ -37,7 +37,7 @@ $description
 This is the server part of $name.
 
 %package client
-Group:          $group
+Group:          $group:$opkg_class
 Summary:        $summary, client part
 $depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('clientDeps', 'provides')#slurp
 %description client
