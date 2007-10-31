@@ -116,7 +116,7 @@
       <xsd:enumeration value="core" />
       <xsd:enumeration value="base" />
       <xsd:enumeration value="included" />
-      <xsd:enumeration value="third-part" />
+      <xsd:enumeration value="third-party" />
     </xsd:restriction>
   </xsd:simpleType>
 
