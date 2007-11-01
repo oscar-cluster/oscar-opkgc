@@ -73,9 +73,8 @@ class RpmSpec(PkgDescription):
                                     archout += "\n%%define is_version %%(test %%{vtag} %s && echo 1 || echo 0)" % xx
                                     archout += "\n%if %{is_version}\n"
                                     archout += "%s: " % self.dependsName[relation]
-
-                    archout += self.formatPkg(d)
-                    if i != 0:
+                    	archout += self.formatPkg(d)
+                    if ((len(deps) > 1) and (i < len(deps) - 1)):
                         archout += ', '
                     if self.formatPkg(d) not in pkg_d and len(ver_d) != 0:
                         pkg_d[self.formatPkg(d)] = 1
