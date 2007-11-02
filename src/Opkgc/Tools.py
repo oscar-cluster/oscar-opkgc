@@ -180,6 +180,7 @@ class Tools:
         s = s.strip()
         for line in s.split('\n'):
             line = line.strip()
+            line += " "
             if line == '':
                 if cur_par != '':
                     paragraphs.append(Tools.align_lines(cur_par, width))
