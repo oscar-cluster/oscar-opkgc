@@ -31,6 +31,7 @@ $description
 %package server
 Group:          $group:$opkg_class
 Summary:        $summary, server part
+Requires: opkg-$name = $version('upstream')-$version('release')
 $depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')#slurp
 %description server
 $description 
@@ -62,4 +63,4 @@ $f
 $f
 #end for
 
-$scripts
+#disabled#_dollar_scripts_
