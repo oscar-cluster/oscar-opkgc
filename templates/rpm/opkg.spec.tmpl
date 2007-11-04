@@ -10,6 +10,7 @@ Packager:       $authors('maintainer')
 BuildRoot:      %{_builddir}/%{name}
 BuildArch:	noarch
 $exclusiveArch#slurp
+AutoReqProv: no
 $depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')#slurp
 %define is_fc   %(test -e /etc/fedora-release && echo 1 || echo 0)
 %define is_rh   %(test -e /etc/redhat-release && echo 1 || echo 0)
