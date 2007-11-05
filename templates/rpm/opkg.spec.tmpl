@@ -32,6 +32,7 @@ $description
 %package server
 Group:          $group:$opkg_class
 Summary:        $summary, server part
+AutoReqProv: no
 Requires: opkg-$name = $version('upstream')-$version('release')
 $depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')#slurp
 %description server
@@ -41,6 +42,7 @@ This is the server part of $name.
 %package client
 Group:          $group:$opkg_class
 Summary:        $summary, client part
+AutoReqProv: no
 $depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('clientDeps', 'provides')#slurp
 %description client
 $description 
