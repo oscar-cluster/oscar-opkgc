@@ -138,3 +138,6 @@ class PkgDescription(object):
             return "%s %s %s" % (date, time, zone)
         else:
             return date
+
+    def opkg_class(self):
+        return self.configXml['class']

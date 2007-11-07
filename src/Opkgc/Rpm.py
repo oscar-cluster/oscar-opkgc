@@ -28,9 +28,6 @@ class RpmSpec(PkgDescription):
             desc += "%s\n" % p
         return desc
         
-    def opkg_class(self):
-        return self.configXml['class']
-
     def depends(self, part, relation):
         """ Return list of dependencies of type 'relation' for
         the 'part' package part.
