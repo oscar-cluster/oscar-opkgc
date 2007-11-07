@@ -16,11 +16,17 @@ find_tools() {
 
     if `which $tool-1.9 > /dev/null 2>&1`; then
 	TOOL=$tool-1.9
-    elif `$tool --version | sed -e '1s/[^9]*//' -e q | grep -v '^$'`; then
-	TOOL=$tool
     else
-	echo "Required: $tool version 1.9"
-	exit 1;
+	major=`$tool --version | grep $tool | awk {'print \$4'} | awk -F '.' {'print \$1'}`
+	minor=`$tool --version | grep $tool | awk {'print \$4'} | awk -F '.' {'print \$2'}`
+	if [ "$major" -gt 1 ]; then
+		TOOL=$tool
+	elif [ "$major" -eq 1 ] && [ "$minor" -ge 9 ]; then
+		TOOL=$tool
+	else
+		echo "Required: $tool version >= 1.9"
+		exit 1;
+	fi
     fi
     
     echo "$TOOL"
