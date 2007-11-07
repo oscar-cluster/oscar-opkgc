@@ -52,6 +52,9 @@ class RpmSpec(PkgDescription):
             deps = []
             deps.extend(self.configXml.getDeps(relation, part, arch, None))
             deps.extend(self.configXml.getDeps(relation, part, arch, self.dist))
+            if part == 'serverDeps' or part == 'clientDeps':
+                deps.extend(self.configXml.getDeps(relation, 'commonDeps', arch, None))
+                deps.extend(self.configXml.getDeps(relation, 'commonDeps', arch, self.dist))
 
             if len(deps) != 0:
                 archout = ""

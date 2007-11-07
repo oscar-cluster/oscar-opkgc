@@ -11,6 +11,7 @@
 	    and RpmSpec and DebDescription
 	* Remove validate option definitively (always validate xml file)
 	* Add a new log level: trace (with -v -v)
+	* Add commonDeps tag
 	Jean Parpaillon <jean.parpaillon@irisa.fr> - September 17th, 2007
 
 	* Add support of automake >= 1.9

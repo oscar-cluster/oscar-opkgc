@@ -65,6 +65,9 @@ class DebDescription(PkgDescription):
         deps = []
         deps.extend(self.configXml.getDeps(relation, part, "*", None))
         deps.extend(self.configXml.getDeps(relation, part, "*", 'debian'))
+        if part == 'serverDeps' or part == 'clientDeps':
+            deps.extend(self.configXml.getDeps(relation, 'commonDeps', "*", None))
+            deps.extend(self.configXml.getDeps(relation, 'commonDeps', "*", 'debian'))
 
         if len(deps) == 0:
             return ""
