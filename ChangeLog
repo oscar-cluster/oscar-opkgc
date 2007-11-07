@@ -1,9 +1,28 @@
 0.4
-        * 
+        * Release "It is not that i do not like people, it is just that 
+	i don't like when they speak to me".
+        * Include assert in opkg-convert to avoid a crash if xsltproc is 
+	not installed.
+	Geoffroy Vallée <valleegr@ornl.gov> - September 13th, 2007	
 
-0.3.2
-    * Release "It is not that i do not like people, it is just that i don't like when they speak to me".
-    * Include assert in opkg-convert to avoid a crash if xsltproc is not installed.
+        * Refactoring of code: 
+	  - all description of opkg is in OpkgDescription
+	  - description of output packages are in PkgDescription (super class)
+	    and RpmSpec and DebDescription
+	* Remove validate option definitively (always validate xml file)
+	* Add a new log level: trace (with -v -v)
+	Jean Parpaillon <jean.parpaillon@irisa.fr> - September 17th, 2007
+
+	* Add support of automake >= 1.9
+	* RPM template fixes
+	Bernard Li <bli@bcgcs.ca>
+
+	* RPM template fixes
+	Erich Focht <efocht@hpce.nec.com>
+
+	* RPM template fixes
+	* opkg-convert fixes
+	DongInn Kim <dikim@osl.iu.edu>
 
 0.3.1
 	* Release "Vandanaa Trayee"
