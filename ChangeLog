@@ -16,7 +16,7 @@
 
 	* Add support of automake >= 1.9
 	* RPM template fixes
-	Bernard Li <bli@bcgcs.ca>
+	Bernard Li <bernard@vanhpc.org>
 
 	* RPM template fixes
 	Erich Focht <efocht@hpce.nec.com>
