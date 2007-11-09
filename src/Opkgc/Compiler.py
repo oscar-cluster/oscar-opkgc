@@ -148,7 +148,7 @@ class CompilerRpm(Compiler):
     """ Extend Compiler for RPM packaging
     """
     configSection = "RPM"
-    supportedDist = ['fc', 'rhel', 'mdv', 'suse']
+    supportedDist = ['fc', 'rhel', 'mdv', 'suse', 'ydl']
     pkgDir = ''
 
     def getOutputDesc(self, opkgDesc):
