@@ -290,6 +290,8 @@
       <xsd:enumeration value="amd64" />
       <xsd:enumeration value="x86_64" />
       <xsd:enumeration value="ia64" />
+      <xsd:enumeration value="ppc" />
+      <xsd:enumeration value="ppc64" />
     </xsd:restriction>
   </xsd:simpleType>
 
