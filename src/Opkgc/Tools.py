@@ -9,26 +9,30 @@
 from UserDict import UserDict
 from UserList import UserList
 from Logger import *
+from Cheetah.Template import Template
 import shutil
 import re
-import os
+import os, sys
 import subprocess
 
 class Tools:
     scriptRe = re.compile(r'(?P<part>api|client|server)-(?P<time>pre|post)-(?P<action>un)?install')
     newlineRe = re.compile(r'\n')
 
-    def listFiles(path):
-        """ List files in path, excluding .svn, *~ and subdirs
+    def ls(path, exclude=None):
+        """ List files in path, excluding .svn, *~ and files
+        described by exclude pattern, if any
         """
         ret = []
         if os.path.isdir(path):
             for p in os.listdir(path):
-                if not re.search("\.svn|.*~", p) and not os.path.isdir(p):
-                    ret.append(os.path.join(path, p))
+                if not (re.search("\.svn|.*~", p) or (exclude and re.search(exclude, p))):
+                    ret.append(p)
+        else:
+            ret.append(path)
 
         return ret
-    listFiles = staticmethod(listFiles)
+    ls = staticmethod(ls)
 
     def rmNewline (text):
         """ Replace newlines with spaces
@@ -75,7 +79,7 @@ class Tools:
                 if recursive:
                     abspath = os.path.join(dest, os.path.basename(orig))
                     os.makedirs(abspath)
-                    Logger().info("Create dir: %s" % abspath)
+                    Logger().debug("Create dir: %s" % abspath)
                     filelist = [os.path.join(orig, f) for f in os.listdir(orig)]
                     for f in filelist:
                         Tools.__copy(f,
@@ -84,7 +88,7 @@ class Tools:
                                      exclude)
             else:
                 shutil.copy(orig, dest)
-                Logger().info("Copy %s to %s" % (orig, dest))
+                Logger().debug("Copy %s to %s" % (orig, dest))
     __copy = staticmethod(__copy)
 
     def normalizeWithDash(s):
@@ -192,6 +196,42 @@ class Tools:
 
         return paragraphs
     align_paragraphs = staticmethod(align_paragraphs)
+
+    def cheetahCompile(orig, template, dest):
+        """ Transform 'orig' to 'dest' with Cheetah template 'template'
+        
+        'template' is a XSLT file
+        """
+        try:
+            Logger().info("Generates %s from template %s" % (dest, template))
+            t = Template(file=template, searchList=[orig])
+            f = open(dest, 'w')
+            f.write(t.respond())
+            f.close()
+        except Exception, e :
+            Logger().error(e)
+            raise SystemExit(1)
+    cheetahCompile = staticmethod(cheetahCompile)
+
+    def tar(tarname, filelist, rootdir=os.path.dirname(sys.argv[0])):
+        """ Create a .tar.gz with files from filelist
+        """
+        abs_tarname = os.path.abspath(tarname)
+        files = ""
+        for f in filelist:
+            files += " %s" % f
+        cmd = "tar zcf %s %s" % (abs_tarname, files)
+        Logger().debug("Create tarball '%s' with '%s' into '%s'" % (abs_tarname, files, rootdir))
+        Tools.command(cmd, rootdir)
+    tar = staticmethod(tar)
+
+    def untar(tarname, rootdir=os.path.dirname(sys.argv[0])):
+        """ Untar tarname in rootdir
+        """
+        cmd = "tar zxf %s" % tarname
+        Logger().debug("Untar '%s' into '%s'" % (tarname, rootdir))
+        Tools.command(cmd, rootdir)
+    untar = staticmethod(untar)
 
 class NoneDict(UserDict):
     """ UserDict which returns None on __getitem__ with

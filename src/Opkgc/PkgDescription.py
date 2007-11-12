@@ -31,7 +31,6 @@ class PkgDescription(object):
                         r'(?P<min>[0-9]{2}):'
                         r'(?P<sec>[0-9]{2})(?P<sfrac>\.[0-9]+)?'
                         r'(?P<tz>((?P<tzs>-|\+)(?P<tzh>[0-9]{2}):(?P<tzm>[0-9]{2}))|Z)?')
-    versionRe = re.compile(r'^(?P<upstream>.*)-(?P<release>.*)')
 
     def __init__(self, opkgDesc, dist):
         self.opkgDesc = opkgDesc
@@ -50,11 +49,7 @@ class PkgDescription(object):
         return self.configXml['name']
 
     def version(self, part=None):
-        version = self.configXml['version']
-        if not part:
-            return version
-        else:
-            return self.versionRe.match(version).group(part)
+        return self.opkgDesc.getVersion(part)
        
     def group(self):
         return self.configXml['group']

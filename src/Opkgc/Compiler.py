@@ -1,4 +1,7 @@
 ###################################################################
+# Copyright (c) 2007 Kerlabs
+#                    Jean Parpaillon <jean.parpaillon@kerlabs.com>
+#                    All rights reserved
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
 #                    All rights reserved
@@ -14,21 +17,21 @@ import os
 import re
 import shutil
 import exceptions
+import tempfile
 from Config import *
 from Tools import *
 from Logger import *
-from Cheetah.Template import Template
 
 from OpkgDescription import *
 from PkgDescription import *
 from Rpm import *
 from Deb import *
 
-__all__ = ['Compiler', 'CompilerRpm', 'CompilerDebian']
-
 class Compiler:
-    """ Generic class for compiling config.xml
+    """ main class for compiling for opgks
     """
+    compilers = ['RPMCompiler', 'DebCompiler']
+    
     config = None
 
     dest_dir = ''
@@ -41,27 +44,11 @@ class Compiler:
         self.inputdir = inputdir
         self.dist = dist
 
-    def cheetahCompile(self, orig, template, dest):
-        """ Transform 'orig' to 'dest' with Cheetah template 'template'
-        
-        'template' is a XSLT file
-        """
-        try:
-            Logger().info("Generates %s from template %s" % (dest, template))
-            t = Template(file=template, searchList=[orig])
-            f = open(dest, 'w')
-            f.write(t.respond())
-            f.close()
-        except OpkgSyntaxException,e :
-            Logger().error(e.msg)
-            sys.exit(1)
-
-    def compile (self, doBuild):
+    def compile (self, targets):
         """ Compile opkg
-        doBuild: if True, generates packages, if False, only meta-files
+        targets: list of targets amongst: 'binary', 'source'
         """
         opkgDesc = OpkgDescription(self.inputdir)
-        outputDesc = self.getOutputDesc(opkgDesc)
 
         self.pkgName = opkgDesc.getPackageName()
         Logger().debug("Package name: %s" % self.pkgName)
@@ -71,165 +58,146 @@ class Compiler:
             Logger().info("Package '%s' is not available on distribution '%s'" % (self.pkgName, self.dist))
             raise SystemExit
 
-        self.pkgDir = self.getSourceDir()
+        tarfile = self.createTarball(opkgDesc)
+        Logger().info("opkg tarball created: %s" % tarfile)
 
-        self.cleanSources()
-        self.prepareBuildEnv()
+        for c in self.compilers:
+            if self.dist in eval(c).supportedDist:
+                dc = eval(c)(opkgDesc, self.dest_dir, self.dist)
+                dc.run(tarfile, targets)
         
-        # Copy files from opkg dir to sources dir
-        for f in outputDesc.getSourceFiles():
-            fDest = os.path.join(self.pkgDir, f['sourcedest'])
-            fDir = os.path.dirname(fDest)
-            if (not os.path.exists(fDir)):
-                os.makedirs(fDir)
-            shutil.copy(f['path'], fDest)
-
-        # Produce templated files
-        self.createSources(outputDesc)
-
-        if doBuild:
-            self.build(outputDesc)
-
-    def getOutputDesc(self, opkgDesc):
-        """ Implemented by sub-classes
+    def createTarball(self, opkgDesc):
+        """ Create a tarball from opkg sources.
+        Return: path to the tarball
         """
-        raise NotImplemented
+        tempdir = tempfile.mkdtemp('.opkgc')
+        sourcedir = "opkg-%s-%s" % (self.pkgName, opkgDesc.getVersion('upstream'))
+        tardir = os.path.join(tempdir, sourcedir)
+        tarname = os.path.join(self.dest_dir, "%s.tar.gz" % sourcedir)
+        
+        os.mkdir(tardir, 0755)
+        filelist = [ os.path.join(opkgDesc.opkgdir, f)
+                     for f in Tools.ls(opkgDesc.opkgdir, exclude='SRPMS|distro') ]
+        Tools.copy(filelist, tardir, exclude='\.svn|.*~$')
 
-    def cleanSources(self):
-        """ Implemented in sub-classes
-        """
-        raise NotImplemented
-
-    def prepareBuildEnv(self):
-        """ Implemented in sub-classes
-        """
-        raise NotImplemented
-
-    def getSourceDir(self):
-        """ Implemented in sub-classes
-        """
-        raise NotImplemented        
-
-    def prepareSources(self):
-        """ Implemented in sub-classes
-        """
-        raise NotImplemented
-
-    def createSources(self, outputDesc):
-        """ Implemented in sub-classes
-        """
-        raise NotImplemented
-
-    def build(self, outputDesc):
-        """ Implemented in sub-classes
-        """
-        raise NotImplemented        
-
-    def execBuild(self, command, cwd='./'):
-        ret = Tools.command(command, cwd)
-        if ret == 0:
-            Logger().info("Packages succesfully generated")
-        else:
-            Logger().error("Package generation failed: return %d" % ret)
-
-    def SupportedDist(cls):
-        """ Return a list of supported dist
-        """
-        return cls.supportedDist
-    SupportedDist = classmethod(SupportedDist)
+        Tools.tar(tarname, [sourcedir], tempdir)
+        Logger().debug("Delete temp dir: %s" % tempdir)
+        Tools.rmDir(tempdir)
+        
+        return tarname
 
     def SupportDist(cls, dist):
-        """ Return true if the class support 'dist'
+        """ Return true if dist is supported 'dist'
         """
-        return dist in cls.supportedDist
+        for c in cls.compilers:
+            if dist in eval(c).supportedDist:
+                return True
+        return False
     SupportDist = classmethod(SupportDist)
-        
-class CompilerRpm(Compiler):
-    """ Extend Compiler for RPM packaging
+
+class RPMCompiler:
+    """ RPM Compiler
     """
+    opkgDesc = None
+    opkgName = None
+    dist = None
     configSection = "RPM"
     supportedDist = ['fc', 'rhel', 'mdv', 'suse', 'ydl']
-    pkgDir = ''
+    buildCmd = "rpmbuild"
 
-    def getOutputDesc(self, opkgDesc):
-        return RpmSpec(opkgDesc, self.dist)
+    def __init__(self, opkgDesc, dest_dir, dist):
+        self.opkgDesc = opkgDesc
+        self.opkgName = opkgDesc.getPackageName()
+        self.dist = dist
 
-    def cleanSources(self):
-        if (os.path.exists(self.pkgDir)):
-            Tools.rmDir(self.pkgDir)
+    def run(self, tarfile, targets):
+        # Create SOURCES dir and copy opkg tarball to it
+        sourcedir = self.getMacro('%{_sourcedir}')
+        if not os.path.exists(sourcedir):
+            os.makedirs(sourcedir)
+        Logger().debug("Copying %s to %s" % (tarfile, sourcedir))
+        shutil.copy(tarfile, sourcedir)
 
-        # Clean existing .spec file
-        specfile = self.getSpecFile()
-        if os.path.exists(os.path.dirname(specfile)):
-            if os.path.exists(specfile):
-                os.remove(specfile)
-
-    def getSpecFile(self):
-        specdir = self.getMacro('%_specdir')
-        return os.path.join(specdir, "opkg-%s.spec" % self.pkgName)
-
-    def prepareBuildEnv(self):
-        os.makedirs(self.pkgDir)
-
+        # Create SPECS dir and create spec file
         specdir = self.getMacro('%_specdir')
         if not os.path.exists(specdir):
             os.makedirs(specdir)
 
-    def getSourceDir(self):
-        return os.path.join(self.getMacro('%_builddir'), "opkg-%s" % self.pkgName)
+        specfile = os.path.join(specdir, "opkg-%s.spec" % self.opkgName)
+        if os.path.exists(specfile):
+            os.remove(specfile)
 
-    def createSources(self, rpmDesc):
-        # Produce spec file
-        self.cheetahCompile(
-            rpmDesc,
+        specfile = os.path.join(self.getMacro('%_specdir'), "opkg-%s.spec" % self.opkgName)
+        Tools.cheetahCompile(
+            RpmSpec(self.opkgDesc, self.dist),
             os.path.join(Config().get(self.configSection, "templatedir"), "opkg.spec.tmpl"),
-            self.getSpecFile())
+            specfile)
 
-    def build(self, rpmDesc):
-        cmd = "%s %s %s" % (Config().get(self.configSection, "buildcmd"),
-                            Config().get(self.configSection, "buildopts"),
-                            self.getSpecFile())
-        ret = Tools.command(cmd, "./")
-        if ret == 0:
-            Logger().info("Packages succesfully generated in %s" % self.getMacro('%_rpmdir'))
-        else:
-            Logger().error("Package generation failed: return %d" % ret)
-
+        # Build targets
+        if 'source' in targets:
+            ret = Tools.command("%s --clean -bs %s" % (self.buildCmd, specfile), "./")
+            if ret == 0:
+                Logger().info("Source package succesfully generated in %s" % self.getMacro('%_srcrpmdir'))
+            else:
+                Logger().error("Source package generation failed: return %d" % ret)
+                raise SystemExit(1)
+            
+        if 'binary' in targets:
+            bindir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
+            ret = Tools.command("%s --clean -bb %s" % (self.buildCmd, specfile), "./")
+            if ret == 0:
+                Logger().info("Binary package succesfully generated in %s" % bindir)
+            else:
+                Logger().error("Binary package generation failed: return %d" % ret)
+                raise SystemExit(1)
+            
     def getMacro(self, name):
         line = os.popen("rpm --eval %s" % name).readline()
         return line.strip()
 
-class CompilerDebian(Compiler):
+class DebCompiler:
     """ Extend Compiler for Debian packaging
     """
+    opkgDesc = None
+    dest_dir = None
+    opkgName = None
     configSection = "DEBIAN"
+    buildCmd = "dpkg-buildpackage"
     supportedDist = ['debian']
-    pkgDir = ''
-    def getOutputDesc(self, opkgDesc):
-        return DebDescription(opkgDesc, self.dist)
 
-    def getSourceDir(self):
-        return os.path.join(self.dest_dir, "opkg-%s" % self.pkgName)
+    def __init__(self, opkgDesc, dest_dir, dist):
+        self.opkgDesc = opkgDesc
+        self.dist = dist
+        self.dest_dir = dest_dir
+        self.opkgName = opkgDesc.getPackageName()
 
-    def cleanSources(self):
-        sourceDir = self.getSourceDir()
-        if os.path.exists(sourceDir):
-            Tools.rmDir(sourceDir)
+    def run(self, tarfile, targets):
+        sourcedir = os.path.join(self.dest_dir,
+                                 "opkg-%s-%s" % (self.opkgName, self.opkgDesc.getVersion('upstream')))
+        # Rename tar to follow Debian non-native package rule
+        debtarfile = "opkg-%s_%s.orig.tar.gz" % (self.opkgName, self.opkgDesc.getVersion('upstream'))
+        os.rename(tarfile, debtarfile)
+        
+        # Uncompress tar
+        if os.path.exists(sourcedir):
+            Tools.rmDir(sourcedir)
+        Tools.untar(debtarfile, self.dest_dir)
 
-    def prepareBuildEnv(self):
-        debiandir = os.path.join(self.getSourceDir(), 'debian')
+        # Create debian dir
+        debiandir = os.path.join(sourcedir, "debian")
         os.makedirs(debiandir)
 
-    def createSources(self, debDesc):
-        debiandir = os.path.join(self.getSourceDir(), 'debian')
-        
         # Compile template files
-        templateDir = Config().get(self.configSection, "templatedir")
-        for template in Tools.listFiles(templateDir):
+        debDesc = DebDescription(self.opkgDesc, self.dist)
+        templateDir = os.path.abspath(Config().get(self.configSection, "templatedir"))
+        tmplList = [ os.path.join(templateDir, t)
+                     for t in Tools.ls(templateDir) ]
+        Logger().debug("Templates: %s" % tmplList)
+        for template in tmplList:
             if re.search("\.tmpl", template):
                 (head, tail) = os.path.split(template)
                 (base, ext) = os.path.splitext(tail)
-                self.cheetahCompile(debDesc, template, os.path.join(debiandir, base))
+                Tools.cheetahCompile(debDesc, template, os.path.join(debiandir, base))
             else:
                 shutil.copy(template, debiandir)
                 Logger().info("Copy %s to %s" % (template, debiandir))
@@ -239,15 +207,22 @@ class CompilerDebian(Compiler):
             installFile = os.path.join(debiandir, debDesc.getInstallFile(part))
             filelist = open(installFile, "a")
             for f in fl:
-                Logger().debug("File: %s" % f['path'])
+                Logger().debug("File: %s" % f['orig'])
                 filelist.write("%s /%s\n" % (f['sourcedest'], f['dest']))
-            filelist.close()        
+            filelist.close()
 
-    def build(self, debDesc):
-        cmd = "%s %s" % (Config().get(self.configSection, "buildcmd"),
-                         Config().get(self.configSection, "buildopts"))
-        ret = Tools.command(cmd, self.getSourceDir())
+        # Build targets
+        cmd = "%s -rfakeroot -sa" % self.buildCmd
+        if 'source' in targets and 'binary' in targets:
+            opts = ""
+        elif 'source' in targets:
+            opts = "-S"
+        elif 'binary' in targets:
+            opts = "-B"
+
+        ret = Tools.command("%s %s" % (cmd, opts), sourcedir)
         if ret == 0:
             Logger().info("Packages succesfully generated")
         else:
-            Logger().error("Package generation failed: return %d" % ret)
+            Logger().error("Packages generation failed: return %d" % ret)
+            raise SystemExit(1)

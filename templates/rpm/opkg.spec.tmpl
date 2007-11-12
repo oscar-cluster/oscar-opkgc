@@ -14,6 +14,7 @@ BuildArch:	noarch
 $exclusiveArch#slurp
 AutoReqProv: no
 $depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')#slurp
+Source0:        opkg-${name}-${version('upstream')}.tar.gz
 %define is_fc   %(test -e /etc/fedora-release && echo 1 || echo 0)
 %define is_rh   %(test -e /etc/redhat-release && echo 1 || echo 0)
 %define is_mdk  %(test -e /etc/mandrake-release && echo 1 || echo 0)
@@ -50,22 +51,37 @@ $depends('clientDeps', 'requires')$depends('clientDeps', 'conflicts')$depends('c
 $description 
 This is the client part of $name.
 
+%prep
+%setup -q
+
+%build
+
+%install
+rm -fr \$RPM_BUILD_ROOT
+#for $f in $filelist
+mkdir -p `dirname \$RPM_BUILD_ROOT/$f.dest`
+cp $f.orig \$RPM_BUILD_ROOT/$f.dest
+#end for
+
+%clean
+rm -fr \$RPM_BUILD_ROOT
+
 %files server
 %defattr(-,root,root)
 #for $f in $filelist('server')
-$f
+/$f.dest
 #end for
 
 %files client
 %defattr(-,root,root)
 #for $f in $filelist('client')
-$f
+/$f.dest
 #end for
 
 %files
 %defattr(-,root,root)
-#for $f in $filelist
-$f
+#for $f in $filelist('api')
+/$f.dest
 #end for
 
 #disabled#_dollar_scripts_

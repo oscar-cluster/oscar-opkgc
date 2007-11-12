@@ -2,6 +2,9 @@
 # coding=utf8
 
 ###################################################################
+# Copyright (c) 2007 Kerlabs
+#                    Jean Parpaillon <jean.parpaillon@kerlabs.com>
+#                    All rights reserved
 # Copyright (c) 2007 Oak Ridge National Laboratory,
 #                    Geoffroy Vallee <valleegr@ornl.gov>,
 #                    All rights reserved
@@ -39,8 +42,6 @@ There is NO WARRANTY, to the extent permitted by law.
 
 Written by Jean Parpaillon and Geoffroy Vallée.'''
 
-compilers = ['CompilerRpm', 'CompilerDebian']
-
 def usage():
     """ Print command usage
     """
@@ -54,7 +55,7 @@ def usage():
     print "\t--supported-dist : list supported distributions for --dist option"
     print "\t--dist           : target distibution"
     print ""
-    print "\t--source : does not build package, only generate sources"
+    print "\t--source : build only source package"
     print "\t--input  : opkg directory, default current dir"
     print "\t--output : build packages in specified dir"
     print "\t-v       : increase verbosity level (can be repeated)"
@@ -67,7 +68,7 @@ def distList():
     """ Print supported target distributions
     """
     print "Supported target distributions are:"
-    for compiler in compilers:
+    for compiler in Compiler.compilers:
         for target in eval(compiler).SupportedDist():
             print target
 
@@ -90,7 +91,7 @@ def main():
         raise SystemExit(2)
 
     # Default values
-    build = True
+    targets = ['source', 'binary']
     inputdir = "."
     output = "."
     dist = ''
@@ -107,7 +108,7 @@ def main():
             distList()
             raise SystemExit(0)
         if o in ("-s", "--source"):
-            build = False
+            targets = ['source']
         if o in ("-i", "--input"):
             inputdir = a
         if o in ("-o", "--output"):
@@ -128,20 +129,13 @@ def main():
     # Initialize config file. Here just to detect early lack of config file
     Config()
 
-    # Build list of available target distributions and
-    # associated compiler
-    targets = {}
-    for compiler in compilers:
-        for target in eval(compiler).SupportedDist():
-            targets[target] = compiler
-
-    # Check if given target dist is available
-    if dist == '' or not(targets[dist]):
+    # Check if dist is supported
+    if not Compiler.SupportDist(dist):
         distList()
         raise SystemExit(2)
 
-    c = eval(targets[dist])( inputdir, output, dist )
-    c.compile(build)
+    c = Compiler(inputdir, output, dist)
+    c.compile(targets)
 
 if __name__ == "__main__":
     main()

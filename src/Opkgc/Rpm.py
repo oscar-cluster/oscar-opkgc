@@ -96,10 +96,12 @@ class RpmSpec(PkgDescription):
             out += ' %s %s' % (p['op'], p['version'])
         return out
 
-    def filelist(self, part='api'):
-        return [ "/%s" % f['dest']
-                 for f in self.opkgDesc.getSourceFiles()
-                 if f['part'] == part ]
+    def filelist(self, part=None):
+        filelist = self.opkgDesc.getSourceFiles()
+        if part:
+            return [ f for f in filelist if f['part'] == part ]
+        else:
+            return filelist
 
     def scripts(self):
         """ Return scripts pre|post (un)install scripts

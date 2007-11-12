@@ -17,27 +17,22 @@ from Tools import *
 class OpkgDescription(object):
     """ Description of an opkg
     """
+    versionRe = re.compile(r'^((?P<epoch>[0-9]):)?(?P<upstream>.*)-(?P<release>.*)')
     opkgdir = None
     configXml = None
 
     def __init__(self, opkgdir):
-        self.opkgdir = opkgdir
-        self.configXml = ConfigXml(self.getConfigFile())
-
-    def getPackageName(self):
-        return self.configXml['name']
-
-    def getConfigFile(self):
-        """ Return path of config.xml file
-        Raise exception if not found
-        """
-        path = os.path.join(self.opkgdir, "config.xml")
-        if not os.path.exists(path):
+        configfile = os.path.join(opkgdir, "config.xml")
+        if not os.path.exists(configfile):
             Logger().error("No config.xml file found. Either:")
             Logger().error("* specify the --input=dir option")
             Logger().error("* run opkgc from the opkg directory")
-            raise SystemExit
-        return path
+            raise SystemExit(1)
+        self.opkgdir = opkgdir
+        self.configXml = ConfigXml(configfile)
+
+    def getPackageName(self):
+        return self.configXml['name']
 
     def checkDist(self, dist):
         """ Check if package is available on given dist (regarding filters on config.xml)
@@ -47,46 +42,63 @@ class OpkgDescription(object):
 
     def getScripts(self):
         """ Return list of OpkgScript, listing files in scripts/
+        Filename relative to opkg dir
         """
+        rel_path = [ os.path.join("scripts", f)
+                     for f in Tools.ls(os.path.join(self.opkgdir, "scripts")) ]
         return [ OpkgScript(self.getPackageName(), path)
-                 for path in Tools.listFiles(os.path.join(self.opkgdir, "scripts"))]
+                 for path in rel_path ]
 
     def getDocFiles(self):
         """ Return list of OpkgDoc, listing files in doc/
+        Filename relative to opkg dir
         """
+        rel_path = [ os.path.join("doc", f)
+                     for f in Tools.ls(os.path.join(self.opkgdir, "doc")) ]
         return [ OpkgDoc(self.getPackageName(), path)
-                 for path in Tools.listFiles(os.path.join(self.opkgdir, "doc"))]
+                 for path in rel_path ]
 
     def getTestingFiles(self):
         """ Return list of OpkgTest, listing files in testing/
+        Filename relative to opkg dir
         """
+        rel_path = [ os.path.join("testing", f)
+                     for f in Tools.ls(os.path.join(self.opkgdir, "testing")) ]
         return [ OpkgTest(self.getPackageName(), path)
-                 for path in Tools.listFiles(os.path.join(self.opkgdir, "testing"))]
+                 for path in rel_path ]
 
     def getSourceFiles(self):
         """ Return list of OpkgFile to package
+        Filename relative to opkg dir
         """
         files = []
         files.extend(self.getScripts())
         files.extend(self.getDocFiles())
         files.extend(self.getTestingFiles())
         
-        configFile = OpkgFile(self.getPackageName(), self.getConfigFile())
+        configFile = OpkgFile(self.getPackageName(), "config.xml")
         configFile['dest'] = os.path.join("var", "lib", "oscar", "packages",
                                           self.getPackageName(),
-                                          configFile['basename'])
+                                          "config.xml")
         files.append(configFile)
 
-        configuratorPath = os.path.join(self.opkgdir, "configurator.html")
+        configuratorPath = "configurator.html"
         if os.path.exists(configuratorPath):
             configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
             configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages",
                                                     self.getPackageName(),
-                                                    configuratorFile['basename'])
+                                                    "configurator.html")
             files.append(configuratorFile)
 
         return files
 
+    def getVersion(self, part=None):
+        version = self.configXml['version']
+        if not part:
+            return version
+        else:
+            return self.versionRe.match(version).group(part)
+    
 class ConfigXml(UserDict):
 
     xmldoc = None
@@ -318,7 +330,8 @@ class OpkgFile(UserDict):
         UserDict.__init__(self)
         self['pkg'] = pkg
         self['part'] = 'api'
-        self['path'] = filename
+        # path relative to opkg
+        self['orig'] = filename
         self['basename'] = os.path.basename(filename)
 
 class OpkgDoc(OpkgFile):
@@ -364,9 +377,3 @@ class OpkgScript(OpkgFile):
         else:
             return ''
         
-class OpkgSyntaxException(Exception):
-
-    msg = None
-
-    def __init__(self, msg):
-        self.msg = msg
