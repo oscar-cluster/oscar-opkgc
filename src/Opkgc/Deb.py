@@ -146,7 +146,7 @@ class DebDescription(PkgDescription):
         """ Not mandatory, return "" if not found
         """ 
         try:
-            return " .\n  %s" % Tools.rmNewline(self.configXml['uri'])
+            return " .\n  %s\n" % Tools.rmNewline(self.configXml['uri'])
         except Exception, e:
             return ""
 
