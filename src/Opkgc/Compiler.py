@@ -207,8 +207,7 @@ class DebCompiler:
             installFile = os.path.join(debiandir, debDesc.getInstallFile(part))
             filelist = open(installFile, "a")
             for f in fl:
-                Logger().debug("File: %s" % f['orig'])
-                filelist.write("%s /%s\n" % (f['sourcedest'], f['dest']))
+                filelist.write("%s /%s/\n" % (f['sourcedest'], f['dest']))
             filelist.close()
 
         # Build targets

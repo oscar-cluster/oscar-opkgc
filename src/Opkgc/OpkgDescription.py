@@ -77,17 +77,13 @@ class OpkgDescription(object):
         files.extend(self.getTestingFiles())
         
         configFile = OpkgFile(self.getPackageName(), "config.xml")
-        configFile['dest'] = os.path.join("var", "lib", "oscar", "packages",
-                                          self.getPackageName(),
-                                          "config.xml")
+        configFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
         files.append(configFile)
 
         configuratorPath = "configurator.html"
         if os.path.exists(configuratorPath):
             configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
-            configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages",
-                                                    self.getPackageName(),
-                                                    "configurator.html")
+            configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
             files.append(configuratorFile)
 
         return files
@@ -345,13 +341,13 @@ class OpkgDoc(OpkgFile):
 
     def __init__(self, pkg, filename):
         OpkgFile.__init__(self, pkg, filename)
-        self['dest'] = os.path.join("usr", "share", "doc", "opkg-%s" % pkg, self['basename'])
+        self['dest'] = os.path.join("usr", "share", "doc", "opkg-%s" % pkg)
 
 class OpkgTest(OpkgFile):
 
     def __init__(self, pkg, filename):
         OpkgFile.__init__(self, pkg, filename)
-        self['dest'] = os.path.join("var", "lib", "oscar", "testing", "%s" % pkg, self['basename'])
+        self['dest'] = os.path.join("var", "lib", "oscar", "testing", "%s" % pkg)
 
 class OpkgScript(OpkgFile):
 
@@ -368,7 +364,7 @@ class OpkgScript(OpkgFile):
             self['part'] = 'api'
         self['time'] = self.__extract__('time')
         self['action'] = self.__extract__('action')
-        self['dest'] = os.path.join("var", "lib", "oscar", "packages", pkg, self['basename'])
+        self['dest'] = os.path.join("var", "lib", "oscar", "packages", pkg)
 
     def __isNative__(self):
         """ True if script is one of scripts included as

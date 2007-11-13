@@ -59,8 +59,8 @@ This is the client part of $name.
 %install
 rm -fr \$RPM_BUILD_ROOT
 #for $f in $filelist
-mkdir -p `dirname \$RPM_BUILD_ROOT/$f.dest`
-cp $f.orig \$RPM_BUILD_ROOT/$f.dest
+mkdir -p \$RPM_BUILD_ROOT/$f.dest
+cp $f.orig \$RPM_BUILD_ROOT/$f.dest/
 #end for
 
 %clean
@@ -69,19 +69,19 @@ rm -fr \$RPM_BUILD_ROOT
 %files server
 %defattr(-,root,root)
 #for $f in $filelist('server')
-/$f.dest
+/$f.dest/$f.basename
 #end for
 
 %files client
 %defattr(-,root,root)
 #for $f in $filelist('client')
-/$f.dest
+/$f.dest/$f.basename
 #end for
 
 %files
 %defattr(-,root,root)
 #for $f in $filelist('api')
-/$f.dest
+/$f.dest/$f.basename
 #end for
 
 %changelog

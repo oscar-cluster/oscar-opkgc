@@ -29,7 +29,8 @@ class Tools:
                 if not (re.search("\.svn|.*~", p) or (exclude and re.search(exclude, p))):
                     ret.append(p)
         else:
-            ret.append(path)
+            if os.path.exists(path):
+                ret.append(path)
 
         return ret
     ls = staticmethod(ls)
