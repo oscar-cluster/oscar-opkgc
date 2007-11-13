@@ -72,6 +72,13 @@ Nunc rhoncus, felis at tincidunt sollicitudin, diam tellus porttitor augue, sit 
     <arch>x86_64</arch>
   </filters --><!-- optional -->
 
+  <conflicts>
+    <pkg>opkg-conflicts</pkg>
+  </conflicts>
+  <requires>
+    <pkg>opkg-require</pkg>
+  </requires>
+
   <serverDeps>
     <provides>
       <pkg>shell</pkg>

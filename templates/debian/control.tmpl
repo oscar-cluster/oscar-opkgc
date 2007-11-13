@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: opkg-${name}
 Architecture: $arch
-$depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')$depends('apiDeps', 'suggests')#slurp
+$depends('apiDeps', 'requires')$depends('apiDeps', 'conflicts')$depends('apiDeps', 'provides')$depends('apiDeps', 'suggests')$depends('apiDeps', 'Opkg-conflicts')#slurp
 Description: $summary
 $description
  .

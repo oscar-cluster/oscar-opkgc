@@ -12,7 +12,7 @@
       Versions:
         0.1: First draft by Jean Parpaillon
 	6.0: Let's call this version 6.0
-	6.1: add commonDeps tag
+	6.1: add opkg-level dependencies
 
       $Id:
   -->
@@ -76,6 +76,16 @@
 
       <!-- Restrict package availability -->
       <xsd:element ref="filters" minOccurs="0" maxOccurs="1" />
+
+      <!-- 
+	   opkg level dependencies:
+	   requires/provides/conflicts: added to server/client requires/provides
+	   conflicts: added as meta-information to api-part (not visible by RPM/dpkg). 
+	     This way, api part can always be installed
+      -->
+      <xsd:element ref="provides" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="conflicts" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element ref="requires" minOccurs="0" maxOccurs="unbounded" />
 
       <!-- Package list for server, client and API package -->
       <xsd:element ref="serverDeps" minOccurs="0" maxOccurs="1" />

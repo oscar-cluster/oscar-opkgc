@@ -11,7 +11,8 @@
 	    and RpmSpec and DebDescription
 	* Remove validate option definitively (always validate xml file)
 	* Add a new log level: trace (with -v -v)
-	* Add commonDeps tag
+	* Add opkg-level dependencies
+	* Fix SRPMS generation
 	Jean Parpaillon <jean.parpaillon@irisa.fr> - September 17th, 2007
 
 	* Add support of automake >= 1.9

@@ -6,6 +6,7 @@
 # directory of the source
 ###################################################################
 
+import copy
 from PkgDescription import *
 from OpkgDescription import *
 
@@ -32,7 +33,7 @@ class RpmSpec(PkgDescription):
         """ Return list of dependencies of type 'relation' for
         the 'part' package part.
         Relation is one of: requires, conflicts, provides
-        Part is one of: apiDeps, serverDeps, clientDeps
+        Part is one of: apiDeps, serverDeps, clientDeps, opkg
         """
         cs = ConfigSchema()
         archs = cs.getArchs()
@@ -49,9 +50,18 @@ class RpmSpec(PkgDescription):
             deps = []
             deps.extend(self.configXml.getDeps(relation, part, arch, None))
             deps.extend(self.configXml.getDeps(relation, part, arch, self.dist))
+            # For server and client, add opkg level deps
             if part == 'serverDeps' or part == 'clientDeps':
-                deps.extend(self.configXml.getDeps(relation, 'commonDeps', arch, None))
-                deps.extend(self.configXml.getDeps(relation, 'commonDeps', arch, self.dist))
+                deps.extend(self.configXml.getDeps(relation, 'opkg', arch, None))
+                deps.extend(self.configXml.getDeps(relation, 'opkg', arch, self.dist))
+            # For api, add opkg conflicts changing name from <name> to OPKG::<name>
+            elif part == 'apiDeps' and relation == 'conflicts':
+                opkgConflicts = self.configXml.getDeps(relation, 'opkg', arch, None)
+                opkgConflicts.extend(self.configXml.getDeps(relation, 'opkg', arch, self.dist))
+                for c in opkgConflicts:
+                    nc = copy.deepcopy(c)
+                    nc['name'] = "OPKG::%s" % c['name']
+                    deps.append(nc)
 
             if len(deps) != 0:
                 archout = ""

@@ -228,26 +228,33 @@ class DependsFactory(object):
     def __loadFromXml__(self, xmldoc):
         """ Load packageDeps from xmldoc
         """
+        # load deps for api, server, client
         for pn in self.getPartNames():
             part = xmldoc.find("/%s" % pn)
             if part:
-                for rn in self.getRelationNames():
-                    relations = part.findall('%s' % rn)
-                    for r in relations:
-                        (dists, archs) = self.getFilters(r.find('filters'))
-                        self.filters.extend(dists)
-                        self.filters.extend(archs)
+                self.__loadPartDeps__(pn, part)
+
+        # load deps at opkg level
+        self.__loadPartDeps__('opkg', xmldoc.find("/"))
+
+    def __loadPartDeps__(self, partName, part):
+        for rn in self.getRelationNames():
+            relations = part.findall('%s' % rn)
+            for r in relations:
+                (dists, archs) = self.getFilters(r.find('filters'))
+                self.filters.extend(dists)
+                self.filters.extend(archs)
                     
-                        pkgList = r.findall("pkg")
-                        for pkg in pkgList:
-                            p = PackageDeps(name=pkg.text,
-                                            op=pkg.get("rel"),
-                                            version=pkg.get("version"),
-                                            arch=archs,
-                                            dist=dists,
-                                            relation=rn,
-                                            part=pn)
-                            self.packageDeps.append(p)
+                pkgList = r.findall("pkg")
+                for pkg in pkgList:
+                    p = PackageDeps(name=pkg.text,
+                                    op=pkg.get("rel"),
+                                    version=pkg.get("version"),
+                                    arch=archs,
+                                    dist=dists,
+                                    relation=rn,
+                                    part=partName)
+                    self.packageDeps.append(p)
 
     def getFilters(self, e):
         """ Return 2 lists: dist and arch filters of

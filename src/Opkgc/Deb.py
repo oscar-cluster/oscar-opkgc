@@ -15,7 +15,8 @@ class DebDescription(PkgDescription):
     """
     dependsName = {"requires":"Depends",
                    "conflicts":"Conflicts",
-                   "provides":"Provides"}
+                   "provides":"Provides",
+                   "Opkg-conflicts":"XBCS-Opkg-conflicts"}
 
     licenses = {"GPL":("GNU General Public License",
                        "/usr/share/common-licenses/GPL"),
@@ -60,14 +61,19 @@ class DebDescription(PkgDescription):
         """ Return list of dependencies of type 'relation' for
         the 'part' package part.
         Relation is one of: requires, conflicts, provides, suggests
-        Part is one of: apiDeps, serverDeps, clientDeps
+        Part is one of: apiDeps, serverDeps, clientDeps, opkg-conflicts
         """
         deps = []
         deps.extend(self.configXml.getDeps(relation, part, "*", None))
         deps.extend(self.configXml.getDeps(relation, part, "*", 'debian'))
+        # For server and client, add opkg level deps
         if part == 'serverDeps' or part == 'clientDeps':
-            deps.extend(self.configXml.getDeps(relation, 'commonDeps', "*", None))
-            deps.extend(self.configXml.getDeps(relation, 'commonDeps', "*", 'debian'))
+            deps.extend(self.configXml.getDeps(relation, 'opkg', "*", None))
+            deps.extend(self.configXml.getDeps(relation, 'opkg', "*", 'debian'))
+        # For api, add opkg conflicts to a user-defined tag: XBCS-Opkg-conflicts
+        elif part == 'apiDeps' and relation == 'Opkg-conflicts':
+            deps.extend(self.configXml.getDeps('conflicts', 'opkg', "*", None))
+            deps.extend(self.configXml.getDeps('conflicts', 'opkg', "*", 'debian'))
 
         if len(deps) == 0:
             return ""
