@@ -43,7 +43,7 @@ distdir: $(DISTFILES)
 	done
 
 install: install-data
-install-data:
+install-data: $(CONFFILE)
 	if test ! -e "$(DESTDIR)$(sysconfdir)/opkgc.conf"; then \
 	  $(INSTALL_DATA) opkgc.conf $(DESTDIR)$(sysconfdir)/opkgc.conf; \
 	fi
