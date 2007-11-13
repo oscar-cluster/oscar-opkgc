@@ -12,7 +12,7 @@ from Logger import *
 from Cheetah.Template import Template
 import shutil
 import re
-import os, sys
+import os, sys, traceback
 import subprocess
 
 class Tools:
@@ -211,6 +211,7 @@ class Tools:
             f.close()
         except Exception, e :
             Logger().error(e)
+            traceback.print_exc()
             raise SystemExit(1)
     cheetahCompile = staticmethod(cheetahCompile)
 

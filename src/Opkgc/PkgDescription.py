@@ -80,7 +80,12 @@ class PkgDescription(object):
         return res
 
     def uri(self):
-        return Tools.rmNewline(self.configXml['uri'])
+        """ uri is not mandatory: return "" if not found
+        """
+        try:
+            return Tools.rmNewline(self.configXml['uri'])
+        except Exception, e:
+            return ""
 
     def copyrights(self, cat):
         """ Return list of copyrights for 'cat'

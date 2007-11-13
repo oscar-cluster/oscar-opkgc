@@ -142,6 +142,14 @@ class DebDescription(PkgDescription):
         else:
             return "opkg-%s-%s.install" % (part, self.opkgDesc.getPackageName())
 
+    def uri(self):
+        """ Not mandatory, return "" if not found
+        """ 
+        try:
+            return " .\n  %s" % Tools.rmNewline(self.configXml['uri'])
+        except Exception, e:
+            return ""
+
 class DebSourceFile(UserDict):
 
     scriptsOrigDest = {'api-pre-install'      : 'opkg-%s.preinst',
