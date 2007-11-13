@@ -84,4 +84,17 @@ rm -fr \$RPM_BUILD_ROOT
 /$f.dest
 #end for
 
+%changelog
+#for $versionEntry in $changelog
+#for $log in $versionEntry.centries
+* $formatCEntry($log)
+#for $item in $log.items
+  - $item
+#end for
+#for $bug in $log.closes
+  - Closes: Bug \#$bug
+#end for
+#end for
+#end for
+
 #disabled#_dollar_scripts_

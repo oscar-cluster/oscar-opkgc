@@ -154,6 +154,13 @@ class RpmSpec(PkgDescription):
         changed_str = sign_hash[sign_only] + " " + num_only
         return changed_str
 
+    def formatCEntry(self, centry):
+        name = centry['name']
+        date = centry['date']
+        for a in self.configXml.getAuthors():
+            # TODO: error if author in changelog is not in author list
+            if a['name'] == name:
+                return "%s %s" % (self.date(date, "RPM"), self.formatAuthor(a))
 
 class RpmScript(UserDict):
 

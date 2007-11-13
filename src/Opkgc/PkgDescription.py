@@ -10,6 +10,8 @@
 ###################################################################
 
 import re
+import calendar
+import string
 from time import *
 from Logger import *
 from Tools import *
@@ -21,9 +23,6 @@ class PkgDescription(object):
     configXml = None
     dist = None
 
-    month = {"01":"Jan", "02":"Feb", "03":"Mar", "04":"Apr",
-             "05":"May", "06":"Jun", "07":"Jul", "08":"Aug",
-             "09":"Sep", "10":"Oct", "11":"Nov", "12":"Dec"}
     dateRe = re.compile(r'^-?(?P<year>[0-9]{4})'
                         r'-(?P<month>[0-9]{2})'
                         r'-(?P<day>[0-9]{2})'
@@ -117,10 +116,14 @@ class PkgDescription(object):
         and return in the format specified.
         Format is one of:
         'RFC822'
+        'RPM': as output by `date +"%a %b %d %Y"`
         """
         m = self.dateRe.search(date)
+        year = string.atoi(m.group('year'))
+        month = string.atoi(m.group('month'))
+        dom = string.atoi(m.group('day'))
         if format == 'RFC822':
-            date = "%s %s %s" % (m.group('day'), self.month[m.group('month')], m.group('year'))
+            date = "%d %s %d" % (dom, calendar.month_abbr[month], year)
             time = "%s:%s" % (m.group('hour'), m.group('min'))
             if m.group('sec'):
                 time += ":%s" % m.group('sec')
@@ -131,6 +134,11 @@ class PkgDescription(object):
                 else:
                     zone = "%s%s%s" % (m.group('tzs'), m.group('tzh'), m.group('tzm'))
             return "%s %s %s" % (date, time, zone)
+        elif format == 'RPM':
+            return "%s %s %d %d" % (calendar.day_abbr[calendar.weekday(year, month, dom)],
+                                    calendar.month_abbr[month],
+                                    dom,
+                                    year)
         else:
             return date
 
