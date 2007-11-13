@@ -3,12 +3,6 @@ xsdfile: _pkgdatadir_/opkg.xsd
 
 [DEBIAN]
 templatedir: _pkgdatadir_/tmpl/debian
-buildcmd: dpkg-buildpackage
-buildopts: -rfakeroot
-# Use this option if you don't want to sign your packages
-#buildopts: -rfakeroot -us -uc
 
 [RPM]
 templatedir: _pkgdatadir_/tmpl/rpm
-buildcmd: rpmbuild
-buildopts: -ba
