@@ -117,10 +117,16 @@ class DebDescription(PkgDescription):
         centry = version['centries'][0]
         name = centry['name']
         date = centry['date']
+        validAuthor = False
         for a in self.configXml.getAuthors():
-            # TODO: error if author in changelog is not in author list
             if a['name'] == name:
-                return "%s  %s" % (self.formatAuthor(a), self.date(date, "RFC822"))
+                validAuthor = True
+                ret = "%s  %s" % (self.formatAuthor(a), self.date(date, "RFC822"))
+        if validAuthor:
+            return ret
+        else:
+            Logger().error("Author %s is not declared in author list" % name)
+            raise SystemExit(2)
 
     def getSourceFiles(self):
         return [ DebSourceFile(f) for f in self.opkgDesc.getSourceFiles()]

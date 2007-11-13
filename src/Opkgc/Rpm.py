@@ -157,10 +157,16 @@ class RpmSpec(PkgDescription):
     def formatCEntry(self, centry):
         name = centry['name']
         date = centry['date']
+        validAuthor = False
         for a in self.configXml.getAuthors():
-            # TODO: error if author in changelog is not in author list
             if a['name'] == name:
-                return "%s %s" % (self.date(date, "RPM"), self.formatAuthor(a))
+                validAuthor = True
+                ret = "%s %s" % (self.date(date, "RPM"), self.formatAuthor(a))
+        if validAuthor:
+            return ret
+        else:
+            Logger().error("Author %s is not declared in author list" % name)
+            raise SystemExit(2)
 
 class RpmScript(UserDict):
 
