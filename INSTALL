@@ -2,6 +2,7 @@ Installing opkgc
 ================
 
 Run
+$ ./autogen.sh (if running from SVN checkout)
 $ ./configure
 $ make
 $ make install
