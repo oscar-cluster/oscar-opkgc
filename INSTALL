@@ -9,6 +9,7 @@ $ make install
 Dependancies
 ------------
 
-* Python 2.4 (not tested with other versions)
+* Python 2.4+ (not tested with other versions)
+* Python header and library files (usually python-devel package)
 * lxml
 * Cheetah templating system
