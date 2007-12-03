@@ -69,7 +69,7 @@ def distList():
     """
     print "Supported target distributions are:"
     for compiler in Compiler.compilers:
-        for target in eval(compiler).SupportedDist():
+        for target in eval(compiler).supportedDist:
             print target
 
 def main():
