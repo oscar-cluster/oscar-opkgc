@@ -31,7 +31,7 @@ if test "$RSYNC" = "no"; then
 ])
 fi
 
-AM_PATH_PYTHON([2.4])
+AM_PATH_PYTHON([2.3])
 
 dnl check documentation tools and options
 AC_ARG_ENABLE([doc-pdf],
