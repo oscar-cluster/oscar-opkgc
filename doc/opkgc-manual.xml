@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"/usr/share/xml/docbook/schema/dtd/4.4/docbook.dtd">
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 
 <article class="whitepaper" id="documentation" lang="en">
   
