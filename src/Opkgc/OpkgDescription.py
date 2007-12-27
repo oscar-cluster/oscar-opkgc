@@ -80,11 +80,14 @@ class OpkgDescription(object):
         configFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
         files.append(configFile)
 
-        configuratorPath = "configurator.html"
-        if os.path.exists(configuratorPath):
-            configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
-            configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
-            files.append(configuratorFile)
+        # DIKIM: we need to take care of the following configurator
+        # files in the meta rpms.
+        config_files = ["configurator.html","configurator_image.html"]
+        for configuratorPath in config_files:
+            if os.path.exists(configuratorPath):
+                configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
+                configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
+                files.append(configuratorFile)
 
         return files
 
@@ -108,6 +111,8 @@ class ConfigXml(UserDict):
         XmlTools().init(configfile)
         self.xmldoc = XmlTools().getXmlDoc()
         self.depsFactory = DependsFactory(self.xmldoc)
+
+        #print self.xmldoc.findall("class")
 
         self.__validate__()
 
