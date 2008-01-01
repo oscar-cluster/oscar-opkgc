@@ -2,6 +2,8 @@
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
 #                    All rights reserved
+# Copyright (c) 2008 The Trustees of Indiana University.
+#                    All rights reserved
 # For license information, see the COPYING file in the top level
 # directory of the source
 ###################################################################
@@ -86,7 +88,7 @@ class RpmSpec(PkgDescription):
                     	archout += self.formatPkg(d)
                     if ((len(deps) > 1) and (i < len(deps) - 1)):
                         archout += ', '
-                    if self.formatPkg(d) not in pkg_d and len(ver_d) != 0:
+                    elif self.formatPkg(d) not in pkg_d and len(ver_d) != 0:
                         pkg_d[self.formatPkg(d)] = 1
                         archout += "\n%endif\n"
                         archout += "%endif\n"
@@ -103,6 +105,12 @@ class RpmSpec(PkgDescription):
         """
         out = p['name']
         if p['version']:
+            sign_only = p['version'].strip('1234567890.')
+            if (p['op'] == None and sign_only == ""):
+                p['op'] = "="
+            else:
+                p['op'] = sign_only
+                p['version'] = p['version'].strip('<=>')
             out += ' %s %s' % (p['op'], p['version'])
         return out
 
@@ -143,7 +151,7 @@ class RpmSpec(PkgDescription):
         return [RpmSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
 
     def replace_comp_sign(self, str):
-        sign_only = str.strip('1234567890')
+        sign_only = str.strip('1234567890.')
         num_only = str.strip('<=>')
         sign_hash = { "=":"-eq",
                       ">":"-gt",
