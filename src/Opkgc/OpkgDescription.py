@@ -84,7 +84,7 @@ class OpkgDescription(object):
         # files in the meta rpms.
         config_files = ["configurator.html","configurator_image.html"]
         for configuratorPath in config_files:
-            if os.path.exists(configuratorPath):
+            if os.path.exists(os.path.join(self.opkgdir,configuratorPath)):
                 configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
                 configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
                 files.append(configuratorFile)
