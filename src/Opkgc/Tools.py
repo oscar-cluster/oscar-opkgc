@@ -130,7 +130,7 @@ class Tools:
                 Logger().debug(l.strip())
         for l in exe.stderr:
             Logger().info(l.strip())
-        return exe.wait()
+        return exe.wait() == 0
     command = staticmethod(command)
 
     def add_word(line, word, width):
@@ -224,7 +224,7 @@ class Tools:
             files += " %s" % f
         cmd = "tar zcf %s %s" % (abs_tarname, files)
         Logger().debug("Create tarball '%s' with '%s' into '%s'" % (abs_tarname, files, rootdir))
-        Tools.command(cmd, rootdir)
+        return Tools.command(cmd, rootdir)
     tar = staticmethod(tar)
 
     def untar(tarname, rootdir=os.path.dirname(sys.argv[0])):
@@ -232,7 +232,7 @@ class Tools:
         """
         cmd = "tar zxf %s" % tarname
         Logger().debug("Untar '%s' into '%s'" % (tarname, rootdir))
-        Tools.command(cmd, rootdir)
+        return Tools.command(cmd, rootdir)
     untar = staticmethod(untar)
 
 class NoneDict(UserDict):
