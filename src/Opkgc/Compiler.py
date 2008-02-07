@@ -140,7 +140,7 @@ class RPMCompiler:
             if Tools.command("%s --clean -bs %s" % (self.buildCmd, specfile), "./"):
                 Logger().info("Source package succesfully generated in %s" % self.getMacro('%_srcrpmdir'))
             else:
-                Logger().error("Source package generation failed: return %d" % ret)
+                Logger().error("Source package generation failed")
                 raise SystemExit(1)
             
         if 'binary' in targets:
@@ -148,7 +148,7 @@ class RPMCompiler:
             if Tools.command("%s --clean -bb %s" % (self.buildCmd, specfile), "./"):
                 Logger().info("Binary package succesfully generated in %s" % bindir)
             else:
-                Logger().error("Binary package generation failed: return %d" % ret)
+                Logger().error("Binary package generation failed")
                 raise SystemExit(1)
             
     def getMacro(self, name):
@@ -225,5 +225,5 @@ class DebCompiler:
         if Tools.command("%s %s" % (cmd, opts), sourcedir):
             Logger().info("Packages succesfully generated")
         else:
-            Logger().error("Packages generation failed: return %d" % ret)
+            Logger().error("Packages generation failed")
             raise SystemExit(1)
