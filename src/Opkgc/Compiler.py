@@ -80,7 +80,9 @@ class Compiler:
                      for f in Tools.ls(opkgDesc.opkgdir, exclude='SRPMS|distro') ]
         Tools.copy(filelist, tardir, exclude='\.svn|.*~$')
 
-        Tools.tar(tarname, [sourcedir], tempdir)
+        if not Tools.tar(tarname, [sourcedir], tempdir):
+            Logger().error("Error while creating tar file: %s" % tarname)
+            raise SystemExit(1)
         Logger().debug("Delete temp dir: %s" % tempdir)
         Tools.rmDir(tempdir)
         
@@ -175,13 +177,16 @@ class DebCompiler:
         sourcedir = os.path.join(self.dest_dir,
                                  "opkg-%s-%s" % (self.opkgName, self.opkgDesc.getVersion('upstream')))
         # Rename tar to follow Debian non-native package rule
-        debtarfile = "opkg-%s_%s.orig.tar.gz" % (self.opkgName, self.opkgDesc.getVersion('upstream'))
+        debtarfile = os.path.join(self.dest_dir,
+                                  "opkg-%s_%s.orig.tar.gz" % (self.opkgName, self.opkgDesc.getVersion('upstream')))
         os.rename(tarfile, debtarfile)
         
         # Uncompress tar
         if os.path.exists(sourcedir):
             Tools.rmDir(sourcedir)
-        Tools.untar(debtarfile, self.dest_dir)
+        if not Tools.untar(debtarfile, self.dest_dir):
+            Logger().error("Error while extracting tar file: %s" % debtarfile)
+            raise SystemExit(1)
 
         # Create debian dir
         debiandir = os.path.join(sourcedir, "debian")
