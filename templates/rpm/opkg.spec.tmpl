@@ -60,7 +60,7 @@ This is the client part of $name.
 rm -fr \$RPM_BUILD_ROOT
 #for $f in $filelist
 mkdir -p \$RPM_BUILD_ROOT/$f.dest
-cp $f.orig \$RPM_BUILD_ROOT/$f.dest/
+cp -r $f.orig \$RPM_BUILD_ROOT/$f.dest/
 #end for
 
 %clean
