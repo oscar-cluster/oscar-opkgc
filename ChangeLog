@@ -1,7 +1,9 @@
-0.4.1 (not yet released)
+0.4.1
 	* The Debian changelog is now correct, we use oscar-devel as user id for
-	the changelog entry and we do not sign the packages
-	Geoffroy Vallee <valleegr@ornl.gov> - December 04th, 2008
+	the changelog entry and we do not sign the packages.
+	* The meta-Debian package now also include the scripts api-post-clientdef and
+	api-post-image (bug #498).
+	Geoffroy Vallee <valleegr@ornl.gov> - December 2008
 
 0.4
 	* Release "It is not that i do not like people, it is just that 

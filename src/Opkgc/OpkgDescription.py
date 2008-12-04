@@ -80,14 +80,23 @@ class OpkgDescription(object):
         configFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
         files.append(configFile)
 
-        # DIKIM: we need to take care of the following configurator
-        # files in the meta rpms.
+        # [DIKIM] we need to take care of the following configurator
+        # files in the meta package.
         config_files = ["configurator.html","configurator_image.html"]
         for configuratorPath in config_files:
             if os.path.exists(os.path.join(self.opkgdir,configuratorPath)):
                 configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
                 configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
                 files.append(configuratorFile)
+
+        # [GVALLEE] we also need to make sure the following scripts are
+        # included: api-post-clientdef & api-post-image
+        scripts = ["api-post-clientdef", "api-post-image"]
+        for scriptPath in scripts:
+            if os.path.exists(os.path.join(self.opkgdir, "scripts", scriptPath)):
+                scriptFile = OpkgFile(self.getPackageName(), os.path.join("scripts",scriptPath))
+                scriptFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
+                files.append(scriptFile)
 
         return files
 

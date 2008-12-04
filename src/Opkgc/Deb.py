@@ -161,6 +161,7 @@ class DebSourceFile(UserDict):
     def __init__(self, opkgfile):
         UserDict.__init__(self, opkgfile)
         basename = opkgfile['basename']
+        orig = opkgfile['orig']
 
         if isinstance(opkgfile, OpkgScript):
             try:
@@ -172,4 +173,4 @@ class DebSourceFile(UserDict):
         elif isinstance(opkgfile, OpkgTest):
             self['sourcedest'] = os.path.join("testing", basename)
         else:
-            self['sourcedest'] = basename
+            self['sourcedest'] = orig
