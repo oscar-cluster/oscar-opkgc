@@ -162,7 +162,7 @@ class DebCompiler:
     dest_dir = None
     opkgName = None
     configSection = "DEBIAN"
-    buildCmd = "dpkg-buildpackage"
+    buildCmd = "dpkg-buildpackage -uc -us"
     supportedDist = ['debian']
 
     def __init__(self, opkgDesc, dest_dir, dist):

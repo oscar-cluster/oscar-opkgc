@@ -1,11 +1,16 @@
+0.4.1 (not yet released)
+	* The Debian changelog is now correct, we use oscar-devel as user id for
+	the changelog entry and we do not sign the packages
+	Geoffroy Vallee <valleegr@ornl.gov> - December 04th, 2008
+
 0.4
-        * Release "It is not that i do not like people, it is just that 
+	* Release "It is not that i do not like people, it is just that 
 	i don't like when they speak to me".
-        * Include assert in opkg-convert to avoid a crash if xsltproc is 
+	* Include assert in opkg-convert to avoid a crash if xsltproc is 
 	not installed.
 	Geoffroy Vallée <valleegr@ornl.gov> - September 13th, 2007	
 
-        * Refactoring of code: 
+	* Refactoring of code: 
 	  - all description of opkg is in OpkgDescription
 	  - description of output packages are in PkgDescription (super class)
 	    and RpmSpec and DebDescription
@@ -37,8 +42,8 @@
 	error in dependancies (Closes #359)
 
 0.3
-        * Release "Ain Ghazel"
-        * Add strictness for package name
+	* Release "Ain Ghazel"
+	* Add strictness for package name
 	* Add formatting of summary and description
 	* Add better support of arch and dist filtering
 

@@ -118,7 +118,8 @@ class DebDescription(PkgDescription):
         name = centry['name']
         date = centry['date']
         validAuthor = False
-        ret = "%s  %s" % (name, self.date(date, "RFC822"))
+        ret = "%s <oscar-devel@lists.sourceforge.net>  %s" % (name, self.date(date, "RFC822"))
+        return ret
 
     def getSourceFiles(self):
         return [ DebSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
