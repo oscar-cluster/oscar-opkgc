@@ -31,6 +31,7 @@ install-stamp:
 	dh_clean -k
 	dh_install
 
+	cp scripts/* debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/	
 	touch $@
 
 binary-arch: build install
