@@ -5,9 +5,9 @@
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
 #                    All rights reserved
-# Copyright (c) 2007 Oak Ridge National Laboratory
-#                    Geoffroy Vallee <valleegr@ornl.gov>
-#                    All rights reserved
+# Copyright (c) 2007-2009   Oak Ridge National Laboratory
+#                           Geoffroy Vallee <valleegr@ornl.gov>
+#                           All rights reserved
 # For license information, see the COPYING file in the top level
 # directory of the source
 ###################################################################
@@ -204,6 +204,15 @@ class DebCompiler:
             else:
                 shutil.copy(template, debiandir)
                 Logger().info("Copy %s to %s" % (template, debiandir))
+
+        # GV: For the rules file, we need to do some simple updates and
+        # I do not know cheetah enough to do that quickly... there we
+        # execute a sed command (yes, it is far from perfect).
+        rulescript = debiandir + "/rules"
+        cmd = "/bin/sed s/OPKGNAME/" + self.opkgName + "/g < " + debiandir + "/rules.in > " + rulescript
+        os.system(cmd)
+        Logger().info("Executing %s" % (cmd))
+        os.chmod (rulescript, 0744)
 
         for part in ['api', 'server', 'client']:
             fl = debDesc.getPackageFiles(part)

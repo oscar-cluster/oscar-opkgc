@@ -91,6 +91,8 @@ class OpkgDescription(object):
 
         # [GVALLEE] we also need to make sure the following scripts are
         # included: api-post-clientdef & api-post-image
+        # [20090330] I fixed a bug that may prevent previous code to do that.
+        # So maybe the following code is not necessary anymore.
         scripts = ["api-post-clientdef", "api-post-image"]
         for scriptPath in scripts:
             if os.path.exists(os.path.join(self.opkgdir, "scripts", scriptPath)):
