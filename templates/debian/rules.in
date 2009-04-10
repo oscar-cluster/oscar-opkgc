@@ -14,6 +14,7 @@
 
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
+OPKG_SCRIPTS=$(sort $(shell cd $(CURDIR)/scripts && find . -name "*"))
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
@@ -30,8 +31,11 @@ install-stamp:
 	dh_testdir
 	dh_clean -k
 	dh_install
-
-	cp scripts/* debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/	
+	@echo "OPKG scripts: $(OPKG_SCRIPTS)"
+	@$(foreach script, $(OPKG_SCRIPTS), (\
+		if [ "$(script)" != "." ]; then \
+			cp -f scripts/$(script) debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/; \
+		fi ) &&) /bin/true
 	touch $@
 
 binary-arch: build install
