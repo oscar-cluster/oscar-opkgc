@@ -82,7 +82,12 @@ class DebDescription(PkgDescription):
             for i, d in enumerate(deps):
                 if i != 0:
                     out += ', '
-                out += self.formatPkg(d)
+                # When parsing the XML file, a "None" may appear right before
+                # the specification of the dependency. We "manually" remove
+                # that, if we leave it, it will fail.
+                # Ex: before -> "gmetad (None >= 3.0.6)
+                #     after  -> "gmetad (>= 3.0.6)
+                out += (self.formatPkg(d)).replace('None ', '')
             out += "\n"
 
         Logger().debug(out.strip())
