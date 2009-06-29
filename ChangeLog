@@ -1,4 +1,4 @@
-0.4.2 (not yet released):
+0.4.2:
 	* [Ticket #534] On Debian based systems, scripts in the "scripts"
 	directory of OPKGs are now included.
 
