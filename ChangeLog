@@ -1,3 +1,6 @@
+0.4.3 (not yet released):
+	* [Ticket #533] The "output" option is now working on RPM based systems.
+
 0.4.2:
 	* [Ticket #534] On Debian based systems, scripts in the "scripts"
 	directory of OPKGs are now included.

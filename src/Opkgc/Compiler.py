@@ -5,9 +5,9 @@
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
 #                    All rights reserved
-# Copyright (c) 2007-2009   Oak Ridge National Laboratory
-#                           Geoffroy Vallee <valleegr@ornl.gov>
-#                           All rights reserved
+# Copyright (c) 2007 Oak Ridge National Laboratory
+#                    Geoffroy Vallee <valleegr@ornl.gov>
+#                    All rights reserved
 # For license information, see the COPYING file in the top level
 # directory of the source
 ###################################################################
@@ -15,7 +15,7 @@
 import sys
 import os
 import re
-import shutil
+import shutil, glob
 import exceptions
 import tempfile
 from Config import *
@@ -103,6 +103,7 @@ class RPMCompiler:
     opkgDesc = None
     opkgName = None
     dist = None
+    dest_dir = None
     configSection = "RPM"
     supportedDist = ['fc', 'rhel', 'mdv', 'suse', 'ydl']
     buildCmd = "rpmbuild"
@@ -111,6 +112,7 @@ class RPMCompiler:
         self.opkgDesc = opkgDesc
         self.opkgName = opkgDesc.getPackageName()
         self.dist = dist
+	self.dest_dir = dest_dir
 
     def run(self, tarfile, targets):
         # Create SOURCES dir and copy opkg tarball to it
@@ -139,6 +141,10 @@ class RPMCompiler:
         if 'source' in targets:
             if Tools.command("%s --clean -bs %s" % (self.buildCmd, specfile), "./"):
                 Logger().info("Source package succesfully generated in %s" % self.getMacro('%_srcrpmdir'))
+		Logger().info("Moving generated files to %s" % self.dest_dir)
+		for file in glob.glob(os.path.join(self.getMacro('%_rpmdir'), "*/opkg-%s*.rpm" % self.opkgName)):
+			Logger().info("Moving files: %s" % file)
+			shutil.move(file, self.dest_dir)
             else:
                 Logger().error("Source package generation failed")
                 raise SystemExit(1)
