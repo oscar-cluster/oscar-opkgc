@@ -1,4 +1,7 @@
 0.4.3 (not yet released):
+    * [Ticket #537] If arch filters are specified in the config.xml file, we
+    generate architecture dependent binary packages to avoid conflicts when
+    different architectures have different dependencies.
 	* [Ticket #533] The "output" option is now working on RPM based systems.
 
 0.4.2:
