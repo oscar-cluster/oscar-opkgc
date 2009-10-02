@@ -31,7 +31,7 @@ class DebDescription(PkgDescription):
                        ">":">>"})
 
     def arch(self):
-        return "all"
+        return self.opkgDesc.arch
 
     def description(self):
         """ Return the description in Debian format:

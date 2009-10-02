@@ -20,8 +20,10 @@ class OpkgDescription(object):
     versionRe = re.compile(r'^((?P<epoch>[0-9]):)?(?P<upstream>.*)-(?P<release>.*)')
     opkgdir = None
     configXml = None
+    arch = None
 
     def __init__(self, opkgdir):
+        # We parse the config.xml file to get data for the target OPKG
         configfile = os.path.join(opkgdir, "config.xml")
         if not os.path.exists(configfile):
             Logger().error("No config.xml file found. Either:")
@@ -30,6 +32,11 @@ class OpkgDescription(object):
             raise SystemExit(1)
         self.opkgdir = opkgdir
         self.configXml = ConfigXml(configfile)
+        if (self.configXml.getNbArchFilters() >= 1):
+            self.arch = "any"
+        else:
+            self.arch = "all"
+        Logger().info("Architecture of the generated package: %s" % self.arch)
 
     def getPackageName(self):
         return self.configXml['name']
@@ -110,6 +117,7 @@ class OpkgDescription(object):
             return self.versionRe.match(version).group(part)
     
 class ConfigXml(UserDict):
+# Implementation of the config.xml parser.
 
     xmldoc = None
     depsFactory = None
@@ -154,8 +162,19 @@ class ConfigXml(UserDict):
         (dists, arch) = self.depsFactory.getFilters(self.xmldoc.find('/filters'))
         return dists
 
+    def getNbArchFilters(self):
+        (dists, arch) = self.depsFactory.getFilters(self.xmldoc.find('/filters'))
+        l = self.xmldoc.findall('serverDeps/requires/filters/arch')
+        return len(l)
+
     def getGlobalArchFilters(self):
         (dists, arch) = self.depsFactory.getFilters(self.xmldoc.find('/filters'))
+        for a in arch:
+            Logger().debug ("-> Arch " + a)
+        for d in dists:
+            Logger().debug ("-> Dist " + d)
+        l = self.xmldoc.findall('serverDeps/requires/filters/arch')
+        Logger().info("Number of arch filters: %d" % len(l))
         return arch
 
 class ConfigSchema(object):
