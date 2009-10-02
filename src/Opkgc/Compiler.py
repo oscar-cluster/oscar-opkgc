@@ -131,28 +131,44 @@ class RPMCompiler:
         if os.path.exists(specfile):
             os.remove(specfile)
 
-        specfile = os.path.join(self.getMacro('%_specdir'), "opkg-%s.spec" % self.opkgName)
+        if self.opkgDesc.arch == "all":
+            specfile = os.path.join(self.getMacro('%_specdir'), "opkg-%s.spec" % self.opkgName)
+        else:
+            specfile = os.path.join(self.getMacro('%_specdir'), "opkg-%s.spec.tmp" % self.opkgName)
+            finalspec = os.path.join(self.getMacro('%_specdir'), "opkg-%s.spec" % self.opkgName)
         Tools.cheetahCompile(
             RpmSpec(self.opkgDesc, self.dist),
             os.path.join(Config().get(self.configSection, "templatedir"), "opkg.spec.tmpl"),
             specfile)
 
+        # GV: I am not familiar enough with Cheetah to trick the spec file on
+        # the fly so i do it here manually. The idea is to remove the BuildArch
+        # line in the spec file when the package is not noarch
+        Logger().debug ("Arch: %s" % self.opkgDesc.arch)
+        if self.opkgDesc.arch == "any":
+            Logger().debug ("Modifying the spec file for the creation of arch dependent RPMs")
+            cmd = "/bin/sed s/BuildArch/\#BuildArch/g < " + specfile + " > " + finalspec
+            Logger().info("Executing %s" % (cmd))
+            os.system(cmd)
+            os.remove(specfile)
+            specfile = finalspec
+            cmd = "cp " + specfile + " /tmp"
+            os.system(cmd)
+
         # Build targets
         if 'source' in targets:
             if Tools.command("%s --clean -bs %s" % (self.buildCmd, specfile), "./"):
                 Logger().info("Source package succesfully generated in %s" % self.getMacro('%_srcrpmdir'))
-                Logger().info("Moving generated files to %s" % self.dest_dir)
-                for file in glob.glob(os.path.join(self.getMacro('%_rpmdir'), "*/opkg-%s*.rpm" % self.opkgName)):
-                    Logger().info("Moving files: %s" % file)
-                    shutil.move(file, self.dest_dir)
             else:
                 Logger().error("Source package generation failed")
                 raise SystemExit(1)
             
         if 'binary' in targets:
-            bindir = os.path.join(self.getMacro('%_rpmdir'), "noarch")
             if Tools.command("%s --clean -bb %s" % (self.buildCmd, specfile), "./"):
-                Logger().info("Binary package succesfully generated in %s" % bindir)
+                Logger().info("Moving generated files to %s" % self.dest_dir)
+                for file in glob.glob(os.path.join(self.getMacro('%_rpmdir'), "*/opkg-%s*.rpm" % self.opkgName)):
+                    Logger().info("Moving files: %s" % file)
+                    shutil.move(file, self.dest_dir)
             else:
                 Logger().error("Binary package generation failed")
                 raise SystemExit(1)
@@ -216,8 +232,8 @@ class DebCompiler:
         # execute a sed command (yes, it is far from perfect).
         rulescript = debiandir + "/rules"
         cmd = "/bin/sed s/OPKGNAME/" + self.opkgName + "/g < " + debiandir + "/rules.in > " + rulescript
-        os.system(cmd)
         Logger().info("Executing %s" % (cmd))
+        os.system(cmd)
         os.chmod (rulescript, 0744)
 
         for part in ['api', 'server', 'client']:
