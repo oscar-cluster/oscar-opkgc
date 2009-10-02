@@ -244,6 +244,10 @@ class DebCompiler:
                 filelist.write("%s /%s/\n" % (f['sourcedest'], f['dest']))
             filelist.close()
 
+        # Since we modified the files from the orig package, we should recreate the .orig.tar.gz
+        # file or just delete it. Right now, we just delete it
+        os.remove (debtarfile)
+
         # Build targets
         cmd = "%s -rfakeroot -sa" % self.buildCmd
         if 'source' in targets and 'binary' in targets:

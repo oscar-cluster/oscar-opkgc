@@ -1,3 +1,7 @@
+0.4.4 (not yet released):
+	* Fix a problem on Debian when generating the .orig tarball. To avoid the
+	problem we simply do not generate this tarball anymore.
+
 0.4.3:
     * [Ticket #537] If arch filters are specified in the config.xml file, we
     generate architecture dependent binary packages to avoid conflicts when
