@@ -1,8 +1,9 @@
-0.4.3 (not yet released):
+0.4.3:
     * [Ticket #537] If arch filters are specified in the config.xml file, we
     generate architecture dependent binary packages to avoid conflicts when
     different architectures have different dependencies.
 	* [Ticket #533] The "output" option is now working on RPM based systems.
+	* [Ticket #501] Correctly include the man page into the OPKGC RPM.
 
 0.4.2:
 	* [Ticket #534] On Debian based systems, scripts in the "scripts"
