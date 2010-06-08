@@ -1,6 +1,7 @@
-0.4.4 (not yet released):
+0.4.4:
 	* Fix a problem on Debian when generating the .orig tarball. To avoid the
 	problem we simply do not generate this tarball anymore.
+	* [Ticket #552] Architecture tags are now correctly parsed and handled.
 
 0.4.3:
     * [Ticket #537] If arch filters are specified in the config.xml file, we
