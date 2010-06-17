@@ -1,12 +1,20 @@
+0.4.5 (not yet released):
+	* Fix problem on Debian platforms:
+		* Copy correctly the different files of the OPKG so the Debian
+		packages are correclty created
+		* Correctly generate the scripts of the Debian packages so the
+		different scripts defined bu the OPKG API are actually executed when
+		installing/removing the different Debian package of a given OPKG.
+
 0.4.4:
 	* Fix a problem on Debian when generating the .orig tarball. To avoid the
 	problem we simply do not generate this tarball anymore.
 	* [Ticket #552] Architecture tags are now correctly parsed and handled.
 
 0.4.3:
-    * [Ticket #537] If arch filters are specified in the config.xml file, we
-    generate architecture dependent binary packages to avoid conflicts when
-    different architectures have different dependencies.
+	* [Ticket #537] If arch filters are specified in the config.xml file, we
+	generate architecture dependent binary packages to avoid conflicts when
+	different architectures have different dependencies.
 	* [Ticket #533] The "output" option is now working on RPM based systems.
 	* [Ticket #501] Correctly include the man page into the OPKGC RPM.
 

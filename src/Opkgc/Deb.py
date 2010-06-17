@@ -13,6 +13,20 @@ from Logger import *
 class DebDescription(PkgDescription):
     """ Describe Debian packages
     """
+
+    scriptsOrigDest = {'api-pre-install'      : 'opkg-%s.preinst',
+                       'api-post-install'     : 'opkg-%s.postinst',
+                       'api-pre-uninstall'    : 'opkg-%s.prerm',
+                       'api-post-uninstall'   : 'opkg-%s.postrm',
+                       'server-pre-install'   : 'opkg-%s-server.preinst',
+                       'server-post-install'  : 'opkg-%s-server.postinst',
+                       'server-pre-uninstall' : 'opkg-%s-server.prerm',
+                       'server-post-uninstall': 'opkg-%s-server.postrm',
+                       'client-pre-install'   : 'opkg-%s-client.preinst',
+                       'client-post-install'  : 'opkg-%s-client.postinst',
+                       'client-pre-uninstall' : 'opkg-%s-client.prerm',
+                       'client-post-uninstall': 'opkg-%s-client.postrm'}
+
     dependsName = {"requires":"Depends",
                    "conflicts":"Conflicts",
                    "provides":"Provides",
@@ -136,17 +150,23 @@ class DebDescription(PkgDescription):
     def getSourceFiles(self):
         return [ DebSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
 
+    # This is a big mess, there is not a single comment! We should trash it
+    # and restart.
+    # Desc ?????
     def getPackageFiles(self, part):
-        return [ DebSourceFile(f)
-                 for f in self.opkgDesc.getSourceFiles()
-                 if not isinstance(f, OpkgScript) and f['part'] == part ]
+        list = [ DebSourceFile(f)
+                for f in self.opkgDesc.getSourceFiles()
+                if f['part'] == part ]
+        return list
 
+    # DESC ????????
     def getInstallFile(self, part):
         if part == 'api':
             return "opkg-%s.install" % self.opkgDesc.getPackageName()
         else:
-            return "opkg-%s-%s.install" % (part, self.opkgDesc.getPackageName())
+            return "opkg-%s-%s.install" % (self.opkgDesc.getPackageName(), part)
 
+    # DESC ????????
     def uri(self):
         """ Not mandatory, return "" if not found
         """ 
@@ -154,7 +174,18 @@ class DebDescription(PkgDescription):
             return " .\n  %s\n" % Tools.rmNewline(self.configXml['uri'])
         except Exception, e:
             return ""
+    # Based on the description of a script, we detect which script is
+    # suitable for the binary package
+    def getPkgScript (self, pkgDesc):
+        list = self.scriptsOrigDest.keys()
+        if (pkgDesc['basename'] in list):
+            ret = self.scriptsOrigDest[pkgDesc['basename']] % self.opkgDesc.getPackageName()
+        else:
+            ret = ""
+        return ret 
 
+# DESC????????
+# DEPRECATED??
 class DebSourceFile(UserDict):
 
     scriptsOrigDest = {'api-pre-install'      : 'opkg-%s.preinst',
@@ -174,8 +205,10 @@ class DebSourceFile(UserDict):
         UserDict.__init__(self, opkgfile)
         basename = opkgfile['basename']
         orig = opkgfile['orig']
+        part = opkgfile['part']
+        dirname = os.path.dirname(orig)
 
-        if isinstance(opkgfile, OpkgScript):
+        if (dirname == "scripts"):
             try:
                 self['sourcedest'] = self.scriptsOrigDest[basename] % opkgfile['part']
             except KeyError:

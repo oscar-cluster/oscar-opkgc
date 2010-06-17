@@ -150,6 +150,7 @@ class RPMCompiler:
             cmd = "/bin/sed s/BuildArch/\#BuildArch/g < " + specfile + " > " + finalspec
             Logger().info("Executing %s" % (cmd))
             os.system(cmd)
+                    
             os.remove(specfile)
             specfile = finalspec
             cmd = "cp " + specfile + " /tmp"
@@ -227,25 +228,74 @@ class DebCompiler:
                 shutil.copy(template, debiandir)
                 Logger().info("Copy %s to %s" % (template, debiandir))
 
+        # [2010/06/17] DEPRECATED!!! We do not need to update the debian/rules
+        # script anymore!
+        # Update the debian/rules file
         # GV: For the rules file, we need to do some simple updates and
         # I do not know cheetah enough to do that quickly... there we
         # execute a sed command (yes, it is far from perfect).
-        rulescript = debiandir + "/rules"
-        cmd = "/bin/sed s/OPKGNAME/" + self.opkgName + "/g < " + debiandir + "/rules.in > " + rulescript
-        Logger().info("Executing %s" % (cmd))
-        os.system(cmd)
-        os.chmod (rulescript, 0744)
+#        rulescript = debiandir + "/rules"
+#        cmd = "/bin/sed s/OPKGNAME/" + self.opkgName + "/g < " + debiandir + "/rules.in > " + rulescript
+#        Logger().info("Executing %s" % (cmd))
+#        os.system(cmd)
+#        os.chmod (rulescript, 0744)
 
+        # Create the debian/rules script
+        source = debiandir + "/rules.in"
+        dest = debiandir + "/rules"
+        shutil.copy(source, dest)
+        os.chmod (dest, 0744)
+
+        # Deal with the different post install scripts specific to each part 
+        # of the OPKG
+        fl = self.opkgDesc.getScripts()
+        for f in fl:
+            script_name = debDesc.getPkgScript(f)
+            # OPKG script also include scripts that are not related to the 
+            # binary package, so we just ignore those (they just need to be
+            # included into the package at the good location).
+            if (script_name != ""):
+                pkgScript = os.path.join(debiandir, debDesc.getPkgScript(f))
+                # Logger().debug ("--> File: "+f['basename']+" part of "+f['part'])
+                Logger().debug("-> Creating %s" % pkgScript)
+                filelist = open(pkgScript, "a")
+                Logger().debug("--> Adding /"+f['dest'] + "/" + f['basename'])
+                filelist.write("#!/bin/sh\n/%s/%s\n" % (f['dest'], f['basename']))
+                filelist.close()
+
+        # Copy the different scripts at the good location, i.e., in the good
+        # directory so it will correctly be included in the appropriate pkg
         for part in ['api', 'server', 'client']:
-            fl = debDesc.getPackageFiles(part)
-            installFile = os.path.join(debiandir, debDesc.getInstallFile(part))
-            filelist = open(installFile, "a")
-            for f in fl:
-                filelist.write("%s /%s/\n" % (f['sourcedest'], f['dest']))
-            filelist.close()
+            list = debDesc.getPackageFiles(part)
+            for f in list:
+                Logger().debug("*** Handling "+f['orig']+" (part:"+f['part']+")")
+                if (part == "" or f['part'] == part):
+                    orig = f['orig']
+                    if not os.path.isdir (debiandir):
+                        Logger().debug("Debian directory does not exist(%s)" % debiandir)
+                        sys.exit (1)
+                    if (part == "api"):
+                        dest = debiandir+"/opkg-"+self.opkgName
+                    else:
+                        dest = debiandir+"/opkg-"+self.opkgName+"-"+f['part']
+                    dest = dest+"/var/lib/oscar/packages/"+self.opkgName
+                    if not os.path.isfile(orig):
+                        Logger().debug("File %s does not exist" % orig)
+                        sys.exit(1)
+                    try:
+                        Logger().debug("Creating %s" % dest)
+                        if not os.path.exists(dest):
+                            os.makedirs (dest)
+                    except:
+                        Logger().debug("ERROR: impossible to create %s" % dest)
+                        sys.exit (1)
+                    Logger().debug("Copy "+orig+" to " + dest)
+                    cmd = "cp "+orig+" "+dest
+                    shutil.copy(orig, dest)
+                    os.system(cmd)
 
-        # Since we modified the files from the orig package, we should recreate the .orig.tar.gz
-        # file or just delete it. Right now, we just delete it
+        # Since we modified the files from the orig package, we should recreate
+        # the .orig.tar.gz file or just delete it. Right now, we just delete it
         os.remove (debtarfile)
 
         # Build targets

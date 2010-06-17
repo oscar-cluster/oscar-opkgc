@@ -1,4 +1,4 @@
-###################################################################
+#################################################################
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
 #                    All rights reserved
@@ -53,8 +53,9 @@ class OpkgDescription(object):
         """
         rel_path = [ os.path.join("scripts", f)
                      for f in Tools.ls(os.path.join(self.opkgdir, "scripts")) ]
-        return [ OpkgScript(self.getPackageName(), path)
+        list = [ OpkgScript(self.getPackageName(), path)
                  for path in rel_path ]
+        return list
 
     def getDocFiles(self):
         """ Return list of OpkgDoc, listing files in doc/
@@ -97,10 +98,10 @@ class OpkgDescription(object):
                 files.append(configuratorFile)
 
         # [GVALLEE] we also need to make sure the following scripts are
-        # included: api-post-clientdef & api-post-image
+        # included
         # [20090330] I fixed a bug that may prevent previous code to do that.
         # So maybe the following code is not necessary anymore.
-        scripts = ["api-post-clientdef", "api-post-image"]
+        scripts = ["api-pre-install", "api-post-install", "api-pre-uninstall", "api-post-uninstall", "server-pre-install", "server-post-install", "server-pre-uninstall", "server-post-uninstall", "client-pre-install", "client-post-install", "client-pre-uninstall", "client-post-uninstall", "api-post-clientdef", "api-post-image", ""]
         for scriptPath in scripts:
             if os.path.exists(os.path.join(self.opkgdir, "scripts", scriptPath)):
                 scriptFile = OpkgFile(self.getPackageName(), os.path.join("scripts",scriptPath))
@@ -389,6 +390,7 @@ class OpkgScript(OpkgFile):
     scriptRe = re.compile(r'(?P<part>api|client|server)-(?P<time>pre|post)-(?P<action>un)?install')
 
     def __init__(self, pkg, filename):
+        # filename = os.path.basename (filename)
         OpkgFile.__init__(self, pkg, filename)
         self['native'] = self.__isNative__()
 

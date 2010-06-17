@@ -14,7 +14,7 @@
 
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
-OPKG_SCRIPTS=$(sort $(shell cd $(CURDIR)/scripts && find . -name "*"))
+# OPKG_SCRIPTS=$(sort $(shell cd $(CURDIR)/scripts && find . -name "*"))
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
@@ -29,13 +29,14 @@ build-stamp:
 install: install-stamp
 install-stamp:
 	dh_testdir
-	dh_clean -k
+#	dh_clean -k
 	dh_install
-	@echo "OPKG scripts: $(OPKG_SCRIPTS)"
-	@$(foreach script, $(OPKG_SCRIPTS), (\
-		if [ "$(script)" != "." ]; then \
-			cp -f scripts/$(script) debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/; \
-		fi ) &&) /bin/true
+#	@echo "OPKG scripts: $(OPKG_SCRIPTS)"
+#	@$(foreach script, $(OPKG_SCRIPTS), (\
+#		if [ "$(script)" != "." ]; then \
+#			mkdir -p debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/;\
+#			cp -f scripts/$(script) debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/; \
+#		fi ) &&) /bin/true
 	touch $@
 
 binary-arch: build install
@@ -77,6 +78,6 @@ binary: binary-arch binary-indep
 
 clean:
 	dh_testdir
-	dh_clean
+#	dh_clean
 
 .PHONY: build clean binary binary-arch binary-indep binary-common install
