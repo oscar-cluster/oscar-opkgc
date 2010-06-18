@@ -29,6 +29,7 @@ build-stamp:
 install: install-stamp
 install-stamp:
 	dh_testdir
+# Since opkgc populate the build tree, we do not want to clean it up
 #	dh_clean -k
 	dh_install
 #	@echo "OPKG scripts: $(OPKG_SCRIPTS)"
@@ -78,6 +79,7 @@ binary: binary-arch binary-indep
 
 clean:
 	dh_testdir
+# Since opkgc populate the build tree, we do not want to clean it up
 #	dh_clean
 
 .PHONY: build clean binary binary-arch binary-indep binary-common install
