@@ -281,18 +281,18 @@ class DebCompiler:
                     dest = dest+"/var/lib/oscar/packages/"+self.opkgName
                     if not os.path.isfile(orig):
                         Logger().debug("File %s does not exist" % orig)
-                        sys.exit(1)
-                    try:
-                        Logger().debug("Creating %s" % dest)
-                        if not os.path.exists(dest):
-                            os.makedirs (dest)
-                    except:
-                        Logger().debug("ERROR: impossible to create %s" % dest)
-                        sys.exit (1)
-                    Logger().debug("Copy "+orig+" to " + dest)
-                    cmd = "cp "+orig+" "+dest
-                    shutil.copy(orig, dest)
-                    os.system(cmd)
+                    else:
+                        try:
+                            Logger().debug("Creating %s" % dest)
+                            if not os.path.exists(dest):
+                                os.makedirs (dest)
+                        except:
+                            Logger().debug("ERROR: impossible to create %s" % dest)
+                            sys.exit (1)
+                        Logger().debug("Copy "+orig+" to " + dest)
+                        cmd = "cp "+orig+" "+dest
+                        shutil.copy(orig, dest)
+                        os.system(cmd)
 
         # Since we modified the files from the orig package, we should recreate
         # the .orig.tar.gz file or just delete it. Right now, we just delete it

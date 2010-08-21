@@ -5,6 +5,7 @@
 		* Correctly generate the scripts of the Debian packages so the
 		different scripts defined bu the OPKG API are actually executed when
 		installing/removing the different Debian package of a given OPKG.
+    * Fix a corner case issue when dealing with the OPKG scripts.
 
 0.4.4:
 	* Fix a problem on Debian when generating the .orig tarball. To avoid the
