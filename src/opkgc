@@ -5,9 +5,9 @@
 # Copyright (c) 2007 Kerlabs
 #                    Jean Parpaillon <jean.parpaillon@kerlabs.com>
 #                    All rights reserved
-# Copyright (c) 2007 Oak Ridge National Laboratory,
-#                    Geoffroy Vallee <valleegr@ornl.gov>,
-#                    All rights reserved
+# Copyright (c) 2007-2010   Oak Ridge National Laboratory,
+#                           Geoffroy Vallee <valleegr@ornl.gov>,
+#                           All rights reserved
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
 #                    All rights reserved
@@ -35,7 +35,7 @@ from Opkgc.Logger import *
 version = '''opkgc 0.4
 
 Copyright (C) 2007 IRISA-INRIA
-              2007 ORNL
+              2007-2010 ORNL
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
