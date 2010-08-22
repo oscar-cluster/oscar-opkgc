@@ -1,4 +1,4 @@
-0.4.5 (not yet released):
+0.4.5:
 	* Fix problem on Debian platforms:
 		* Copy correctly the different files of the OPKG so the Debian
 		packages are correclty created
