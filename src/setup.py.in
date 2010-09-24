@@ -28,5 +28,5 @@ set of RPM or Debian packages.""",
       author_email="oscar-users@lists.sourceforge.net",
       url="http://oscar.openclustergroup.org/comp_opkgc",
       scripts = ['opkgc'],
-      packages = ['Opkgc']
+      packages = ['OpkgcLib']
      )
