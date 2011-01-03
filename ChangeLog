@@ -1,5 +1,7 @@
 0.4.6 (not yet released):
     * Avoid warnings when using Python-2.6.
+    * [Ticket #590] Correctly deal with the "rel" tag of config.xml files on RPM based
+      systems.
 
 0.4.5:
 	* Fix problem on Debian platforms:

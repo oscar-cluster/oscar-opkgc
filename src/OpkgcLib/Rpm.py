@@ -102,14 +102,20 @@ class RpmSpec(PkgDescription):
 
     def formatPkg(self, p):
         """ Return formatted package dep
+            Note:   p['version'] contains the version for the dependency
+                    p['op'] contains the operator regarding the dependency (e.g., "<")
+                    So typically, with this two, you know that a dep is for instance < 1.0
         """
         out = p['name']
         if p['version']:
             sign_only = p['version'].strip('1234567890.')
             if (p['op'] == None and sign_only == ""):
+                " Special case: a version is specified but no operator
+                "
                 p['op'] = "="
             else:
-                p['op'] = sign_only
+                " Normal case: we get the version and the operator to create the dependency string
+                "
                 p['version'] = p['version'].strip('<=>')
             out += ' %s %s' % (p['op'], p['version'])
         return out
