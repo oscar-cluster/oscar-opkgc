@@ -263,7 +263,7 @@ class DependsFactory(object):
         # load deps for api, server, client
         for pn in self.getPartNames():
             part = xmldoc.find("/%s" % pn)
-            if part:
+            if part is not None:
                 self.__loadPartDeps__(pn, part)
 
         # load deps at opkg level
@@ -279,6 +279,7 @@ class DependsFactory(object):
                     
                 pkgList = r.findall("pkg")
                 for pkg in pkgList:
+                    Logger().info ("Titi %s" % pkg.get("rel"))
                     p = PackageDeps(name=pkg.text,
                                     op=pkg.get("rel"),
                                     version=pkg.get("version"),
@@ -295,7 +296,7 @@ class DependsFactory(object):
         dists = []
         archs = []
 
-        if e:
+        if e is not None:
             for df in e.findall('dist'):
                 d = DistFilter(name=df.text,
                                op=df.get("rel"),

@@ -1,3 +1,6 @@
+0.4.6 (not yet released):
+    * Avoid warnings when using Python-2.6.
+
 0.4.5:
 	* Fix problem on Debian platforms:
 		* Copy correctly the different files of the OPKG so the Debian
