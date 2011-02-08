@@ -28,14 +28,14 @@
 import sys
 import getopt
 import re
-from Opkgc.Compiler import *
-from Opkgc.Config import *
-from Opkgc.Logger import *
+from OpkgcLib.Compiler import *
+from OpkgcLib.Config import *
+from OpkgcLib.Logger import *
 
-version = '''opkgc 0.4
+version = '''opkgc 0.5
 
 Copyright (C) 2007 IRISA-INRIA
-              2007-2010 ORNL
+              2007-2011 ORNL
 This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
