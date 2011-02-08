@@ -110,12 +110,12 @@ class RpmSpec(PkgDescription):
         if p['version']:
             sign_only = p['version'].strip('1234567890.')
             if (p['op'] == None and sign_only == ""):
-                " Special case: a version is specified but no operator
-                "
+                """ Special case: a version is specified but no operator
+                """
                 p['op'] = "="
             else:
-                " Normal case: we get the version and the operator to create the dependency string
-                "
+                """ Normal case: we get the version and the operator to create the dependency string
+                """
                 p['version'] = p['version'].strip('<=>')
             out += ' %s %s' % (p['op'], p['version'])
         return out
