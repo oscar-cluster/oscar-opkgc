@@ -151,7 +151,7 @@ class DebDescription(PkgDescription):
         return [ DebSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
 
     # This is a big mess, there is not a single comment! We should trash it
-    # and restart.
+    # and restart. 
     # Desc ?????
     def getPackageFiles(self, part):
         list = [ DebSourceFile(f)

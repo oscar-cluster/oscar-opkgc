@@ -97,8 +97,8 @@ class OpkgDescription(object):
                 configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
                 files.append(configuratorFile)
 
-        # [GVALLEE] we also need to make sure the following scripts are
-        # included
+        # [GVALLEE] we also need to make sure the following scripts are 
+        # included. 
         # [20090330] I fixed a bug that may prevent previous code to do that.
         # So maybe the following code is not necessary anymore.
         scripts = ["api-pre-install", "api-post-install", "api-pre-uninstall", "api-post-uninstall", "server-pre-install", "server-post-install", "server-pre-uninstall", "server-post-uninstall", "client-pre-install", "client-post-install", "client-pre-uninstall", "client-post-uninstall", "api-post-clientdef", "api-post-image", ""]
@@ -106,6 +106,14 @@ class OpkgDescription(object):
             if os.path.exists(os.path.join(self.opkgdir, "scripts", scriptPath)):
                 scriptFile = OpkgFile(self.getPackageName(), os.path.join("scripts",scriptPath))
                 scriptFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
+                # By default, we set the part of the script to Unknown
+                scriptFile['part'] = "Unknowm"
+                if scriptPath.startswith ("api"):
+                    scriptFile['part'] = "api"
+                if scriptPath.startswith ("server"):
+                    scriptFile['part'] = "server"
+                if scriptPath.startswith ("client"):
+                    scriptFile['part'] = "client"
                 files.append(scriptFile)
 
         return files
