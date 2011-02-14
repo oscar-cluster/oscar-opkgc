@@ -1,4 +1,4 @@
-0.5.1 (not yet released):
+0.6.0 (not yet released):
     * On Debian, put the scripts in the correct OPKG packages (correctly deal 
       with the part
 
