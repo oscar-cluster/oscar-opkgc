@@ -1,6 +1,8 @@
 0.6.0 (not yet released):
     * On Debian, put the scripts in the correct OPKG packages (correctly deal 
       with the part
+    * The old "setup" script corresponds to "api-pot-install" and not 
+      "api-pre-install", so i updated opkg-convert.
 
 0.5.0:
     * Avoid warnings when using Python-2.6.
