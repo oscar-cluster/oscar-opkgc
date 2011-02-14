@@ -312,7 +312,7 @@ function convert_scripts() {
     for script in $scripts; do
 	s=''
 	case `basename $script` in
-	    setup)                     s='api-pre-install';;
+	    setup)                     s='api-post-install';;
 	    pre_configure)             s='api-pre-configure';;
 	    post_configure)            s='api-post-configure';;
 	    post_clients)              s='api-post-clientdef';;
