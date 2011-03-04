@@ -3,6 +3,8 @@
       with the part
     * The old "setup" script corresponds to "api-pot-install" and not 
       "api-pre-install", so i updated opkg-convert.
+    * Move the files for the creation of binary packages directly into the
+      source code (easier to maintain).
 
 0.5.0:
     * Avoid warnings when using Python-2.6.
