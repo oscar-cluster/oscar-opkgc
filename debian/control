@@ -1,0 +1,22 @@
+Source: opkgc
+Section: devel
+Priority: optional
+Maintainer: OSCAR Core Team <oscar-devel@lists.sourceforge.net>
+Uploaders: Jean Parpaillon <jean.parpaillon@irisa.fr>
+Build-Depends: debhelper (>= 5), dpkg-dev (>= 1.13), autotools-dev, python-all-dev, python-central (>= 0.5), xmlto, dblatex, rsync, m4
+Standards-Version: 3.7.2
+XS-Python-Version: >= 2.4
+
+Package: opkgc
+Architecture: all
+Depends: ${python:Depends}, python-lxml, python-cheetah, dpkg-dev (>= 1.13), make, rpm, xsltproc
+Provides: ${python:Provides}
+XB-Python-Version: ${python:Versions}
+Description: Transform OSCAR Package into .deb or RPM
+ opkgc is a tool, written in Python and Cheetah templates, which
+ transform an OSCAR [1] package description into RPM or Debian
+ packages.
+ .
+ It is part of the OSCAR Project.
+ .
+  http://oscar.openclustergroup.org

@@ -1,0 +1,69 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+PACKAGE_NAME=opkgc
+MODULE_NAME=opkgc
+
+DEB_UPSTREAM_VERSION=$(shell dpkg-parsechangelog \
+	| grep ^Version: | cut -d ' ' -f 2 | cut -d '-' -f 1)
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f *-stamp
+	rm -rf dist build
+	find . -name *\.py[co] -exec rm {} \;
+	dh_clean
+
+config.status:
+	dh_testdir
+	./configure \
+	  --prefix=/usr \
+	  --mandir=\$${prefix}/share/man \
+	  --disable-doc-pdf \
+	  --enable-html-doc
+
+build: build-arch build-indep
+
+build-arch: build-arch-stamp
+build-arch-stamp: config.status
+	touch $@
+
+build-indep: build-indep-stamp
+build-indep-stamp: config.status
+	dh_testdir
+	$(MAKE)
+	touch $@
+
+install: install-stamp
+install-stamp: build
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/${PACKAGE_NAME}
+	# delete manpages in HTML
+	rm -f $(CURDIR)/debian/${PACKAGE_NAME}/usr/share/doc/opkgc/*.1.html
+	rm -f $(CURDIR)/debian/${PACKAGE_NAME}/usr/share/doc/opkgc/*.5.html
+	touch $@
+
+binary: binary-arch binary-indep
+
+binary-arch: build install
+
+binary-indep: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+binary-common:
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs ChangeLog
+#	dh_installdocs
+	dh_pycentral
+	dh_strip
+	dh_compress -X.py
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+.PHONY: build clean binary binary-arch binary-indep install configure
