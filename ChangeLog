@@ -1,4 +1,4 @@
-0.6.0 (not yet released):
+0.6.0:
     * On Debian, put the scripts in the correct OPKG packages (correctly deal 
       with the part
     * The old "setup" script corresponds to "api-pot-install" and not 
