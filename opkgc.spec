@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        0.6.0
-Release:        1
+Release:        2
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -24,8 +24,12 @@ It includes the opkg-convert tool to convert OSCAR packages from old form to cur
 
 
 %build
+# On some distros, the NEWS file is NOT created automatically when missing
+touch NEWS
+autoreconf -f -i -s
+
 ./configure --prefix=/usr
-make
+%__make
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -49,6 +53,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Mon May 30 2011 Geoffroy Vallee <valleegr@ornl.gov> 0.6.0-2
+- Run autoreconf before configure.
 * Fri Mar 04 2011 Geoffroy Vallee <valleegr@ornl.gov> 0.6.0-1
 - Update from upstream (0.6.0).
 * Tue Feb 08 2011 Geoffroy Vallee <valleegr@ornl.gov> 0.5.0-1
