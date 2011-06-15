@@ -287,7 +287,6 @@ class DependsFactory(object):
                     
                 pkgList = r.findall("pkg")
                 for pkg in pkgList:
-                    Logger().info ("Titi %s" % pkg.get("rel"))
                     p = PackageDeps(name=pkg.text,
                                     op=pkg.get("rel"),
                                     version=pkg.get("version"),
