@@ -1,6 +1,9 @@
 0.6.1 (not yet released):
     * Patch for ScientificLinux 6.0: run autoreconf before configure (patch
       from Olivier Lahaye).
+    * When generating RPMs, do not fail if files are installed but unpackaged
+      (we copy some files we do not actually need).
+    * Code clean-up.
 
 0.6.0:
     * On Debian, put the scripts in the correct OPKG packages (correctly deal 
