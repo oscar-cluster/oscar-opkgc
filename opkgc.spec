@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           opkgc
-Version:        0.6.0
-Release:        2
+Version:        1.0.0
+Release:        1
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -53,6 +53,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Mon Aug 07 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-1
+- Update from upstrean (1.0.0).
 * Mon May 30 2011 Geoffroy Vallee <valleegr@ornl.gov> 0.6.0-2
 - Run autoreconf before configure.
 * Fri Mar 04 2011 Geoffroy Vallee <valleegr@ornl.gov> 0.6.0-1

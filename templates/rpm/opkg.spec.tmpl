@@ -1,6 +1,10 @@
 # -*- Mode: rpm-spec -*-
 #
-%define _unpackaged_files_terminate_build 0
+#from OpkgcLib.Logger import *
+
+#if Logger().isDebug()
+    #silent $sys.stderr.write("[DEBUG] Cheetah compil: generating opkg-" + $name + ".spec\n")
+#end if
 Summary:        $summary
 Name:           opkg-$name
 Version:        $version('upstream')
@@ -57,9 +61,15 @@ This is the client part of $name.
 
 %build
 
+#if Logger().isDebug()
+    #silent $sys.stderr.write("[DEBUG] %install: step generation\n")
+#end if
 %install
 rm -fr \$RPM_BUILD_ROOT
 #for $f in $filelist
+#if Logger().isDebug()
+    #silent $sys.stderr.write("        %install: Need to copy: " + str($f.orig) + "\n")
+#end if
 mkdir -p \$RPM_BUILD_ROOT/$f.dest
 cp -r $f.orig \$RPM_BUILD_ROOT/$f.dest/
 #end for

@@ -5,8 +5,8 @@ opkgc is a tool, written in Python and Cheetah templates, which
 transform an OSCAR [1] package description into RPM or Debian
 packages.
 
-Requirements:
--------------
+Requirements
+------------
 
 opkgc depends on:
 - Python (>= 2.4)
@@ -25,6 +25,13 @@ order (the last available will be the right one):
 1/ /etc/opkgc.conf
 2/ ~/.opkgc
 3/ ./opkgc.conf
+
+Build the Debian Package
+------------------------
+dpkg-buildpackage -us -uc
+
+References
+----------
 
 [1] http://oscar.openclustergroup.org/
 [2] http://docs.python.org/lib/module-ConfigParser.html

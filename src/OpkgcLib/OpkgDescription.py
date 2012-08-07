@@ -83,7 +83,7 @@ class OpkgDescription(object):
         files.extend(self.getScripts())
         files.extend(self.getDocFiles())
         files.extend(self.getTestingFiles())
-        
+
         configFile = OpkgFile(self.getPackageName(), "config.xml")
         configFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
         files.append(configFile)
@@ -96,26 +96,6 @@ class OpkgDescription(object):
                 configuratorFile = OpkgFile(self.getPackageName(), configuratorPath)
                 configuratorFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
                 files.append(configuratorFile)
-
-        # [GVALLEE] we also need to make sure the following scripts are 
-        # included. 
-        # [20090330] I fixed a bug that may prevent previous code to do that.
-        # So maybe the following code is not necessary anymore.
-        scripts = ["api-pre-install", "api-post-install", "api-pre-uninstall", "api-post-uninstall", "server-pre-install", "server-post-install", "server-pre-uninstall", "server-post-uninstall", "client-pre-install", "client-post-install", "client-pre-uninstall", "client-post-uninstall", "api-post-clientdef", "api-post-image", ""]
-        for scriptPath in scripts:
-            if os.path.exists(os.path.join(self.opkgdir, "scripts", scriptPath)):
-                scriptFile = OpkgFile(self.getPackageName(), os.path.join("scripts",scriptPath))
-                scriptFile['dest'] = os.path.join("var", "lib", "oscar", "packages", self.getPackageName())
-                # By default, we set the part of the script to Unknown
-                scriptFile['part'] = "Unknowm"
-                if scriptPath.startswith ("api"):
-                    scriptFile['part'] = "api"
-                if scriptPath.startswith ("server"):
-                    scriptFile['part'] = "server"
-                if scriptPath.startswith ("client"):
-                    scriptFile['part'] = "client"
-                files.append(scriptFile)
-
         return files
 
     def getVersion(self, part=None):
@@ -181,7 +161,7 @@ class ConfigXml(UserDict):
         for a in arch:
             Logger().debug ("-> Arch " + a)
         for d in dists:
-            Logger().debug ("-> Dist " + d)
+            Logger().debug ("-> Dist " + d['name'])
         l = self.xmldoc.findall('serverDeps/requires/filters/arch')
         Logger().info("Number of arch filters: %d" % len(l))
         return arch
@@ -376,7 +356,7 @@ class OpkgFile(UserDict):
     def __init__(self, pkg, filename):
         UserDict.__init__(self)
         self['pkg'] = pkg
-        self['part'] = 'api'
+        self['part'] = 'api' # By default: part = api
         # path relative to opkg
         self['orig'] = filename
         self['basename'] = os.path.basename(filename)
@@ -402,13 +382,13 @@ class OpkgScript(OpkgFile):
         OpkgFile.__init__(self, pkg, filename)
         self['native'] = self.__isNative__()
 
-        part = self.__extract__('part')
+        part = self.__extract__('part') # api|client|server
         if part:
             self['part'] = part
         else:
-            self['part'] = 'api'
-        self['time'] = self.__extract__('time')
-        self['action'] = self.__extract__('action')
+            self['part'] = 'api' # Unknown part => api (OL: redundant with __init__)
+        self['time'] = self.__extract__('time') # pre|post
+        self['action'] = self.__extract__('action') # install|uninstall
         self['dest'] = os.path.join("var", "lib", "oscar", "packages", pkg)
 
     def __isNative__(self):
@@ -416,9 +396,9 @@ class OpkgScript(OpkgFile):
         {pre|post}{inst|rm} scripts
         name: basename of the script
         """
-        return self.scriptRe.match(self['basename'])
+        return self.scriptRe.match(self['basename']) # Matches pkg name at the beginning of the script name or None
 
-    def __extract__(self, group):
+    def __extract__(self, group): # group = part|time|action
         m = self.scriptRe.match(self['basename'])
         if m:
             return m.group(group)

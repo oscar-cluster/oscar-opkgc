@@ -65,39 +65,46 @@ class RpmSpec(PkgDescription):
                     nc['name'] = "OPKG::%s" % c['name']
                     deps.append(nc)
 
-            if len(deps) != 0:
+            if len(deps) != 0: # if there are some dependncies
                 archout = ""
-                if arch != None:
+                if arch != None: # if there is a specific arch, report it
                     archout += "%%if %%{_build_arch} == %s\n" % arch
-                archout += "%s: " % self.dependsName[relation]
-                pkg_d = {}
-                ver_d = {}
+                pkg_d = {} # memory for processed deps
+                ver_d = {} # flags for each filters. (if not in: create section)
+                version=-1 # no version for generic requirements.
                 for i, d in enumerate(deps):
-                    if len(d) != 0:
-                        xs = d['dist']
-                        for x in xs:
-                            if x['version'] != None: 
+                    if len(d) != 0: # non empty deps
+                        xs = d['dist'] # dependancy filter (os, version, ...)
+                        for x in xs:   # scann all filters for this "requires"
+                            if x['version'] != None:  # filter exists
                                 xx = x['version']
-                                if xx not in ver_d:
-                                    ver_d[xx] = 1
-                                    xx = self.replace_comp_sign(xx)
+                                if xx != version and version != -1:
+                                    archout += "\n%endif\n"
+                                    archout += "%endif\n"
+                                version = xx # keep version tracking so we can add endif when changing.
+                                if xx not in ver_d:   # 1st time we see this version => create section
+                                    ver_d[xx] = 1     # remember section created
+                                    xx = self.replace_comp_sign(xx) # convert comparison sign
                                     archout += "\n%%if %%{%s}" % distro_d[x['name']]
                                     archout += "\n%%define is_version %%(test %%{vtag} %s && echo 1 || echo 0)" % xx
                                     archout += "\n%if %{is_version}\n"
                                     archout += "%s: " % self.dependsName[relation]
+                                else:
+                                    archout += ', ' # section exists, just add a ","
+                        if len(pkg_d) == 0: # 1st relation:
+                            archout += "%s: " % self.dependsName[relation]
+                        elif version == -1: # still processing generic requirements
+                            archout += ', ' # section exists, jsut add a ","
+                        pkg_d[self.formatPkg(d)] = 1 # package processed
                     	archout += self.formatPkg(d)
-                    if ((len(deps) > 1) and (i < len(deps) - 1)):
-                        archout += ', '
-                    elif self.formatPkg(d) not in pkg_d and len(ver_d) != 0:
-                        pkg_d[self.formatPkg(d)] = 1
-                        archout += "\n%endif\n"
-                        archout += "%endif\n"
+                if version != -1:
+                    archout += "\n%endif\n"
+                    archout += "%endif\n"
                 archout += "\n"
-                if arch != None:
+                if arch != None: # OL: Still usefull?
                     archout += "%endif\n"
                 archout += "\n"
                 out += archout
-
         return out
 
     def formatPkg(self, p):
