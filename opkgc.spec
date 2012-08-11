@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        1.0.0
-Release:        1
+Release:        2
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -26,34 +26,37 @@ It includes the opkg-convert tool to convert OSCAR packages from old form to cur
 %build
 # On some distros, the NEWS file is NOT created automatically when missing
 touch NEWS
-autoreconf -f -i -s
+#autoreconf -f -i -s
+./autogen.sh
 
 ./configure --prefix=/usr
 %__make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+%__make install DESTDIR=$RPM_BUILD_ROOT
  
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc 
+%doc AUTHORS ChangeLog COPYING README INSTALL RELEASE
 %{python_sitelib}/*
 %{_bindir}/opkgc
 %{_bindir}/opkg-convert
 %{_datadir}/%{name}/
-#%{_defaultdocdir}/%{name}/
-#%{_mandir}/man1/opkgc.1.gz
-#%{_mandir}/man5/opkg.5.gz
-/usr/man/man1/opkgc.1.gz
-/usr/man/man5/opkg.5.gz
+%{_defaultdocdir}/%{name}/
+%{_mandir}/man1/opkgc.1.gz
+%{_mandir}/man5/opkg.5.gz
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
-* Mon Aug 07 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-1
+* Wed Aug 09 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-2
+- Updated build step using autogen
+- Updated file section (doc and use macro instead of
+  hardcoded paths)
+* Tue Aug 07 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-1
 - Update from upstrean (1.0.0).
 * Mon May 30 2011 Geoffroy Vallee <valleegr@ornl.gov> 0.6.0-2
 - Run autoreconf before configure.

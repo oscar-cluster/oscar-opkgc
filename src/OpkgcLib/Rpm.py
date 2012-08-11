@@ -65,7 +65,7 @@ class RpmSpec(PkgDescription):
                     nc['name'] = "OPKG::%s" % c['name']
                     deps.append(nc)
 
-            if len(deps) != 0: # if there are some dependncies
+            if len(deps) != 0: # if there are some dependencies
                 archout = ""
                 if arch != None: # if there is a specific arch, report it
                     archout += "%%if %%{_build_arch} == %s\n" % arch
