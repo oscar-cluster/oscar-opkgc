@@ -168,7 +168,11 @@ class RPMCompiler:
             if Tools.command("%s --clean -bb %s" % (self.buildCmd, specfile), "./"):
                 Logger().info("Moving generated files to %s" % self.dest_dir)
                 for file in glob.glob(os.path.join(self.getMacro('%_rpmdir'), "*/opkg-%s*.rpm" % self.opkgName)):
-                    Logger().info("Moving files: %s" % file)
+                    dest_file = os.path.join(self.dest_dir, os.path.basename(file))
+                    if os.path.exists(dest_file):
+                        Logger().info("Removing existing file: %s" % dest_file)
+                        os.unlink(dest_file)
+                    Logger().info("Moving file: %s" % file)
                     shutil.move(file, self.dest_dir)
             else:
                 Logger().error("Binary package generation failed")

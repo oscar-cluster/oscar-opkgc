@@ -7,6 +7,8 @@
     * Better rpm requirements processing msg09108 from Olivier LAHAYE
     * Fix scripts files enumeration so there a no missing files an no
       duplicate
+    * Delete the destination directory is it already exists (patch from
+      Olivier Lahaye).
 
 0.6.0:
     * On Debian, put the scripts in the correct OPKG packages (correctly deal 
