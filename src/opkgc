@@ -32,7 +32,7 @@ from OpkgcLib.Compiler import *
 from OpkgcLib.Config import *
 from OpkgcLib.Logger import *
 
-version = '''opkgc 0.6.0
+version = '''opkgc 1.0.0
 
 Copyright (C) 2007 IRISA-INRIA
               2007-2011 ORNL

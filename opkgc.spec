@@ -52,7 +52,7 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
-* Wed Aug 09 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-2
+* Sun Sep 30 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-2
 - Updated build step using autogen
 - Updated file section (doc and use macro instead of
   hardcoded paths)

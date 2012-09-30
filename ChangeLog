@@ -1,4 +1,4 @@
-1.0.0 (not yet released):
+1.0.0:
     * Patch for ScientificLinux 6.0: run autoreconf before configure (patch
       from Olivier Lahaye).
     * When generating RPMs, do not fail if files are installed but unpackaged
