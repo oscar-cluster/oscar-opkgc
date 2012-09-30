@@ -9,6 +9,7 @@
       duplicate
     * Delete the destination directory is it already exists (patch from
       Olivier Lahaye).
+    * Fix a debian template (do not use special characters).
 
 0.6.0:
     * On Debian, put the scripts in the correct OPKG packages (correctly deal 
