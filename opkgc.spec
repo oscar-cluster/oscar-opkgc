@@ -1,7 +1,7 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           opkgc
-Version:        1.0.0
+Version:        1.0.1
 Release:        2
 Summary:        Compiler for OSCAR package
 
@@ -52,6 +52,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Wed Nov 14 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.1-1
+- Update from upstrean (1.0.1).
 * Sun Sep 30 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-2
 - Updated build step using autogen
 - Updated file section (doc and use macro instead of

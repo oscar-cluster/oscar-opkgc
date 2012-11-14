@@ -1,3 +1,15 @@
+opkgc (1.0.1-1) precise; urgency=low
+
+  * New upstream version.
+
+ -- Geoffroy Vallee <valleegr@ornl.gov>  Wed, 14 Nov 2012 13:05:14 -0500
+
+opkgc (1.0.1-1) precise; urgency=low
+
+  * New upstream version.
+
+ -- Geoffroy Vallee <valleegr@ornl.gov>  Wed, 14 Nov 2012 13:01:24 -0500
+
 opkgc (1.0.0-1) lucid; urgency=low
 
   * New upstream version.

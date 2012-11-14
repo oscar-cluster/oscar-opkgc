@@ -1,3 +1,6 @@
+1.0.1 (not yet released):
+    * Fix a debian template (do not use special characters).
+
 1.0.0:
     * Patch for ScientificLinux 6.0: run autoreconf before configure (patch
       from Olivier Lahaye).
@@ -9,7 +12,6 @@
       duplicate
     * Delete the destination directory is it already exists (patch from
       Olivier Lahaye).
-    * Fix a debian template (do not use special characters).
 
 0.6.0:
     * On Debian, put the scripts in the correct OPKG packages (correctly deal 
