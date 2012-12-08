@@ -1,4 +1,4 @@
-1.0.1 (not yet released):
+1.0.1:
     * Fix a debian template (do not use special characters).
 
 1.0.0:
