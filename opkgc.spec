@@ -27,7 +27,7 @@ It includes the opkg-convert tool to convert OSCAR packages from old form to cur
 # On some distros, the NEWS file is NOT created automatically when missing
 touch NEWS
 #autoreconf -f -i -s
-./autogen.sh
+#./autogen.sh WHEN CREATING THE RPM FROM THE TARBAL AUTOGEN IS **NOT** AVAILABLE!!!!!!!!
 
 ./configure --prefix=/usr
 %__make
@@ -41,14 +41,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc AUTHORS ChangeLog COPYING README INSTALL RELEASE
+#%doc AUTHORS ChangeLog COPYING README INSTALL RELEASE ** THIS IS SIMPLY ALL BROKEN ON CENTOS 6 **
 %{python_sitelib}/*
 %{_bindir}/opkgc
 %{_bindir}/opkg-convert
 %{_datadir}/%{name}/
 %{_defaultdocdir}/%{name}/
-%{_mandir}/man1/opkgc.1.gz
-%{_mandir}/man5/opkg.5.gz
+#%{_mandir}/man1/opkgc.1.gz THIS DOES NOT WORK ON CENTOS 6
+#%{_mandir}/man5/opkg.5.gz THIS DOES NOT WORK ON CENTOS 6
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog

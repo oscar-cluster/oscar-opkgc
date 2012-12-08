@@ -1,3 +1,6 @@
+1.0.2 (not yet released):
+    * Modify the spec file so it can be used out of the box on CentOS 6.
+
 1.0.1:
     * Fix a debian template (do not use special characters).
 
