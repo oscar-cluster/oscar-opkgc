@@ -41,7 +41,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-#%doc AUTHORS ChangeLog COPYING README INSTALL RELEASE ** THIS IS SIMPLY ALL BROKEN ON CENTOS 6 **
+%doc AUTHORS ChangeLog COPYING README INSTALL
 %{python_sitelib}/*
 %{_bindir}/opkgc
 %{_bindir}/opkg-convert
