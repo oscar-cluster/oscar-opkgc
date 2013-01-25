@@ -13,7 +13,7 @@ AC_INIT([opkgc], [1.0.1], [oscar-devel@lists.sourceforge.net])
 dnl check host and target
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
+dnl AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
