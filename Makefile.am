@@ -5,3 +5,4 @@
 # 	Jean PARPAILLON <jean.parpaillon@irisa.fr>
 #
 SUBDIRS = src conf templates doc
+EXTRA_DIST = opkgc.spec
