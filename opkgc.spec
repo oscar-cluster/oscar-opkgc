@@ -22,18 +22,15 @@ It includes the opkg-convert tool to convert OSCAR packages from old form to cur
 %prep
 %setup -q
 
-
 %build
-# On some distros, the NEWS file is NOT created automatically when missing
-touch NEWS
 #autoreconf -f -i -s
-#./autogen.sh WHEN CREATING THE RPM FROM THE TARBAL AUTOGEN IS **NOT** AVAILABLE!!!!!!!!
+%configure
 
-./configure --prefix=/usr
-%__make
+%{__make} %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
+# cannot use makeinstall macro because pkgdatadir= is not part of the macro.
 %__make install DESTDIR=$RPM_BUILD_ROOT
  
 %clean
@@ -47,11 +44,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/opkg-convert
 %{_datadir}/%{name}/
 %{_defaultdocdir}/%{name}/
-#%{_mandir}/man1/opkgc.1.gz THIS DOES NOT WORK ON CENTOS 6
-#%{_mandir}/man5/opkg.5.gz THIS DOES NOT WORK ON CENTOS 6
+%{_mandir}/man1/opkgc.1*
+%{_mandir}/man5/opkg.5*
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Thu Dec 13 2012 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-2
+- Use macros when possible.
+- Fix man packaging.
+- Fix doc packaging.
 * Wed Nov 14 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.1-1
 - Update from upstrean (1.0.1).
 * Sun Sep 30 2012 Geoffroy Vallee <valleegr@ornl.gov> 1.0.0-2
