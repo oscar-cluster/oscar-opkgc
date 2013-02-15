@@ -11,8 +11,8 @@ dnl mandatory stuff
 AC_INIT([opkgc], [1.0.1], [oscar-devel@lists.sourceforge.net])
 
 dnl check host and target
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
+dnl AC_CANONICAL_BUILD
+dnl AC_CANONICAL_HOST
 dnl AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE
