@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        1.0.1
-Release:        2
+Release:        3
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -12,7 +12,7 @@ Source0:        opkgc-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
-#BuildRequires:  python-devel, xmlto
+BuildRequires:  python-devel, xmlto
 #Requires: 	libxslt, python-lxml, python-cheetah
 
 %description
@@ -49,6 +49,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Sun Mar 10 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-3
+- Restored BuildRequires (xmlto is needed to generate mans)
 * Thu Dec 13 2012 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-2
 - Use macros when possible.
 - Fix man packaging.
