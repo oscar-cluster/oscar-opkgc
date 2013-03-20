@@ -33,7 +33,7 @@ docdir=@docdir@
 htmldir=@htmldir@
 pdfdir=@docdir@
 mandir=@mandir@
-mkdir_p = @mkdir_p@
+mkdir_p =@MKDIR_P@
 INSTALL = @install_sh@
 INSTALL_DATA = @INSTALL_DATA@
 
