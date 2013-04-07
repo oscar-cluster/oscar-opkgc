@@ -10,3 +10,7 @@ then
 	echo "  --> Moving ${RPMS/\n/ /} to ${PKGDEST}/"
 	mv -f ${RPMS/\n/ /} ${PKGDEST}/
 fi
+
+# remove the Makefile to prevent for a second build attempt (make rpm) that would fail
+# as there is no rpm: rule.
+make distclean
