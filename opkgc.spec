@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           opkgc
-Version:        1.0.1
-Release:        3
+Version:        1.0.2
+Release:        0.1
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -49,6 +49,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Sun Apr 16 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-0.1
+- v1.0.2 prerelease for testing.
 * Sun Mar 10 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-3
 - Restored BuildRequires (xmlto is needed to generate mans)
 * Thu Dec 13 2012 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-2

@@ -1,5 +1,7 @@
 1.0.2 (not yet released):
     * Modify the spec file so it can be used out of the box on CentOS 6.
+    * build the package from the --source directory instead of the --output
+      directory. This avoids having unwanted files in the --output directory.
 
 1.0.1:
     * Fix a debian template (do not use special characters).
