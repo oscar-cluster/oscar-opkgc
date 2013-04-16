@@ -73,11 +73,13 @@ class Compiler:
         tempdir = tempfile.mkdtemp('.opkgc')
         sourcedir = "opkg-%s-%s" % (self.pkgName, opkgDesc.getVersion('upstream'))
         tardir = os.path.join(tempdir, sourcedir)
-        tarname = os.path.join(self.dest_dir, "%s.tar.gz" % sourcedir)
+        tarfile = "%s.tar.gz" % sourcedir
+        tarname = os.path.join(opkgDesc.opkgdir, tarfile)
+        filelist_filter = "SRPMS|distro|%s" % tarname
         
         os.mkdir(tardir, 0755)
         filelist = [ os.path.join(opkgDesc.opkgdir, f)
-                     for f in Tools.ls(opkgDesc.opkgdir, exclude='SRPMS|distro') ]
+                     for f in Tools.ls(opkgDesc.opkgdir, exclude=filelist_filter) ]
         Tools.copy(filelist, tardir, exclude='\.svn|.*~$')
 
         if not Tools.tar(tarname, [sourcedir], tempdir):
@@ -199,17 +201,17 @@ class DebCompiler:
         self.opkgName = opkgDesc.getPackageName()
 
     def run(self, tarfile, targets):
-        sourcedir = os.path.join(self.dest_dir,
+        sourcedir = os.path.join(self.opkgDesc.opkgdir,
                                  "opkg-%s-%s" % (self.opkgName, self.opkgDesc.getVersion('upstream')))
         # Rename tar to follow Debian non-native package rule
-        debtarfile = os.path.join(self.dest_dir,
+        debtarfile = os.path.join(self.opkgDesc.opkgdir,
                                   "opkg-%s_%s.orig.tar.gz" % (self.opkgName, self.opkgDesc.getVersion('upstream')))
         os.rename(tarfile, debtarfile)
         
         # Uncompress tar
         if os.path.exists(sourcedir):
             Tools.rmDir(sourcedir)
-        if not Tools.untar(debtarfile, self.dest_dir):
+        if not Tools.untar(debtarfile, self.opkgDesc.opkgdir):
             Logger().error("Error while extracting tar file: %s" % debtarfile)
             raise SystemExit(1)
 
@@ -314,3 +316,12 @@ class DebCompiler:
         else:
             Logger().error("Packages generation failed")
             raise SystemExit(1)
+
+        # Now, move the packages from self.opkgDesc.opkgdir/../*.deb to self.dest_dir
+        for file in glob.glob(os.path.join(self.opkgDesc.opkgdir, "opkg-%s*.deb" % self.opkgName)):
+            dest_file = os.path.join(self.dest_dir, os.path.basename(file))
+            if os.path.exists(dest_file):
+                 Logger().info("Removing existing file: %s" % dest_file)
+                 os.unlink(dest_file)
+            Logger().info("Moving file: %s" % file)
+            shutil.move(file, self.dest_dir)
