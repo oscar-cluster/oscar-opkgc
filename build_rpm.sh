@@ -4,7 +4,7 @@
 make dist
 yum -y install python-devel xmlto
 
-RPMS="$(LC_ALL=C rpmbuild -tb opkgc-1.0.1.tar.gz |grep ^Wrote:|cut -d' ' -f2)"
+RPMS="$(LC_ALL=C rpmbuild -tb opkgc-1.0.2.tar.gz |grep ^Wrote:|cut -d' ' -f2)"
 
 if test -d "$PKGDEST"
 then

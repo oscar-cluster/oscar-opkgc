@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        1.0.2
-Release:        0.1
+Release:        1
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -49,10 +49,10 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
-* Sun Apr 16 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-0.1
-- v1.0.2 prerelease for testing.
+* Mon Jun  3 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-1
+- New upstream version.
 * Sun Mar 10 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-3
-- Restored BuildRequires (xmlto is needed to generate mans)
+- Restored BuildRequires (xmlto is needed to generate mans).
 * Thu Dec 13 2012 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-2
 - Use macros when possible.
 - Fix man packaging.
