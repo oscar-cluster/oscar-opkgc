@@ -16,13 +16,16 @@ clean:
 	find . -name *\.py[co] -exec rm {} \;
 	dh_clean
 
-config.status:
+configure: autogen.sh
+	./autogen.sh
+
+config.status: configure
 	dh_testdir
 	./configure \
 	  --prefix=/usr \
 	  --mandir=\$${prefix}/share/man \
 	  --disable-doc-pdf \
-	  --enable-html-doc
+	  --enable-doc-html
 
 build: build-arch build-indep
 
