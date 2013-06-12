@@ -1,8 +1,8 @@
 #!/bin/bash
+yum -y install python-devel xmlto autoconf automake
 ./autogen.sh
 ./configure
 make dist
-yum -y install python-devel xmlto
 
 RPMS="$(LC_ALL=C rpmbuild -tb opkgc-1.0.2.tar.gz |grep ^Wrote:|cut -d' ' -f2)"
 
