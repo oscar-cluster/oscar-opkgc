@@ -1,5 +1,5 @@
 #!/bin/bash
-apt-get install -y autotools-dev automake autoconf python-all-dev xmlto dblatex
+apt-get install -y autotools-dev automake autoconf2.13 python-all-dev xmlto dblatex
 ./autogen.sh
 ./configure
 make dist
