@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        1.0.2
-Release:        1
+Release:        2
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -43,12 +43,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/opkgc
 %{_bindir}/opkg-convert
 %{_datadir}/%{name}/
-%{_defaultdocdir}/%{name}/
+%{_docdir}/%{name}/
 %{_mandir}/man1/opkgc.1*
 %{_mandir}/man5/opkg.5*
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Fri Oct 25 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-2
+- use _docdir instead of _defaultdocdir (SuSE packaging issue)
 * Mon Jun  3 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-1
 - New upstream version.
 * Sun Mar 10 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.1-3

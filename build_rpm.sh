@@ -1,5 +1,11 @@
 #!/bin/bash
-yum -y install python-devel xmlto autoconf automake
+if test -f /usr/bin/yum
+then
+    yum -y install python-devel xmlto autoconf automake
+else
+    yast -i python-devel xmlto autoconf automake
+fi
+
 ./autogen.sh
 ./configure
 make dist
