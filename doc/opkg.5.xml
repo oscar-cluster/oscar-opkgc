@@ -254,7 +254,7 @@
 	  All scripts which are not described as native scripts in
 	  <xref linkend="scriptstable" /> are installed with package
 	  <filename>opkg-&lt;package&gt;</filename> into
-	  <filename>/var/lib/oscar/packages/&lt;package&gt;</filename>.
+	  <filename>/usr/lib/oscar/packages/&lt;package&gt;</filename>.
 	</para>
 	<para>
 	  About <filename>api-pre-configure</filename> and
@@ -269,7 +269,7 @@
 
       <para>
 	All files in this directory are installed into
-	<filename>/var/lib/oscar/testing/&lt;package&gt;</filename>
+	<filename>/usr/lib/oscar/testing/&lt;package&gt;</filename>
 	directory by the <filename>opkg-&lt;package&gt;</filename>
 	package (hence on the server).
       </para>
@@ -338,7 +338,7 @@
       the package selection phase of the OSCAR Wizard all packages
       containing this file are processed by the Configurator. The
       results of this processing are written out in XML format in
-      <filename>/var/lib/oscar/packages/&lt;package&gt;/.configurator.values</filename>. At
+      <filename>/usr/lib/oscar/packages/&lt;package&gt;/.configurator.values</filename>. At
       this point, the <filename>api-post-configure</filename> scripts
       are fired so packages may read the results of the configuration
       phase. The Perl <varname>XML::Simple</varname> module is

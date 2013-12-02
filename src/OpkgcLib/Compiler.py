@@ -284,7 +284,7 @@ class DebCompiler:
                         dest = debiandir+"/opkg-"+self.opkgName
                     else:
                         dest = debiandir+"/opkg-"+self.opkgName+"-"+f['part']
-                    dest = dest+"/var/lib/oscar/packages/"+self.opkgName
+                    dest = dest+"/usr/lib/oscar/packages/"+self.opkgName
                     if not os.path.isfile(orig):
                         Logger().debug("File %s does not exist" % orig)
                     else:

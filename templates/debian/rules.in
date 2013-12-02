@@ -35,8 +35,8 @@ install-stamp:
 #	@echo "OPKG scripts: $(OPKG_SCRIPTS)"
 #	@$(foreach script, $(OPKG_SCRIPTS), (\
 #		if [ "$(script)" != "." ]; then \
-#			mkdir -p debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/;\
-#			cp -f scripts/$(script) debian/opkg-OPKGNAME/var/lib/oscar/packages/OPKGNAME/; \
+#			mkdir -p debian/opkg-OPKGNAME/usr/lib/oscar/packages/OPKGNAME/;\
+#			cp -f scripts/$(script) debian/opkg-OPKGNAME/usr/lib/oscar/packages/OPKGNAME/; \
 #		fi ) &&) /bin/true
 	touch $@
 

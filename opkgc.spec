@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           opkgc
-Version:        1.0.2
-Release:        2
+Version:        1.0.3
+Release:        1
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -49,6 +49,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Mon Dec 02 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.3-1
+- Migration from /var/lib/oscar/{package,testing} to /usr/lib/oscar (FHS)
 * Fri Oct 25 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-2
 - use _docdir instead of _defaultdocdir (SuSE packaging issue)
 * Mon Jun  3 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-1

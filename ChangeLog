@@ -1,3 +1,7 @@
+1.0.3:
+    * Migration from /var/lib/oscar/{packages,testing} to /usr/lib/oscar/
+    (FHS)
+
 1.0.2:
     * Modify the spec file so it can be used out of the box on CentOS 6.
     * build the package from the --source directory instead of the --output
