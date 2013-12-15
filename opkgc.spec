@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        1.0.3
-Release:        1
+Release:        2
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -49,6 +49,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Mon Dec 02 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.3-2
+- Got ride of AutoReqProv:no
 * Mon Dec 02 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.3-1
 - Migration from /var/lib/oscar/{package,testing} to /usr/lib/oscar (FHS)
 * Fri Oct 25 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.2-2
