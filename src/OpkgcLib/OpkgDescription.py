@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 #################################################################
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
@@ -371,7 +372,21 @@ class OpkgTest(OpkgFile):
 
     def __init__(self, pkg, filename):
         OpkgFile.__init__(self, pkg, filename)
-        self['dest'] = os.path.join("usr", "lib", "oscar", "testing", "%s" % pkg)
+        test_d_re = re.compile('.*tests\.d')
+        # Testing contains only directories.
+        # If it ends with test.d, the directory is already owned by oscar-base: we add /* to work only on its content.
+        if os.path.isdir (filename):
+            if test_d_re.match(filename):
+                self['orig'] = os.path.join(self['orig'],"*")
+                self['dest'] = os.path.join("usr", "lib", "oscar", "testing", self['basename'])
+                self['basename'] = "*" # When packaged, f.dest/f.basename becomes f.dest/* => we don't own the package.
+            else: # The is the "data/<pkg> dir" We need to own it.
+                self['orig'] = os.path.join(self['orig'],"*") # Need to work on files to reparent
+                self['dest'] = os.path.join("usr", "lib", "oscar", "testing", "data" ,"%s" % pkg) # New Path
+                self['basename'] = "" # When packaged, f.dest/f.basename becomes f.dest/ => we own the package.
+        else:
+            Logger().debug("Not a directory: (%s) => Moved into data. Please migrate to new apitest" % filename)
+            self['dest'] = os.path.join("usr", "lib", "oscar", "testing", "data" ,"%s" % pkg) # Moved into data dir.
 
 class OpkgScript(OpkgFile):
 
@@ -383,10 +398,7 @@ class OpkgScript(OpkgFile):
         self['native'] = self.__isNative__()
 
         part = self.__extract__('part') # api|client|server
-        if part:
-            self['part'] = part
-        else:
-            self['part'] = 'api' # Unknown part => api (OL: redundant with __init__)
+        self['part'] = part
         self['time'] = self.__extract__('time') # pre|post
         self['action'] = self.__extract__('action') # install|uninstall
         self['dest'] = os.path.join("usr", "lib", "oscar", "packages", pkg)
@@ -403,5 +415,5 @@ class OpkgScript(OpkgFile):
         if m:
             return m.group(group)
         else:
-            return ''
+            return 'api'
         
