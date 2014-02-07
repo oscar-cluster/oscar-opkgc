@@ -380,8 +380,8 @@ class OpkgTest(OpkgFile):
                 self['orig'] = os.path.join(self['orig'],"*")
                 self['dest'] = os.path.join("usr", "lib", "oscar", "testing", self['basename'])
                 self['basename'] = "*" # When packaged, f.dest/f.basename becomes f.dest/* => we don't own the package.
-            else: # The is the "data/<pkg> dir" We need to own it.
-                self['orig'] = os.path.join(self['orig'],"*") # Need to work on files to reparent
+            else: # This is the "data/<pkg> dir" We need to own it.
+                self['orig'] = os.path.join(self['orig'],"*") # We work on files to reparent
                 self['dest'] = os.path.join("usr", "lib", "oscar", "testing", "data" ,"%s" % pkg) # New Path
                 self['basename'] = "" # When packaged, f.dest/f.basename becomes f.dest/ => we own the package.
         else:
