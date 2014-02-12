@@ -61,39 +61,18 @@ This is the client part of $name.
 
 %build
 
-#if Logger().isDebug()
-    #silent $sys.stderr.write("[DEBUG] %install: step generation\n")
-#end if
 %install
 rm -fr \$RPM_BUILD_ROOT
-#for $f in $filelist
-#if Logger().isDebug()
-    #silent $sys.stderr.write("        %install: Need to copy: " + str($f.orig) + "\n")
-#end if
-mkdir -p \$RPM_BUILD_ROOT/$f.dest
-cp -r $f.orig \$RPM_BUILD_ROOT/$f.dest/
-#end for
+make install DESTDIR=\$RPM_BUILD_ROOT
 
 %clean
 rm -fr \$RPM_BUILD_ROOT
 
-%files server
-%defattr(-,root,root)
-#for $f in $filelist('server')
-/$f.dest/$f.basename
-#end for
+%files server -f %{name}-server.list
 
-%files client
-%defattr(-,root,root)
-#for $f in $filelist('client')
-/$f.dest/$f.basename
-#end for
+%files client -f %{name}-client.list
 
-%files
-%defattr(-,root,root)
-#for $f in $filelist('api')
-/$f.dest/$f.basename
-#end for
+%files -f %{name}.list
 
 %changelog
 #for $versionEntry in $changelog
