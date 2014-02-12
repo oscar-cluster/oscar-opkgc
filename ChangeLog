@@ -1,3 +1,8 @@
+2.0.0:
+    * Major rewrite of the Compiler to adapt to the new apitests filesystem
+    structure. Now use Makefile.tmpl so generated packages are the exact same
+    on debian and on rpm based distros.
+
 1.0.3:
     * Migration from /var/lib/oscar/{packages,testing} to /usr/lib/oscar/
     (FHS)

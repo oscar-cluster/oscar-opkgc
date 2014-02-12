@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           opkgc
-Version:        1.0.3
-Release:        2
+Version:        2.0.0
+Release:        1
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -49,6 +49,10 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Wed Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.0-1
+- Major rewrite of the compiler part to match new apitest filesystem
+  hierachy. Now use Makefile.tmpl so deb and rpm sides gets the
+  exact same packages.
 * Mon Dec 02 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.3-2
 - Got ride of AutoReqProv:no
 * Mon Dec 02 2013 Olivier Lahaye <olivier.lahaye@cea.fr> 1.0.3-1
