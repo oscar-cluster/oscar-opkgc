@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 ###################################################################
 # Copyright (c) 2007 INRIA-IRISA,
 #                    Jean Parpaillon <jean.parpaillon@inria.fr>
@@ -148,18 +149,23 @@ class DebDescription(PkgDescription):
         return ret
 
     def getSourceFiles(self):
-        return [ DebSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
+        return [DebSourceFile(f) for f in self.opkgDesc.getSourceFiles()]
 
-    # This is a big mess, there is not a single comment! We should trash it
-    # and restart. 
-    # Desc ?????
+    # Returns the list of file belonging to a specific opkg package (api, client or server)
     def getPackageFiles(self, part):
         list = [ DebSourceFile(f)
                 for f in self.opkgDesc.getSourceFiles()
                 if f['part'] == part ]
         return list
 
-    # DESC ????????
+    def filelist(self, part=None):
+        filelist = self.opkgDesc.getSourceFiles()
+        if part:
+            return [ f for f in filelist if f['part'] == part ]
+        else:
+            return filelist
+
+    # Returns the debian install file for a specific opkg package (api, client or server)
     def getInstallFile(self, part):
         if part == 'api':
             return "opkg-%s.install" % self.opkgDesc.getPackageName()
@@ -188,34 +194,37 @@ class DebDescription(PkgDescription):
 # DEPRECATED??
 class DebSourceFile(UserDict):
 
-    scriptsOrigDest = {'api-pre-install'      : 'opkg-%s.preinst',
-                       'api-post-install'     : 'opkg-%s.postinst',
-                       'api-pre-uninstall'    : 'opkg-%s.prerm',
-                       'api-post-uninstall'   : 'opkg-%s.postrm',
-                       'server-pre-install'   : 'opkg-server-%s.preinst',
-                       'server-post-install'  : 'opkg-server-%s.postinst',
-                       'server-pre-uninstall' : 'opkg-server-%s.prerm',
-                       'server-post-uninstall': 'opkg-server-%s.postrm',
-                       'client-pre-install'   : 'opkg-client-%s.preinst',
-                       'client-post-install'  : 'opkg-client-%s.postinst',
-                       'client-pre-uninstall' : 'opkg-client-%s.prerm',
-                       'client-post-uninstall': 'opkg-client-%s.postrm'}
-
     def __init__(self, opkgfile):
         UserDict.__init__(self, opkgfile)
-        basename = opkgfile['basename']
-        orig = opkgfile['orig']
-        part = opkgfile['part']
-        dirname = os.path.dirname(orig)
-
-        if (dirname == "scripts"):
-            try:
-                self['sourcedest'] = self.scriptsOrigDest[basename] % opkgfile['part']
-            except KeyError:
-                self['sourcedest'] = os.path.join("scripts", basename)
-        elif isinstance(opkgfile, OpkgDoc):
-            self['sourcedest'] = os.path.join("doc", basename)
-        elif isinstance(opkgfile, OpkgTest):
-            self['sourcedest'] = os.path.join("testing", basename)
-        else:
-            self['sourcedest'] = orig
+        self['sourcedest'] = opkgfile['dest']
+#    scriptsOrigDest = {'api-pre-install'      : 'opkg-%s.preinst',
+#                       'api-post-install'     : 'opkg-%s.postinst',
+#                       'api-pre-uninstall'    : 'opkg-%s.prerm',
+#                       'api-post-uninstall'   : 'opkg-%s.postrm',
+#                       'server-pre-install'   : 'opkg-server-%s.preinst',
+#                       'server-post-install'  : 'opkg-server-%s.postinst',
+#                       'server-pre-uninstall' : 'opkg-server-%s.prerm',
+#                       'server-post-uninstall': 'opkg-server-%s.postrm',
+#                       'client-pre-install'   : 'opkg-client-%s.preinst',
+#                       'client-post-install'  : 'opkg-client-%s.postinst',
+#                       'client-pre-uninstall' : 'opkg-client-%s.prerm',
+#                       'client-post-uninstall': 'opkg-client-%s.postrm'}
+#
+#    def __init__(self, opkgfile):
+#        UserDict.__init__(self, opkgfile)
+#        basename = opkgfile['basename']
+#        orig = opkgfile['orig']
+#        part = opkgfile['part']
+#        dirname = os.path.dirname(orig)
+#
+#        if (dirname == "scripts"):
+#            try:
+#                self['sourcedest'] = self.scriptsOrigDest[basename] % opkgfile['part']
+#            except KeyError:
+#                self['sourcedest'] = os.path.join("scripts", basename)
+#        elif isinstance(opkgfile, OpkgDoc):
+#            self['sourcedest'] = os.path.join("doc", basename)
+#        elif isinstance(opkgfile, OpkgTest):
+#            self['sourcedest'] = os.path.join("testing", basename)
+#        else:
+#            self['sourcedest'] = orig

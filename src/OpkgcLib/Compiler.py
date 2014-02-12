@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 ###################################################################
 # Copyright (c) 2007 Kerlabs
 #                    Jean Parpaillon <jean.parpaillon@kerlabs.com>
@@ -26,6 +27,7 @@ from OpkgDescription import *
 from PkgDescription import *
 from Rpm import *
 from Deb import *
+from Makefile import *
 
 class Compiler:
     """ main class for compiling for opgks
@@ -43,6 +45,7 @@ class Compiler:
         self.dest_dir = dest_dir
         self.inputdir = inputdir
         self.dist = dist
+        os.chdir(inputdir)
 
     def compile (self, targets):
         """ Compile opkg
@@ -82,6 +85,11 @@ class Compiler:
                      for f in Tools.ls(opkgDesc.opkgdir, exclude=filelist_filter) ]
         Tools.copy(filelist, tardir, exclude='\.svn|.*~$')
 
+	# Creates the Makefile from template (before creating the tarfile.
+        Tools.cheetahCompile(
+            MakeDesc(OpkgDescription(self.inputdir), self.dist),
+            os.path.join(Config().get("GENERAL", "templatedir"), "Makefile.tmpl"),
+            os.path.join(tardir,"Makefile"))
         if not Tools.tar(tarname, [sourcedir], tempdir):
             Logger().error("Error while creating tar file: %s" % tarname)
             raise SystemExit(1)
@@ -138,6 +146,7 @@ class RPMCompiler:
         else:
             specfile = os.path.join(self.getMacro('%_specdir'), "opkg-%s.spec.tmp" % self.opkgName)
             finalspec = os.path.join(self.getMacro('%_specdir'), "opkg-%s.spec" % self.opkgName)
+        # Create the spec finale file from template.
         Tools.cheetahCompile(
             RpmSpec(self.opkgDesc, self.dist),
             os.path.join(Config().get(self.configSection, "templatedir"), "opkg.spec.tmpl"),
@@ -247,56 +256,63 @@ class DebCompiler:
 #        os.chmod (rulescript, 0744)
 
         # Create the debian/rules script
-        source = debiandir + "/rules.in"
-        dest = debiandir + "/rules"
-        shutil.copy(source, dest)
-        os.chmod (dest, 0744)
+        #source = os.path.join(debiandir, "rules.in")
+        #dest = os.path.join(debiandir, "rules")
+        #shutil.copy(source, dest)
+        #os.chmod (dest, 0744)
 
         # Deal with the different post install scripts specific to each part 
         # of the OPKG
-        fl = self.opkgDesc.getScripts()
-        for f in fl:
-            script_name = debDesc.getPkgScript(f)
-            # OPKG script also include scripts that are not related to the 
-            # binary package, so we just ignore those (they just need to be
-            # included into the package at the good location).
-            if (script_name != ""):
-                pkgScript = os.path.join(debiandir, debDesc.getPkgScript(f))
-                # Logger().debug ("--> File: "+f['basename']+" part of "+f['part'])
-                Logger().debug("-> Creating %s" % pkgScript)
-                filelist = open(pkgScript, "a")
-                Logger().debug("--> Adding /"+f['dest'] + "/" + f['basename'])
-                filelist.write("#!/bin/sh\n/%s/%s\n" % (f['dest'], f['basename']))
-                filelist.close()
+#        fl = self.opkgDesc.getScripts()
+#        for f in fl:
+#            script_name = debDesc.getPkgScript(f)
+#            # OPKG script also include scripts that are not related to the 
+#            # binary package, so we just ignore those (they just need to be
+#            # included into the package at the good location).
+#            if (script_name != ""):
+#                pkgScript = os.path.join(debiandir, debDesc.getPkgScript(f))
+#                # Logger().debug ("--> File: "+f['basename']+" part of "+f['part'])
+#                Logger().debug("-> Creating %s" % pkgScript)
+#                filelist = open(pkgScript, "a")
+#                Logger().debug("--> Adding /"+f['dest'] + "/" + f['basename'])
+#                filelist.write("#!/bin/sh\n/%s/%s\n" % (f['dest'], f['basename']))
+#                filelist.close()
 
         # Copy the different scripts at the good location, i.e., in the good
         # directory so it will correctly be included in the appropriate pkg
-        for part in ['api', 'server', 'client']:
-            list = debDesc.getPackageFiles(part)
-            for f in list:
-                Logger().debug("*** Handling "+f['orig']+" (part:"+f['part']+")")
-                if (part == "" or f['part'] == part):
-                    orig = f['orig']
-                    if not os.path.isdir (debiandir):
-                        Logger().debug("Debian directory does not exist(%s)" % debiandir)
-                        sys.exit (1)
-                    if (part == "api"):
-                        dest = debiandir+"/opkg-"+self.opkgName
-                    else:
-                        dest = debiandir+"/opkg-"+self.opkgName+"-"+f['part']
-                    dest = dest+"/usr/lib/oscar/packages/"+self.opkgName
-                    if not os.path.isfile(orig):
-                        Logger().debug("File %s does not exist" % orig)
-                    else:
-                        try:
-                            Logger().debug("Creating %s" % dest)
-                            if not os.path.exists(dest):
-                                os.makedirs (dest)
-                        except:
-                            Logger().debug("ERROR: impossible to create %s" % dest)
-                            sys.exit (1)
-                        Logger().debug("Copy "+orig+" to " + dest)
-                        shutil.copy(orig, dest)
+#        # OL: Should be replaced by make install DESTDIR=./debian/tmp
+#        # OL: Also, .install files should be generated.
+#        for part in ['api', 'server', 'client']:
+#            list = debDesc.getPackageFiles(part)
+#            print "LIST:"
+#            print list
+#            for f in list:
+#                Logger().debug("*** Handling "+f['orig']+" (part:"+f['part']+")")
+#                if (part == "" or f['part'] == part):
+#                    orig = os.path.join(sourcedir, f['orig'])
+#                    itest_d_re = re.compile('\*')
+#                    if itest_d_re.match(orig):
+#                        orig = os.path.dirname(orig)
+#                    if not os.path.isdir (debiandir):
+#                        Logger().debug("Debian directory does not exist(%s)" % debiandir)
+#                        sys.exit (1)
+#                    if (part == "api"):
+#                        dest = os.path.join(debiandir, "opkg-"+self.opkgName)
+#                    else:
+#                        dest = os.path.join(debiandir,"opkg-"+self.opkgName+"-"+f['part'])
+#                    dest = dest+"/usr/lib/oscar/packages/"+self.opkgName
+#                    if not os.path.isfile(orig):
+#                        Logger().debug("File %s does not exist" % orig)
+#                    else:
+#                        try:
+#                            Logger().debug("Creating %s" % dest)
+#                            if not os.path.exists(dest):
+#                                os.makedirs (dest)
+#                        except:
+#                            Logger().debug("ERROR: impossible to create %s" % dest)
+#                            sys.exit (1)
+#                        Logger().debug("Copy "+orig+" to " + dest)
+#                        shutil.copy(orig, dest)
 
         # Since we modified the files from the orig package, we should recreate
         # the .orig.tar.gz file or just delete it. Right now, we just delete it

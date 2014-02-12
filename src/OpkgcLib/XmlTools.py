@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 ###################################################################
 # Copyright (c) 2007 Oak Ridge National Laboratory,
 #                    Geoffroy Vallee <valleegr@ornl.gov>
