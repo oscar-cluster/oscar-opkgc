@@ -66,13 +66,13 @@ rpm_files_sections_list:
 		find scripts/ -type f -printf "/usr/lib/oscar/packages/${name}/%f\n"|grep -v '\.svn' >> opkg-${name}.list; \
 	fi
 	find . -type f -name "config*\.*ml" -printf "/usr/lib/oscar/packages/${name}/%f\n"|grep -v '\.svn' >> opkg-${name}.list
-	if test `ls -A1 doc|testing/apitests.d|wc -l` -gt 0; then \
+	if test `ls -A1 testing/apitests.d|wc -l` -gt 0; then \
 		find testing/apitests.d -type f -printf "/usr/lib/oscar/%h/%f\n"|grep -v '\.svn' >> opkg-${name}.list; \
 	fi
-	if test `ls -A1 doc|testing/tests.d|wc -l` -gt 0; then \
+	if test `ls -A1 testing/tests.d|wc -l` -gt 0; then \
 		find testing/tests.d -type f -printf "/usr/lib/oscar/%h/%f\n"|grep -v '\.svn' >> opkg-${name}.list; \
 	fi
-	if test `ls -A1 doc|testing/data|wc -l` -gt 0; then \
+	if test `ls -A1 testing/data|wc -l` -gt 0; then \
 		(cd testing/data ; find -type f -printf "/usr/lib/oscar/testing/data/${name}/%h/%f\n"|grep -v '\.svn') >> opkg-${name}.list; \
 		(cd testing/data ; find -type d -printf "%%dir /usr/lib/oscar/testing/data/${name}/%h/%f\n"|grep -v '\.svn') >> opkg-${name}.list; \
 	fi
