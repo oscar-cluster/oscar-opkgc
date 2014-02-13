@@ -23,7 +23,10 @@ It includes the opkg-convert tool to convert OSCAR packages from old form to cur
 %setup -q
 
 %build
-./autogen.sh
+if test -x ./autogen.sh
+then
+	./autogen.sh
+fi
 %configure --disable-doc-pdf --enable-doc-html
 
 %{__make} %{?_smp_mflags}
