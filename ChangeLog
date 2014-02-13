@@ -1,3 +1,6 @@
+2.0.1:
+    * Bugfix release.
+
 2.0.0:
     * Major rewrite of the Compiler to adapt to the new apitests filesystem
     structure. Now use Makefile.tmpl so generated packages are the exact same
