@@ -1,4 +1,4 @@
-# Makefile for opkg-$name
+# Makefile for opkg-${name}
 #raw
 #
 # Copyright 2014 CEA
@@ -7,7 +7,7 @@
 #end raw
 
 DESTDIR = 
-OPKG_DIR=/usr/lib/oscar/packages/$name
+OPKG_DIR=/usr/lib/oscar/packages/${name}
 TEST_DIR=/usr/lib/oscar/testing/
 
 all:
@@ -17,8 +17,10 @@ install: deb_dot_install_files rpm_files_sections_list
 	mkdir -p \$(DESTDIR)\$(TEST_DIR)
 	mkdir -p \$(DESTDIR)\$(TEST_DIR)/apitests.d
 	mkdir -p \$(DESTDIR)\$(TEST_DIR)/tests.d
-	mkdir -p \$(DESTDIR)\$(TEST_DIR)/data/$name
-	cp -r ./scripts/*          \$(DESTDIR)\$(OPKG_DIR)/
+	mkdir -p \$(DESTDIR)\$(TEST_DIR)/data/${name}
+	if test `ls -A1 ./scripts/|wc -l` -gt 0; then \
+		cp -r ./scripts/*          \$(DESTDIR)\$(OPKG_DIR)/; \
+	fi
 	cp config*.*ml             \$(DESTDIR)\$(OPKG_DIR)/
 	if test -d testing/apitests.d; then \
 		cp -r testing/apitests.d/* \$(DESTDIR)\$(TEST_DIR)/apitests.d/; \
@@ -27,49 +29,66 @@ install: deb_dot_install_files rpm_files_sections_list
 		cp -r testing/tests.d/*    \$(DESTDIR)\$(TEST_DIR)/tests.d/; \
 	fi
 	if test -d testing/data; then \
-		cp -r testing/data/*       \$(DESTDIR)\$(TEST_DIR)/data/$name/; \
+		cp -r testing/data/*       \$(DESTDIR)\$(TEST_DIR)/data/${name}/; \
 	fi
 
 
 deb_dot_install_files:
 	if test ! -d ./debian; then mkdir ./debian; fi
-	find scripts/ -type f -printf "%h/%f /usr/lib/oscar/packages/$name/\n"|grep -v '\.svn' > debian/opkg-$name\.install
-	find . -type f -name "config*\.*ml" -printf "%f /usr/lib/oscar/packages/$name/\n"|grep -v '\.svn' >> debian/opkg-$name\.install
-	if test -d testing/apitests.d; then \
-		find testing/apitests.d -type f -printf "%h/%f /usr/lib/oscar/%h/\n"|grep -v '\.svn' >> debian/opkg-$name\.install; \
+	touch debian/opkg-${name}.install debian/opkg-${name}-client.install debian/opkg-${name}-server.install
+	if test `ls -A1 scripts/|wc -l` -gt 0; then \
+		find scripts/ -type f -printf "%h/%f /usr/lib/oscar/packages/${name}/\n"|grep -v '\.svn' >> debian/opkg-${name}.install; \
 	fi
-	if test -d testing/tests.d; then \
-		find testing/tests.d -type f -printf "%h/%f /usr/lib/oscar/%h/\n"|grep -v '\.svn' >> debian/opkg-$name\.install; \
+	find . -type f -name "config*\.*ml" -printf "%f /usr/lib/oscar/packages/${name}/\n"|grep -v '\.svn' >> debian/opkg-${name}.install
+	if test `ls -A1 testing/apitests.d|wc -l` -gt 0; then \
+		find testing/apitests.d -type f -printf "%h/%f /usr/lib/oscar/%h/\n"|grep -v '\.svn' >> debian/opkg-${name}.install; \
 	fi
-	if test -d testing/data; then \
-		(cd testing/data ; find  -type f -printf "testing/data/%h/%f /usr/lib/oscar/testing/data/$name/%h/"|grep -v '\.svn') >> debian/opkg-$name\.install; \
+	if test `ls -A1 testing/tests.d|wc -l` -gt 0; then \
+		find testing/tests.d -type f -printf "%h/%f /usr/lib/oscar/%h/\n"|grep -v '\.svn' >> debian/opkg-${name}.install; \
 	fi
-	if test  -d doc; then \
-		find doc -type f -printf "%h/%f\n"|grep -v '\.svn' > debian/opkg-$name\.docs; \
+	if test `ls -A1 testing/data|wc -l` -gt 0; then \
+		(cd testing/data ; find  -type f -printf "testing/data/%h/%f /usr/lib/oscar/testing/data/${name}/%h/"|grep -v '\.svn') >> debian/opkg-${name}.install; \
 	fi
-	grep client-post-install debian/opkg-$name\.install > debian/opkg-$name-client\.install
-	grep server-post-install debian/opkg-$name\.install > debian/opkg-$name-server\.install
-	sed -i -e '/client-post-install/d' -e '/server-post-install/d' debian/opkg-$name\.install
+	if test `ls -A1 doc|wc -l` -gt 0; then \
+		find doc -type f -printf "%h/%f\n"|grep -v '\.svn' > debian/opkg-${name}.docs; \
+	fi
+	if test -f scripts/client-post-install; then \
+		grep client-post-install debian/opkg-${name}.install > debian/opkg-${name}-client.install; \
+	fi
+	if test -f scripts/server-post-install; then \
+		grep server-post-install debian/opkg-${name}\.install > debian/opkg-${name}-server.install; \
+	fi
+	sed -i -e '/client-post-install/d' -e '/server-post-install/d' debian/opkg-${name}.install
 
 rpm_files_sections_list:
-	for i in opkg-$name\.list opkg-$name-client\.list opkg-$name-server\.list ; do echo "%defattr(-,root,root)" > \$\$i; done
-	find scripts/ -type f -printf "/usr/lib/oscar/packages/$name/%f\n"|grep -v '\.svn' >> opkg-$name\.list
-	find . -type f -name "config*\.*ml" -printf "/usr/lib/oscar/packages/$name/%f\n"|grep -v '\.svn' >> opkg-$name\.list
-	if test -d testing/apitests.d; then \
-		find testing/apitests.d -type f -printf "/usr/lib/oscar/%h/%f\n"|grep -v '\.svn' >> opkg-$name\.list; \
+	for i in opkg-${name}.list opkg-${name}-client.list opkg-${name}-server.list ; do echo "%defattr(-,root,root)" > \$\$i; done
+	if test `ls -A1 scripts/|wc -l` -gt 0; then \
+		find scripts/ -type f -printf "/usr/lib/oscar/packages/${name}/%f\n"|grep -v '\.svn' >> opkg-${name}.list; \
 	fi
-	if test -d testing/tests.d; then \
-		find testing/tests.d -type f -printf "/usr/lib/oscar/%h/%f\n"|grep -v '\.svn' >> opkg-$name\.list; \
+	find . -type f -name "config*\.*ml" -printf "/usr/lib/oscar/packages/${name}/%f\n"|grep -v '\.svn' >> opkg-${name}.list
+	if test `ls -A1 doc|testing/apitests.d|wc -l` -gt 0; then \
+		find testing/apitests.d -type f -printf "/usr/lib/oscar/%h/%f\n"|grep -v '\.svn' >> opkg-${name}.list; \
 	fi
-	if test -d testing/data; then \
-		(cd testing/data ; find -type f -printf "/usr/lib/oscar/testing/data/$name/%h/%f\n"|grep -v '\.svn') >> opkg-$name\.list; \
-		(cd testing/data ; find -type d -printf "%%dir /usr/lib/oscar/testing/data/$name/%h/%f\n"|grep -v '\.svn') >> opkg-$name\.list; \
+	if test `ls -A1 doc|testing/tests.d|wc -l` -gt 0; then \
+		find testing/tests.d -type f -printf "/usr/lib/oscar/%h/%f\n"|grep -v '\.svn' >> opkg-${name}.list; \
 	fi
-	if test -d doc; then \
-		find doc -type f -printf "%%doc %h/%f\n"|grep -v '\.svn' >> opkg-$name\.list; \
+	if test `ls -A1 doc|testing/data|wc -l` -gt 0; then \
+		(cd testing/data ; find -type f -printf "/usr/lib/oscar/testing/data/${name}/%h/%f\n"|grep -v '\.svn') >> opkg-${name}.list; \
+		(cd testing/data ; find -type d -printf "%%dir /usr/lib/oscar/testing/data/${name}/%h/%f\n"|grep -v '\.svn') >> opkg-${name}.list; \
 	fi
-	for i in AUTHORS CHANGELOG BUGS NEWS README* TODO ; do if test -f \$\$i; then echo "%doc \$i"; fi; done
-	grep client-post-install opkg-$name\.list >> opkg-$name-client\.list
-	grep server-post-install opkg-$name\.list >> opkg-$name-server\.list
-	sed -i -e '/client-post-install/d' -e '/server-post-install/d' opkg-$name\.list
+	if test `ls -A1 doc|wc -l` -gt 0; then \
+		find doc -type f -printf "%%doc %h/%f\n"|grep -v '\.svn' >> opkg-${name}.list; \
+	fi
+	for i in AUTHORS CHANGELOG BUGS NEWS README* TODO ; do if test -f \$\$i; then echo "%doc \$i" >> opkg-${name}.list; fi; done
+	if test -f scripts/client-post-install; then \
+		grep client-post-install opkg-${name}.list >> opkg-${name}-client.list; \
+	else \
+		touch opkg-${name}-client.list; \
+	fi
+	if test -f scripts/server-post-install; then \
+		grep server-post-install opkg-${name}\.list >> opkg-${name}-server.list; \
+	else \
+		touch opkg-${name}-server.list; \
+	fi
+	sed -i -e '/client-post-install/d' -e '/server-post-install/d' opkg-${name}.list
 

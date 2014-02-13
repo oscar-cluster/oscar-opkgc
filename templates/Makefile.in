@@ -3,7 +3,7 @@
 ### Copyright 2007 INRIA-IRISA
 ###     Jean Parpaillon <jean.parpaillon@irisa.fr>
 ###
-TEMPLATES = debian rpm
+TEMPLATES = debian rpm Makefile.tmpl
 
 DISTFILES = $(TEMPLATES) $(EXTRA_DIST) 
 DISTCLEAN_FILES = $(EXTRA_DISTCLEAN_FILES) Makefile
