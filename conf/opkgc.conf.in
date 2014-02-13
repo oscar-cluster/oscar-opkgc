@@ -1,5 +1,6 @@
 [GENERAL]
 xsdfile: _pkgdatadir_/opkg.xsd
+templatedir: _pkgdatadir_/tmpl
 
 [DEBIAN]
 templatedir: _pkgdatadir_/tmpl/debian
