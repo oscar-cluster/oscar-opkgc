@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        2.0.1
-Release:        1
+Release:        2
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -12,7 +12,7 @@ Source0:        opkgc-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
-BuildRequires:  python-devel, xmlto
+BuildRequires:  python-devel, xmlto, automake, autoconf
 Requires: 	libxslt, python-lxml, python-cheetah
 
 %description
@@ -52,6 +52,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Mon Jun 30 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.1-2
+- Add missing BuildRequires (automake).
 * Wed Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.1-1
 - bugfix release. See ChangeLog.
 * Wed Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.0-1
