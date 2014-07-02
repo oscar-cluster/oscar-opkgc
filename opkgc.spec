@@ -54,9 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Mon Jun 30 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.1-2
 - Add missing BuildRequires (automake).
-* Wed Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.1-1
+* Sun Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.1-1
 - bugfix release. See ChangeLog.
-* Wed Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.0-1
+* Sun Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.0-1
 - Major rewrite of the compiler part to match new apitest filesystem
   hierachy. Now use Makefile.tmpl so deb and rpm sides gets the
   exact same packages.
@@ -100,7 +100,7 @@ rm -rf $RPM_BUILD_ROOT
 - Update from upstream (0.4.1)
 * Tue Nov 13 2007 Jean Parpaillon <jean.parpaillon@kerlabs.com> 0.4-1
 - Update from upstrean (0.4)
-* Mon Sep 13 2007 Jean Parpaillon <jean.parpaillon@irisa.fr> 0.3.2-1
+* Thu Sep 13 2007 Jean Parpaillon <jean.parpaillon@irisa.fr> 0.3.2-1
 - Update from upstream (0.3.2)
 - Fix dependency (libxslt that provides xsltproc, needed by opkg-convert)
 * Mon Aug 6 2007 Jean Parpaillon <jean.parpaillon@irisa.fr> 0.3.1-1
