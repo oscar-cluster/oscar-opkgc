@@ -2,7 +2,7 @@
 
 Name:           opkgc
 Version:        2.0.1
-Release:        2
+Release:        2%{?dist}
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
