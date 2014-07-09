@@ -13,7 +13,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
 BuildRequires:  python-devel, xmlto, automake, autoconf
-Requires: 	libxslt, python-lxml, python-cheetah
+Requires: 	python, libxslt, python-lxml, python-cheetah
 
 %description
 opkgc transform the description of an OSCAR package into a set of native packages (.deb or RPM).
