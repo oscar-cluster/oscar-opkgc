@@ -129,6 +129,11 @@ Nunc rhoncus, felis at tincidunt sollicitudin, diam tellus porttitor augue, sit 
   </apiDeps><!-- optional -->
 
   <changelog>
+    <versionEntry version="2.3.6-5.1">
+      <changelogEntry authorName="Olivier Lahaye" date="2014-07-11T15:25:17+02:00">
+        <item>Rebuild to avoid conflicts with new disttag in rpm distros</item>
+      </changelogEntry>
+    </versionEntry>
     <versionEntry version="2.3.6-5" >
       <changelogEntry authorName="John Foo Jr." date="2006-10-29T13:20:00.000+01:00" >
 	<item>Update from upstream</item>
