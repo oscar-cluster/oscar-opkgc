@@ -1,8 +1,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           opkgc
-Version:        2.0.1
-Release:        2%{?dist}
+Version:        2.0.2
+Release:        1%{?dist}
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -52,6 +52,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Mon Jun 30 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.2-1
+- Fix a bug in spec template (Requires was missing %{?dist})
 * Mon Jun 30 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.1-2
 - Add missing BuildRequires (automake).
 * Sun Jan 12 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.1-1

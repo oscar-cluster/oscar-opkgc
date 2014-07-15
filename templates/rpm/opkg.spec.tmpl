@@ -41,7 +41,7 @@ $description
 Group:          $group:$opkg_class
 Summary:        $summary, server part
 #AutoReqProv: no
-Requires: opkg-$name = $version('upstream')-$version('release')
+Requires: opkg-$name = $version('upstream')-$version('release')%{?dist}
 $depends('serverDeps', 'requires')$depends('serverDeps', 'conflicts')$depends('serverDeps', 'provides')#slurp
 %description server
 $description 
