@@ -1,3 +1,6 @@
+2.0.2:
+    * Add %{?dist} to release in spec template.
+
 2.0.1:
     * Bugfix release.
 
