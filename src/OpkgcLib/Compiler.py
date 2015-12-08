@@ -319,7 +319,8 @@ class DebCompiler:
         os.remove (debtarfile)
 
         # Build targets
-        cmd = "%s -rfakeroot -sa" % self.buildCmd
+        # OL: faikeroot not needed (cmd = "%s -rfakeroot -sa" % self.buildCmd)
+        cmd = "%s -sa" % self.buildCmd
         if 'source' in targets and 'binary' in targets:
             opts = ""
         elif 'source' in targets:
