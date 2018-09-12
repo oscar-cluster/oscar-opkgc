@@ -5,6 +5,9 @@
 #if Logger().isDebug()
     #silent $sys.stderr.write("[DEBUG] Cheetah compil: generating opkg-" + $name + ".spec\n")
 #end if
+
+%global debug_package %{nil}
+
 Summary:        $summary
 Name:           opkg-$name
 Version:        $version('upstream')
