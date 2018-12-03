@@ -11,7 +11,7 @@ XS-Python-Version: >= 2.4
 Package: opkgc
 Architecture: all
 Depends: ${python:Depends}, python-lxml, python-cheetah, dpkg-dev (>= 1.13), make, rpm, xsltproc
-Provides: ${python:Provides}
+#Provides: ${python:Provides}
 XB-Python-Version: ${python:Versions}
 Description: Transform OSCAR Package into .deb or RPM
  opkgc is a tool, written in Python and Cheetah templates, which
