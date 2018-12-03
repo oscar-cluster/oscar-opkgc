@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: OSCAR Core Team <oscar-devel@lists.sourceforge.net>
 Uploaders: Jean Parpaillon <jean.parpaillon@irisa.fr>
 #Build-Depends: debhelper (>= 5), dpkg-dev (>= 1.13), autotools-dev, python-all-dev, python-central (>= 0.5), xmlto, dblatex, rsync, m4
-Build-Depends: debhelper (>= 5), dpkg-dev (>= 1.13), autotools-dev, python-all-dev, xmlto, dblatex, rsync, m4
+Build-Depends: debhelper (>= 5), dpkg-dev (>= 1.13), autotools-dev, python-all-dev, xmlto, dblatex, rsync, m4, dh-python
 Standards-Version: 3.7.2
 XS-Python-Version: >= 2.4
 
