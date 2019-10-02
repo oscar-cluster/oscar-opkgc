@@ -10,7 +10,7 @@ Source0:        opkgc-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
-BuildRequires:  python-devel, xmlto, automake, autoconf
+BuildRequires:  python3-devel, xmlto, automake, autoconf
 Requires: 	python3, libxslt, python3-lxml, python-cheetah
 
 %description
