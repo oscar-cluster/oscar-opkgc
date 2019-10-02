@@ -9,8 +9,8 @@
 ###################################################################
 
 import copy
-from PkgDescription import *
-from OpkgDescription import *
+from .PkgDescription import *
+from .OpkgDescription import *
 
 class MakeDesc(PkgDescription):
     """ Describe Makefile

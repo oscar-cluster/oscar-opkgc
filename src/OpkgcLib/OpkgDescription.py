@@ -12,8 +12,8 @@
 
 import re
 from time import *
-from XmlTools import *
-from Tools import *
+from .XmlTools import *
+from .Tools import *
 
 class OpkgDescription(object):
     """ Description of an opkg
@@ -177,8 +177,7 @@ class ConfigSchema(object):
     def getArchs(self):
         """ Return list of authorized arch filters
         """
-        complexType = filter(lambda x: x.get("name") == "archType",
-                             self.schemaTree.findall("{%s}simpleType" % XmlTools.xsd_uri))[0]
+        complexType = [x for x in self.schemaTree.findall("{%s}simpleType" % XmlTools.xsd_uri) if x.get("name") == "archType"][0]
         archs = [e.get("value")
                  for e in complexType.find("{%s}restriction" % XmlTools.xsd_uri).findall("{%s}enumeration" % XmlTools.xsd_uri)]
 
@@ -240,7 +239,7 @@ class DependsFactory(object):
         self.__loadFromXml__(xmldoc)
 
         # Add OSCAR automatic deps
-        for part in self.partsReqs.keys():
+        for part in list(self.partsReqs.keys()):
             p = PackageDeps(name=self.partsReqs[part],
                             relation='requires',
                             part=part)
@@ -299,13 +298,11 @@ class DependsFactory(object):
     def getPartNames(self):
         schema = XmlTools().getXsdDoc()
         return [e.get("name")
-                for e in filter(lambda x: x.get("type") == "depsListType",
-                                schema.findall('/{%s}element' % XmlTools.xsd_uri))]
+                for e in [x for x in schema.findall('/{%s}element' % XmlTools.xsd_uri) if x.get("type") == "depsListType"]]
 
     def getRelationNames(self):
         schema = XmlTools().getXsdDoc()
-        complexType = filter(lambda x: x.get("name") == "depsListType",
-                             schema.findall('{%s}complexType' % XmlTools.xsd_uri))[0]
+        complexType = [x for x in schema.findall('{%s}complexType' % XmlTools.xsd_uri) if x.get("name") == "depsListType"][0]
         return [e.get("ref")
                 for e in complexType.find('{%s}sequence' % XmlTools.xsd_uri).findall('{%s}element' % XmlTools.xsd_uri)]
 

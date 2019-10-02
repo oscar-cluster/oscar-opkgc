@@ -7,9 +7,9 @@
 # directory of the source
 ###################################################################
 
-from UserDict import UserDict
-from UserList import UserList
-from Logger import *
+from collections import UserDict
+from collections import UserList
+from .Logger import *
 from Cheetah.Template import Template
 import shutil
 import re
@@ -210,7 +210,7 @@ class Tools:
             f = open(dest, 'w')
             f.write(t.respond())
             f.close()
-        except Exception, e :
+        except Exception as e :
             Logger().error(e)
             traceback.print_exc()
             raise SystemExit(1)
@@ -246,7 +246,7 @@ class NoneDict(UserDict):
     def __getitem__(self, key):
         try:
             return UserDict.__getitem__(self, key)
-        except KeyError, e:
+        except KeyError as e:
             return None
 
 class NoneList(UserList):
@@ -270,5 +270,5 @@ class KeyDict(UserDict):
     def __getitem__(self, key):
         try:
             return UserDict.__getitem__(self, key)
-        except KeyError, e:
+        except KeyError as e:
             return key

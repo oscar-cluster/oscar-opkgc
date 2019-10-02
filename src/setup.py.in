@@ -28,5 +28,9 @@ set of RPM or Debian packages.""",
       author_email="oscar-users@lists.sourceforge.net",
       url="http://oscar.openclustergroup.org/comp_opkgc",
       scripts = ['opkgc'],
-      packages = ['OpkgcLib']
+      packages = ['OpkgcLib'],
+      classifiers=[
+          "Programming Language :: Python :: 3",
+          "Operating System :: OS Independent",
+          ],
      )

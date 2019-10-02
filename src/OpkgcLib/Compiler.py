@@ -17,17 +17,17 @@ import sys
 import os
 import re
 import shutil, glob
-import exceptions
+#import exceptions
 import tempfile
-from Config import *
-from Tools import *
-from Logger import *
+from .Config import *
+from .Tools import *
+from .Logger import *
 
-from OpkgDescription import *
-from PkgDescription import *
-from Rpm import *
-from Deb import *
-from Makefile import *
+from .OpkgDescription import *
+from .PkgDescription import *
+from .Rpm import *
+from .Deb import *
+from .Makefile import *
 
 class Compiler:
     """ main class for compiling for opgks
@@ -80,7 +80,7 @@ class Compiler:
         tarname = os.path.join(opkgDesc.opkgdir, tarfile)
         filelist_filter = "SRPMS|distro|%s" % tarname
         
-        os.mkdir(tardir, 0755)
+        os.mkdir(tardir, 0o755)
         filelist = [ os.path.join(opkgDesc.opkgdir, f)
                      for f in Tools.ls(opkgDesc.opkgdir, exclude=filelist_filter) ]
         Tools.copy(filelist, tardir, exclude='\.svn|.*~$')

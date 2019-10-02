@@ -7,9 +7,9 @@
 # directory of the source
 ###################################################################
 
-from PkgDescription import *
-from OpkgDescription import *
-from Logger import *
+from .PkgDescription import *
+from .OpkgDescription import *
+from .Logger import *
 
 class DebDescription(PkgDescription):
     """ Describe Debian packages
@@ -134,7 +134,7 @@ class DebDescription(PkgDescription):
         try:
             (lName, lPath) = self.licenses[out]
             out += ". On Debian GNU/Linux systems, the complete text of the %s can be found in `%s`." % (lName, lPath)
-        except KeyError, e:
+        except KeyError as e:
             pass
         return Tools.align_lines(out, 80)
 
@@ -178,12 +178,12 @@ class DebDescription(PkgDescription):
         """ 
         try:
             return " .\n  %s\n" % Tools.rmNewline(self.configXml['uri'])
-        except Exception, e:
+        except Exception as e:
             return ""
     # Based on the description of a script, we detect which script is
     # suitable for the binary package
     def getPkgScript (self, pkgDesc):
-        list = self.scriptsOrigDest.keys()
+        list = list(self.scriptsOrigDest.keys())
         if (pkgDesc['basename'] in list):
             ret = self.scriptsOrigDest[pkgDesc['basename']] % self.opkgDesc.getPackageName()
         else:

@@ -10,8 +10,8 @@
 ###################################################################
 
 import copy
-from PkgDescription import *
-from OpkgDescription import *
+from .PkgDescription import *
+from .OpkgDescription import *
 
 class RpmSpec(PkgDescription):
     """ Describe RPM packages
@@ -97,7 +97,7 @@ class RpmSpec(PkgDescription):
                         elif version == -1: # still processing generic requirements
                             archout += ', ' # section exists, jsut add a ","
                         pkg_d[self.formatPkg(d)] = 1 # package processed
-                    	archout += self.formatPkg(d)
+                        archout += self.formatPkg(d)
                 if version != -1:
                     archout += "\n%endif\n"
                     archout += "%endif\n"

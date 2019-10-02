@@ -31,7 +31,7 @@ destdircmd=--root=$(DESTDIR)
 endif
 
 all:
-	python setup.py build
+	python3 setup.py build
 
 distdir: $(DISTFILES)
 	for distfile in $(DISTFILES); do \
@@ -45,9 +45,9 @@ distdir: $(DISTFILES)
 	done
 
 install: all
-#	python setup.py install -f --prefix=$(prefix) $(destdircmd) | \
+#	python3 setup.py install -f --prefix=$(prefix) $(destdircmd) | \
 #	  egrep '^copying' | sed -e 's/.*\(\/[a-zA-Z0-9_-.]*\)\s*->\s*\(.*\)/\2\1/' > install.list
-	python setup.py install -f --prefix=$(prefix) $(destdircmd)
+	python3 setup.py install -f --prefix=$(prefix) $(destdircmd)
 	$(install_sh_SCRIPT) opkg-convert $(DESTDIR)$(bindir)
 
 uninstall:
@@ -62,7 +62,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/opkg-convert 
 
 clean:
-	python setup.py clean
+	python3 setup.py clean
 	rm -rf $(CLEAN_FILES) *~ 
 
 distclean: clean

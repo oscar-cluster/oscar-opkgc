@@ -7,8 +7,8 @@
 # directory of the source
 ###################################################################
 
-from Logger import *
-import ConfigParser, os
+from .Logger import *
+import configparser, os
 
 __all__ = ['Config']
 
@@ -24,7 +24,7 @@ class Config(object):
         return cls.__instance
 
     def readConfig (self):
-        self.__config = ConfigParser.ConfigParser()
+        self.__config = configparser.ConfigParser()
         success = self.__config.read(['/etc/opkgc.conf', os.path.expanduser('~/.opkgc'), './opkgc.conf'])
         if len(success) == 0:
             Logger().error("No configuration file found (in /etc/opkgc.conf, ~/.opkgc or ./opkgc.conf)")

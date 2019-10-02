@@ -7,7 +7,7 @@
 # directory of the source
 ###################################################################
 
-import ConfigParser, os
+import configparser, os
 
 __all__ = ['Logger']
 
@@ -36,25 +36,25 @@ class Logger(object):
         return self.__level >= Logger.ERROR
         
     def error(self, msg):
-        print "[ERROR] %s" % msg
+        print("[ERROR] %s" % msg)
 
     def isInfo(self):
         return self.__level >= Logger.INFO
         
     def info(self, msg):
         if self.__level >= Logger.INFO:
-            print "[INFO] %s" % msg
+            print("[INFO] %s" % msg)
 
     def isDebug(self):
         return self.__level >= Logger.DEBUG
         
     def debug(self, msg):
         if self.__level >= Logger.DEBUG:
-            print "[DEBUG] %s" % msg
+            print("[DEBUG] %s" % msg)
 
     def isTrace(self):
         return self.__level >= Logger.TRACE
         
     def trace(self, msg):
         if self.__level >= Logger.TRACE:
-            print "[TRACE] %s" % msg
+            print("[TRACE] %s" % msg)

@@ -14,9 +14,9 @@ import re
 import calendar
 import string
 from time import *
-from Logger import *
-from Tools import *
-from OpkgDescription import *
+from .Logger import *
+from .Tools import *
+from .OpkgDescription import *
 
 class PkgDescription(object):
 
@@ -85,7 +85,7 @@ class PkgDescription(object):
         """
         try:
             return Tools.rmNewline(self.configXml['uri'])
-        except Exception, e:
+        except Exception as e:
             return ""
 
     def copyrights(self, cat):
@@ -125,9 +125,9 @@ class PkgDescription(object):
         'RPM': as output by `date +"%a %b %d %Y"`
         """
         m = self.dateRe.search(date)
-        year = string.atoi(m.group('year'))
-        month = string.atoi(m.group('month'))
-        dom = string.atoi(m.group('day'))
+        year = int(m.group('year'))
+        month = int(m.group('month'))
+        dom = int(m.group('day'))
         if format == 'RFC822':
             date = "%d %s %d" % (dom, calendar.month_abbr[month], year)
             time = "%s:%s" % (m.group('hour'), m.group('min'))

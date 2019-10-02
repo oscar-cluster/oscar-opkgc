@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf8
 
 ###################################################################
@@ -45,32 +45,32 @@ Written by Jean Parpaillon and Geoffroy Vallée.'''
 def usage():
     """ Print command usage
     """
-    print "Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [-V|--version]"
-    print "               [-o|--output=dir] [-i|--input=dir] [--source]"
-    print "               [-q|--quiet] [-v|--verbose]"
-    print "               --dist=targetDist"
-    print ""
-    print "\t--version : print version and exit"
-    print ""
-    print "\t--supported-dist : list supported distributions for --dist option"
-    print "\t--dist           : target distibution"
-    print ""
-    print "\t--source : build only source package"
-    print "\t--input  : opkg directory, default current dir"
-    print "\t--output : build packages in specified dir"
-    print "\t-v       : increase verbosity level (can be repeated)"
-    print "\t-q       : decrease verbosity level"
+    print("Usage: " + sys.argv[0] + " [-h] [-u|--supported-dist] [-V|--version]")
+    print("               [-o|--output=dir] [-i|--input=dir] [--source]")
+    print("               [-q|--quiet] [-v|--verbose]")
+    print("               --dist=targetDist")
+    print("")
+    print("\t--version : print version and exit")
+    print("")
+    print("\t--supported-dist : list supported distributions for --dist option")
+    print("\t--dist           : target distibution")
+    print("")
+    print("\t--source : build only source package")
+    print("\t--input  : opkg directory, default current dir")
+    print("\t--output : build packages in specified dir")
+    print("\t-v       : increase verbosity level (can be repeated)")
+    print("\t-q       : decrease verbosity level")
 
 def printVersion():
-    print version
+    print(version)
     
 def distList():
     """ Print supported target distributions
     """
-    print "Supported target distributions are:"
+    print("Supported target distributions are:")
     for compiler in Compiler.compilers:
         for target in eval(compiler).supportedDist:
-            print target
+            print(target)
 
 def main():
     try:

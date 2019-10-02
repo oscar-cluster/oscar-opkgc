@@ -1,3 +1,9 @@
+opkgc (2.1-1) precise; urgency=low
+
+  * New upstream version.
+
+ -- Olivier Lahaye <olivier.lahaye@cea.fr>  Wed, 02 Oct 2019 15:54:12 +0200
+
 opkgc (2.0.2-1) precise; urgency=low
 
   * New upstream version.

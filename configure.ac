@@ -8,7 +8,7 @@ dnl autoconf version
 AC_PREREQ(2.59)
 
 dnl mandatory stuff
-AC_INIT([opkgc], [2.0.2], [oscar-devel@lists.sourceforge.net])
+AC_INIT([opkgc], [2.1], [oscar-devel@lists.sourceforge.net])
 
 dnl check host and target
 dnl AC_CANONICAL_BUILD
@@ -31,7 +31,7 @@ if test "$RSYNC" = "no"; then
 ])
 fi
 
-AM_PATH_PYTHON([2.3])
+AM_PATH_PYTHON([3])
 
 dnl check documentation tools and options
 AC_ARG_ENABLE([doc-pdf],

@@ -13,10 +13,10 @@
 import sys
 import os
 from lxml import etree
-from StringIO import StringIO
-from Config import *
-from Tools import *
-from Logger import *
+from io import StringIO
+from .Config import *
+from .Tools import *
+from .Logger import *
 
 class XmlTools(object):
     xsd_uri = "http://www.w3.org/2001/XMLSchema"
@@ -51,7 +51,7 @@ class XmlTools(object):
             xml_doc = etree.parse(xml_file, parser_xml)
             xml_file.close()
             Logger().debug("%s loaded" % file)
-        except Exception, e:
+        except Exception as e:
             Logger().error(e)
             raise SystemExit(1)
 
