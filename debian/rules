@@ -60,7 +60,7 @@ binary-common:
 	dh_installchangelogs ChangeLog
 #	dh_installdocs
 #	dh_pycentral # replaced by dh_python2
-	dh_python2
+	dh_python3
 	dh_strip
 	dh_compress -X.py
 	dh_fixperms
