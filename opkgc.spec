@@ -1,5 +1,3 @@
-#{!?python3_sitelib: %define python3_sitelib %(%{__python3} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
-
 Name:           opkgc
 Version:        2.1
 Release:        1%{?dist}
