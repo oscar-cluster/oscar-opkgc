@@ -168,6 +168,8 @@
       Written by Jean Parpaillon
       <email>jean.parpaillon@irisa.fr</email> and Geoffroy Vallée
       <email>valleegr@ornl.gov</email>.
+      Ported to Python3 by Olivier Lahaye
+      <email>olivier.lahaye@cea.fr</email>.
     </para>
     <para>
       From an original idea of Erich Focht.

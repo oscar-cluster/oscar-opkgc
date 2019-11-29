@@ -40,7 +40,8 @@ This is free software.  You may redistribute copies of it under the terms of
 the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.
 There is NO WARRANTY, to the extent permitted by law.
 
-Written by Jean Parpaillon and Geoffroy Vallée.'''
+Written by Jean Parpaillon and Geoffroy Vallée.
+Ported to Python3 by Olivier Lahaye.'''
 
 def usage():
     """ Print command usage
