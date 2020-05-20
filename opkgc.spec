@@ -25,7 +25,7 @@ if test -x ./autogen.sh
 then
 	./autogen.sh
 fi
-%configure --disable-doc-pdf --enable-doc-html
+%configure --disable-doc-pdf --enable-doc-html  --docdir=%{_docdir}/%{name}
 
 %{__make} %{?_smp_mflags}
 
