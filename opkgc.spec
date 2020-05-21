@@ -1,6 +1,8 @@
+%define is_suse %(test -f /etc/SuSE-release && echo 1 || echo 0)
+
 Name:           opkgc
 Version:        2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Compiler for OSCAR package
 
 Group:          Development/Languages
@@ -11,7 +13,13 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
 BuildRequires:  python3-devel, xmlto, automake, autoconf
-Requires: 	python3, libxslt, python3-lxml, python3-cheetah
+Requires: 	python3, libxslt, python3-lxml
+%if 0%{?fedora} >= 16 || 0%{?rhel} >= 6
+Requires:	python3-cheetah
+%endif
+%if 0%{?is_suse}%{?is_opensuse}
+Requires:	python3-Cheetah3
+%endif
 
 %description
 opkgc transform the description of an OSCAR package into a set of native packages (.deb or RPM).
@@ -50,6 +58,8 @@ rm -rf $RPM_BUILD_ROOT
 %config %{_sysconfdir}/opkgc.conf
 
 %changelog
+* Thu May 21 2020 Olivier Lahaye <olivier.lahaye@cea.fr> 2.1-2
+- Add support for openSuSE Leap.
 * Wed Oct 2 2019 Olivier Lahaye <olivier.lahaye@cea.fr> 2.1-1
 - New version ported to python3.
 * Mon Jun 30 2014 Olivier Lahaye <olivier.lahaye@cea.fr> 2.0.2-1
