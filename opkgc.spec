@@ -1,4 +1,6 @@
-%define is_suse %(test -f /etc/SuSE-release && echo 1 || echo 0)
+#define is_suse %(test -f /etc/SuSE-release && echo 1 || echo 0)
+%define is_suse %(grep -E "(suse)" /etc/os-release > /dev/null 2>&1 && echo 1 || echo 0)
+
 
 Name:           opkgc
 Version:        2.1
