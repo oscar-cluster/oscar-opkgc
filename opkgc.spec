@@ -14,10 +14,10 @@ Source0:        opkgc-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
-BuildRequires:  python3-devel, xmlto, automake, autoconf
-Requires: 	python3, libxslt, python3-lxml
+BuildRequires:  python%{python3_pkgversion}-devel, xmlto, automake, autoconf
+Requires: 	python%{python3_pkgversion}, libxslt, python%{python3_pkgversion}-lxml
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 6
-Requires:	python3-cheetah
+Requires:	python%{python3_pkgversion}-cheetah
 %endif
 %if 0%{?is_suse}%{?is_opensuse}
 Requires:	python3-Cheetah3
