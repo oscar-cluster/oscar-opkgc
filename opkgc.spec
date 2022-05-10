@@ -1,6 +1,8 @@
 #define is_suse %(test -f /etc/SuSE-release && echo 1 || echo 0)
 %define is_suse %(grep -E "(suse)" /etc/os-release > /dev/null 2>&1 && echo 1 || echo 0)
 
+# If python3_pkgversion is not defined, then set it to 3 (e.g. OpenSuSE)
+%{!?python3_pkgversion: %define python3_pkgversion 3}
 
 Name:           opkgc
 Version:        2.1
