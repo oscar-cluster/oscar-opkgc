@@ -226,9 +226,9 @@ class ChangelogCEntry(UserDict):
 class DependsFactory(object):
     """ Store an retrieve package dependancy informations
     """
-    partsReqs = {"clientDeps":"oscar-base-client",
-                 "apiDeps":"oscar-base",
-                 "serverDeps":"oscar-base-server"}
+    partsReqs = {"clientDeps":"liboscar-client",
+                 "apiDeps":"oscar-data",
+                 "serverDeps":"liboscar-server"}
 
     packageDeps = None
     filters = None

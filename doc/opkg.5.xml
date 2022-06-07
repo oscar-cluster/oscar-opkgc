@@ -370,7 +370,7 @@
 
       <para>
 	<command>opkg-&lt;package&gt;-server</command> depends on
-	<command>oscar-base-server</command> package plus other
+	<command>liboscar-server</command> package plus other
 	specified packages, if any. It is installed on the server. Its
 	main goal is to describe dependancies for server side of the
 	software. It may also contain post installation or removal
@@ -383,7 +383,7 @@
 
       <para>
 	<command>opkg-&lt;package&gt;-client</command> depends on
-	<command>oscar-base-client</command> package plus other
+	<command>liboscar-client</command> package plus other
 	specified packages, if any. It is installed on the client nodes
 	image. Its main goal is to describe dependancies for client side
 	of the software. It may also contain post installation or
