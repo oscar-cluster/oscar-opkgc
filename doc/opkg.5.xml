@@ -358,7 +358,7 @@
 
       <para>
 	<command>opkg-&lt;package&gt;</command> depends on
-	<command>oscar-base</command> package plus other specified
+	<command>oscar-core</command> package plus other specified
 	packages, if any. It is installed on the server. It contains
 	various scripts to execute on the OSCAR server before or after
 	other packahes have been installed. 
