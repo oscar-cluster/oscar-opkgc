@@ -69,7 +69,7 @@ class RpmSpec(PkgDescription):
             if len(deps) != 0: # if there are some dependencies
                 archout = ""
                 if arch != None: # if there is a specific arch, report it
-                    archout += "%%if %%{_build_arch} == %s\n" % arch
+                    archout += "%%if \"%%{_build_arch}\" == \"%s\"\n" % arch
                 pkg_d = {} # memory for processed deps
                 ver_d = {} # flags for each filters. (if not in: create section)
                 version=-1 # no version for generic requirements.
@@ -86,7 +86,7 @@ class RpmSpec(PkgDescription):
                                 if xx not in ver_d:   # 1st time we see this version => create section
                                     ver_d[xx] = 1     # remember section created
                                     xx = self.replace_comp_sign(xx) # convert comparison sign
-                                    archout += "\n%%if %%{%s}" % distro_d[x['name']]
+                                    archout += "\n%%if \"%%{%s}\"" % distro_d[x['name']]
                                     archout += "\n%%define is_version %%(test %%{vtag} %s && echo 1 || echo 0)" % xx
                                     archout += "\n%if %{is_version}\n"
                                     archout += "%s: " % self.dependsName[relation]
