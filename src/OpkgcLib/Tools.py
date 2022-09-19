@@ -125,6 +125,7 @@ class Tools:
                                stdin=None,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
+                               universal_newlines=True,
                                shell=True)
         if Logger().isDebug():
             for l in exe.stdout:
