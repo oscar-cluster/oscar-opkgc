@@ -9,7 +9,7 @@ Requirements
 ------------
 
 opkgc depends on:
-- Python (>= 2.4)
+- Python (>= 3.0)
 - lxml
 - Cheetah template engine
 - dblatex (for PDF documentation)
