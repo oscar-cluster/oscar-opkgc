@@ -130,7 +130,12 @@ class RPMCompiler:
         if not os.path.exists(sourcedir):
             os.makedirs(sourcedir)
         Logger().debug("Copying %s to %s" % (tarfile, sourcedir))
-        shutil.copy(tarfile, sourcedir)
+        try:
+            shutil.copy(tarfile, sourcedir)
+        except PermissionError:
+            Logger().error("Permission denied.")
+        except:
+            Logger().error("Error occurred while copying %s to %s" % (tarfile, sourcedir))
 
         # Create SPECS dir and create spec file
         specdir = self.getMacro('%_specdir')
